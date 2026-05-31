@@ -3,6 +3,10 @@ import app from "./app.js";
 import { env } from "./config/env.js";
 import { prisma } from "./config/prisma.js";
 
+BigInt.prototype.toJSON = function () {
+  return this.toString();
+};
+
 const start = async () => {
   try {
     // Test DB connection

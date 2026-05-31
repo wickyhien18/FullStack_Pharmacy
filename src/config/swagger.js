@@ -1,5 +1,11 @@
 import swaggerJsdoc from "swagger-jsdoc";
 
+// Gộp tất cả docs lại
+const paths = {
+  // ...authDocs,      ← thêm dần khi làm phase 2
+  // ...medicineDocs,
+};
+
 const options = {
   definition: {
     openapi: "3.0.0",
@@ -18,8 +24,9 @@ const options = {
         },
       },
     },
+    paths,
   },
-  apis: ["./src/routes/*.js"], // Swagger đọc comment từ các file route
+  apis: [], // để trống vì không dùng JSDoc nữa
 };
 
 export const swaggerSpec = swaggerJsdoc(options);
