@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-function requireEnv(key: string): string {
+function requireEnv(key) {
   const val = process.env[key];
   if (!val) throw new Error(`Missing required environment variable: ${key}`);
   return val;

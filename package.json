@@ -1,6 +1,7 @@
 {
   "name": "pharmacy-js",
   "version": "1.0.0",
+  "type": "module",
   "description": "Pharmacy E-Commerce API - inspired by NhathuocLongChau",
   "main": "src/server.js",
   "scripts": {

@@ -1,17 +1,15 @@
-import { Request, Response, NextFunction } from 'express';
-import { ZodSchema, ZodError } from 'zod';
-import { sendError } from '../utils/response';
+import { sendError } from '../utils/response.js';
 
 // Zod validation middleware
 export const validate =
-  (schema: ZodSchema, target: 'body' | 'query' | 'params' = 'body') =>
-  (req: Request, res: Response, next: NextFunction) => {
+  (schema, target = 'body') =>
+  (req, res, next) => {
     try {
       const result = schema.parse(req[target]);
       req[target] = result;
       return next();
     } catch (err) {
-      if (err instanceof ZodError) {
+      if (err && err.errors) {
         const errors = err.errors.map((e) => ({
           field: e.path.join('.'),
           message: e.message,

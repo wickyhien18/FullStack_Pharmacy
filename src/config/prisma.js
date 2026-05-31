@@ -1,8 +1,8 @@
 import { PrismaClient } from '@prisma/client';
-import { env } from './env';
+import { env } from './env.js';
 
 // Singleton — tránh nhiều connection khi hot reload dev
-const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
+const globalForPrisma = globalThis;
 
 export const prisma =
   globalForPrisma.prisma ||
