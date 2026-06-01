@@ -1,7 +1,7 @@
 import "dotenv/config";
-import app from "../app.js";
-import { env } from "./env.js";
-import { prisma } from "./prisma.js";
+import app from "./app.js";
+import { env } from "./config/env.js";
+import { prisma } from "./config/prisma.js";
 
 BigInt.prototype.toJSON = function () {
   return this.toString();

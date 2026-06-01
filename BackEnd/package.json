@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "description": "Pharmacy E-Commerce API - inspired by NhathuocLongChau",
-  "main": "src/config/database.js",
+  "main": "src/server.js ",
   "author": "Wicky Hien",
   "license": "MIT",
   "repository": {
@@ -11,8 +11,8 @@
     "url": "https://github.com/wickyhien18/FullStack_Pharmacy"
   },
   "scripts": {
-    "dev": "nodemon src/config/database.js",
-    "start": "node src/config/database.js",
+    "dev": "nodemon src/server.js ",
+    "start": "node src/server.js ",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio"
