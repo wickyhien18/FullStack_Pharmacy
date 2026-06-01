@@ -1,0 +1,195 @@
+// ================================================================
+// Prisma Schema — Future Extensions (Mở rộng tương lai)
+// Chưa dùng — copy từng model vào schema.prisma khi cần
+// ================================================================
+
+// ── ENUMs mới ────────────────────────────────────────────────────
+
+enum CouponTypeEnum {
+  PERCENT
+  FIXED
+  @@map("coupon_type_enum")
+}
+
+enum OtpPurposeEnum {
+  REGISTER
+  RESET_PASSWORD
+  VERIFY_EMAIL
+  VERIFY_PHONE
+  @@map("otp_purpose_enum")
+}
+
+enum PrescriptionStatusEnum {
+  PENDING
+  APPROVED
+  REJECTED
+  @@map("prescription_status_enum")
+}
+
+// ── 1. Address ───────────────────────────────────────────────────
+model Address {
+  addressId BigInt   @id @default(autoincrement()) @map("address_id")
+  userId    BigInt   @map("user_id")
+  receiver  String   @db.VarChar(255)
+  phone     String   @db.VarChar(20)
+  province  String   @db.VarChar(100)
+  district  String   @db.VarChar(100)
+  ward      String   @db.VarChar(100)
+  street    String   @db.VarChar(500)
+  isDefault Boolean  @default(false) @map("is_default")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@map("addresses")
+}
+
+// ── 2. MedicineImage ─────────────────────────────────────────────
+model MedicineImage {
+  imageId    BigInt  @id @default(autoincrement()) @map("image_id")
+  medicineId BigInt  @map("medicine_id")
+  url        String  @db.VarChar(500)
+  isPrimary  Boolean @default(false) @map("is_primary")
+  sortOrder  Int     @default(0) @map("sort_order")
+
+  medicine Medicine @relation(fields: [medicineId], references: [medicineId], onDelete: Cascade)
+
+  @@map("medicine_images")
+}
+
+// ── 3. Review ────────────────────────────────────────────────────
+model Review {
+  reviewId   BigInt   @id @default(autoincrement()) @map("review_id")
+  userId     BigInt   @map("user_id")
+  medicineId BigInt   @map("medicine_id")
+  orderId    BigInt?  @map("order_id")
+  rating     Int
+  title      String?  @db.VarChar(255)
+  content    String?  @db.Text
+  isVerified Boolean  @default(false) @map("is_verified")
+  isVisible  Boolean  @default(true) @map("is_visible")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  user     User     @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  medicine Medicine @relation(fields: [medicineId], references: [medicineId], onDelete: Cascade)
+  order    Order?   @relation(fields: [orderId], references: [orderId], onDelete: SetNull)
+
+  @@unique([userId, medicineId], name: "uk_user_medicine_review")
+  @@map("reviews")
+}
+
+// ── 4. Coupon + CouponUsage ──────────────────────────────────────
+model Coupon {
+  couponId      BigInt         @id @default(autoincrement()) @map("coupon_id")
+  code          String         @unique @db.VarChar(50)
+  name          String         @db.VarChar(255)
+  description   String?        @db.Text
+  type          CouponTypeEnum
+  value         Decimal        @db.Decimal(15, 2)
+  minOrderValue Decimal        @default(0) @map("min_order_value") @db.Decimal(15, 2)
+  maxDiscount   Decimal?       @map("max_discount") @db.Decimal(15, 2)
+  usageLimit    Int?           @map("usage_limit")
+  usedCount     Int            @default(0) @map("used_count")
+  perUserLimit  Int            @default(1) @map("per_user_limit")
+  isActive      Boolean        @default(true) @map("is_active")
+  startAt       DateTime       @map("start_at")
+  expireAt      DateTime       @map("expire_at")
+  createdAt     DateTime       @default(now()) @map("created_at")
+
+  usages CouponUsage[]
+
+  @@map("coupons")
+}
+
+model CouponUsage {
+  usageId  BigInt   @id @default(autoincrement()) @map("usage_id")
+  couponId BigInt   @map("coupon_id")
+  userId   BigInt   @map("user_id")
+  orderId  BigInt?  @map("order_id")
+  usedAt   DateTime @default(now()) @map("used_at")
+
+  coupon Coupon @relation(fields: [couponId], references: [couponId], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@map("coupon_usages")
+}
+
+// ── 5. Otp ───────────────────────────────────────────────────────
+model Otp {
+  otpId     BigInt         @id @default(autoincrement()) @map("otp_id")
+  userId    BigInt?        @map("user_id")
+  email     String         @db.VarChar(255)
+  code      String         @db.VarChar(10)
+  purpose   OtpPurposeEnum
+  isUsed    Boolean        @default(false) @map("is_used")
+  expireAt  DateTime       @map("expire_at")
+  createdAt DateTime       @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@map("otps")
+}
+
+// ── 6. Wishlist ──────────────────────────────────────────────────
+model Wishlist {
+  wishlistId BigInt   @id @default(autoincrement()) @map("wishlist_id")
+  userId     BigInt   @map("user_id")
+  medicineId BigInt   @map("medicine_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user     User     @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  medicine Medicine @relation(fields: [medicineId], references: [medicineId], onDelete: Cascade)
+
+  @@unique([userId, medicineId], name: "uk_wishlist")
+  @@map("wishlists")
+}
+
+// ── 7. Notification ──────────────────────────────────────────────
+// Kết hợp Socket.io ở Phase 4
+model Notification {
+  notificationId BigInt   @id @default(autoincrement()) @map("notification_id")
+  userId         BigInt   @map("user_id")
+  title          String   @db.VarChar(255)
+  content        String   @db.Text
+  type           String   @db.VarChar(50)  // ORDER_STATUS | PROMOTION | SYSTEM
+  referenceId    BigInt?  @map("reference_id")
+  isRead         Boolean  @default(false) @map("is_read")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+// ── 8. Banner ────────────────────────────────────────────────────
+model Banner {
+  bannerId  BigInt    @id @default(autoincrement()) @map("banner_id")
+  title     String    @db.VarChar(255)
+  imageUrl  String    @map("image_url") @db.VarChar(500)
+  link      String?   @db.VarChar(500)
+  sortOrder Int       @default(0) @map("sort_order")
+  isActive  Boolean   @default(true) @map("is_active")
+  startAt   DateTime? @map("start_at")
+  expireAt  DateTime? @map("expire_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  @@map("banners")
+}
+
+// ── 9. PrescriptionUpload ────────────────────────────────────────
+model PrescriptionUpload {
+  prescriptionId BigInt                  @id @default(autoincrement()) @map("prescription_id")
+  userId         BigInt                  @map("user_id")
+  imageUrl       String                  @map("image_url") @db.VarChar(500)
+  status         PrescriptionStatusEnum  @default(PENDING)
+  note           String?                 @db.Text
+  reviewedBy     BigInt?                 @map("reviewed_by")
+  reviewedAt     DateTime?               @map("reviewed_at")
+  createdAt      DateTime                @default(now()) @map("created_at")
+
+  user     User  @relation("UserPrescriptions", fields: [userId], references: [userId], onDelete: Cascade)
+  reviewer User? @relation("ReviewerPrescriptions", fields: [reviewedBy], references: [userId], onDelete: SetNull)
+
+  @@map("prescription_uploads")
+}
