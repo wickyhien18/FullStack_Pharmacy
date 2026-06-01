@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "type": "module",
   "description": "Pharmacy E-Commerce API - inspired by NhathuocLongChau",
-  "main": "BackEnd/src/server.js",
+  "main": "src/server.js",
   "scripts": {
-    "dev": "nodemon BackEnd/src/server.js",
-    "start": "node BackEnd/src/server.js",
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio"
