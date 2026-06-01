@@ -20,8 +20,6 @@ import { errorHandler, notFound } from "./middlewares/error.middleware.js";
 
 const app = express();
 
-// ── Swagger UI ───────────────────────────────────────────────────
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // ── Security ─────────────────────────────────────────────────────
 app.use(helmet());
 app.use(
@@ -55,7 +53,8 @@ if (env.isDev) app.use(morgan("dev"));
 app.get("/health", (_req, res) => {
   res.json({ success: true, message: "API is running", env: env.NODE_ENV });
 });
-
+// ── Swagger UI ───────────────────────────────────────────────────
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // ── Routes ────────────────────────────────────────────────────────
 // app.use('/api/auth',      authRoutes);
 // app.use('/api/medicines', medicineRoutes);
