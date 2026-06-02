@@ -347,42 +347,42 @@ INSERT INTO categories (name, slug) VALUES
 INSERT INTO medicines (name, slug, description, price, unit, category_id, manufacturer_id, status)
 VALUES
     ('Smecta 3g', 'smecta-3g',
-     N'Điều trị tiêu chảy cấp và mãn tính', 85000, 'Hộp 30 gói',
+     N'Điều trị tiêu chảy cấp và mãn tính', 85000, N'Hộp 30 gói',
      (SELECT category_id FROM categories WHERE slug = 'thuoc-tieu-hoa'),
      (SELECT manufacturer_id FROM manufacturers WHERE name = 'Ipsen Pharma'), 'ACTIVE'),
 
     ('Motilium-M 10mg', 'motilium-m-10mg',
-     N'Điều trị buồn nôn, nôn, đầy bụng', 120000, 'Hộp 30 viên',
+     N'Điều trị buồn nôn, nôn, đầy bụng', 120000, N'Hộp 30 viên',
      (SELECT category_id FROM categories WHERE slug = 'thuoc-tieu-hoa'),
      (SELECT manufacturer_id FROM manufacturers WHERE name = 'Janssen'), 'ACTIVE'),
 
     ('Vitamin C 1000mg Redoxon', 'vitamin-c-1000mg-redoxon',
-     N'Bổ sung vitamin C, tăng sức đề kháng', 180000, 'Hộp 10 ống sủi',
+     N'Bổ sung vitamin C, tăng sức đề kháng', 180000, N'Hộp 10 ống sủi',
      (SELECT category_id FROM categories WHERE slug = 'vitamin-khoang-chat'),
      (SELECT manufacturer_id FROM manufacturers WHERE name = 'Bayer'), 'ACTIVE'),
 
     ('Centrum Silver', 'centrum-silver',
-     N'Vitamin tổng hợp cho người trên 50 tuổi', 450000, 'Hộp 30 viên',
+     N'Vitamin tổng hợp cho người trên 50 tuổi', 450000, N'Hộp 30 viên',
      (SELECT category_id FROM categories WHERE slug = 'vitamin-khoang-chat'),
      (SELECT manufacturer_id FROM manufacturers WHERE name = 'Pfizer'), 'ACTIVE'),
 
     ('Blackmores Fish Oil 1000mg', 'blackmores-fish-oil-1000mg',
-     N'Omega-3 hỗ trợ tim mạch và não bộ', 320000, 'Hộp 60 viên',
+     N'Omega-3 hỗ trợ tim mạch và não bộ', 320000, N'Hộp 60 viên',
      (SELECT category_id FROM categories WHERE slug = 'vitamin-khoang-chat'),
      (SELECT manufacturer_id FROM manufacturers WHERE name = 'Blackmores'), 'ACTIVE'),
 
     ('Tiffy Forte', 'tiffy-forte',
-     N'Điều trị cảm cúm, sổ mũi, nghẹt mũi', 45000, 'Hộp 24 viên',
+     N'Điều trị cảm cúm, sổ mũi, nghẹt mũi', 45000, N'Hộp 24 viên',
      (SELECT category_id FROM categories WHERE slug = 'thuoc-ho-hap'),
      (SELECT manufacturer_id FROM manufacturers WHERE name = 'Dược Hậu Giang'), 'ACTIVE'),
 
     ('Broncol 5mg', 'broncol-5mg',
-     N'Điều trị ho, long đờm', 78000, 'Hộp 20 viên',
+     N'Điều trị ho, long đờm', 78000, N'Hộp 20 viên',
      (SELECT category_id FROM categories WHERE slug = 'thuoc-ho-hap'),
      (SELECT manufacturer_id FROM manufacturers WHERE name = 'Dược Hậu Giang'), 'ACTIVE'),
 
-    ('Máy đo huyết áp Omron HEM-7120', 'may-do-huyet-ap-omron-7120',
-     N'Đo huyết áp bắp tay tự động, kết quả chính xác', 890000, 'Cái',
+    (N'Máy đo huyết áp Omron HEM-7120', 'may-do-huyet-ap-omron-7120',
+     N'Đo huyết áp bắp tay tự động, kết quả chính xác', 890000, N'Cái',
      (SELECT category_id FROM categories WHERE slug = 'thiet-bi-y-te'),
      (SELECT manufacturer_id FROM manufacturers WHERE name = 'Omron'), 'ACTIVE');
 
