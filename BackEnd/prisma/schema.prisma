@@ -73,7 +73,7 @@ model Medicine {
   image          String?        @db.VarChar(500)
   description    String?
   price          Decimal        @db.Decimal(15, 2)
-  unit           String?        @default("H?p") @db.VarChar(50)
+  unit           String?        @default("Hộp") @db.VarChar(50)
   categoryId     BigInt?        @map("category_id")
   manufacturerId BigInt?        @map("manufacturer_id")
   status         String?        @default("ACTIVE") @db.VarChar(255)
@@ -82,7 +82,6 @@ model Medicine {
   updatedAt      DateTime?      @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
   deletedAt      DateTime?      @map("deleted_at") @db.Timestamp(6)
   cartItems      CartItem[]
-  inventories    inventories?
   inventory      Inventory?
   inventoryLogs  InventoryLog[]
   category       Category?      @relation(fields: [categoryId], references: [categoryId], onUpdate: NoAction)
@@ -212,14 +211,6 @@ model Shipment {
   order        Order     @relation(fields: [orderId], references: [orderId], onDelete: Cascade, onUpdate: NoAction)
 
   @@map("shipments")
-}
-
-model inventories {
-  inventory_id BigInt    @id @default(autoincrement())
-  last_updated DateTime? @db.Timestamp(6)
-  quantity     Int
-  medicine_id  BigInt    @unique(map: "uki72bfidak1wnqg22a6js1okjx")
-  medicines    Medicine  @relation(fields: [medicine_id], references: [medicineId], onDelete: NoAction, onUpdate: NoAction, map: "fkesc1pe7l0fpyrlrvkqh52d4gm")
 }
 
 enum MedicineStatus {

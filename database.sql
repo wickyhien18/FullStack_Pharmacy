@@ -9,6 +9,9 @@ CREATE DATABASE PharmacyDB
 
 \c PharmacyDB;
 
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+
 -- ----------------------------------------------------------------
 -- Custom ENUM types (PostgreSQL không inline ENUM trong CREATE TABLE)
 -- ----------------------------------------------------------------
