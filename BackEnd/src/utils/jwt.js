@@ -1,20 +1,17 @@
-import jwt from 'jsonwebtoken';
-import { env } from '../config/env.js';
+import jwt from "jsonwebtoken";
+import crypto from "crypto";
+import { env } from "../config/env.js";
 
 export const generateTokens = (payload) => {
-  const accessToken = jwt.sign(payload, env.JWT_ACCESS_SECRET, {
+  return jwt.sign(payload, env.JWT_ACCESS_SECRET, {
     expiresIn: env.JWT_ACCESS_EXPIRES,
   });
-  const refreshToken = jwt.sign(payload, env.JWT_REFRESH_SECRET, {
-    expiresIn: env.JWT_REFRESH_EXPIRES,
-  });
-  return { accessToken, refreshToken };
+};
+
+export const generateRefreshToken = () => {
+  return crypto.randomBytes(64).toString("hex");
 };
 
 export const verifyAccessToken = (token) => {
   return jwt.verify(token, env.JWT_ACCESS_SECRET);
-};
-
-export const verifyRefreshToken = (token) => {
-  return jwt.verify(token, env.JWT_REFRESH_SECRET);
 };
