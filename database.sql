@@ -128,7 +128,7 @@ CREATE TABLE medicines (
     image           VARCHAR(500)     NULL,
     description     TEXT             NULL,
     price           NUMERIC(15,2)    NOT NULL,
-    unit            VARCHAR(50)      DEFAULT 'Hộp',
+    unit            VARCHAR(50)      DEFAULT N'Hộp',
     category_id     BIGINT           NULL,
     manufacturer_id BIGINT           NULL,
     status          medicine_status  DEFAULT 'ACTIVE',
@@ -308,81 +308,81 @@ INSERT INTO roles (role_name) VALUES ('ROLE_CUSTOMER'), ('ROLE_ADMIN'), ('ROLE_P
 INSERT INTO users (user_name, password, full_name, email, phone, role_id)
 SELECT 'admin',
        '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy',
-       'Quản trị viên', 'admin@pharmacy.vn', '0900000000', role_id
+       N'Quản trị viên', 'admin@pharmacy.vn', '0900000000', role_id
 FROM roles WHERE role_name = 'ROLE_ADMIN';
 
 INSERT INTO users (user_name, password, full_name, email, phone, role_id)
 SELECT 'wicky',
        '$2a$10$s8XCruq912V8s9qDmswh0uCBkaKyKa6c84svh753usl1ysqh/6CvW',
-       'Wicky White', 'wicky@gmail.com', '0812099286', role_id
+       N'Wicky White', 'wicky@gmail.com', '0812099286', role_id
 FROM roles WHERE role_name = 'ROLE_ADMIN';
 
 INSERT INTO users (user_name, password, full_name, email, phone, role_id)
 SELECT 'giaphien',
        '$2a$10$OJT.ies8HZksnB28yS5lduxCddwTIO.4QVLVBNR2oBj5F.G4JMNk.',
-       'Giáp Minh Hiển', 'hien@gmail.com', '0977711418', role_id
+       N'Giáp Minh Hiển', 'hien@gmail.com', '0977711418', role_id
 FROM roles WHERE role_name = 'ROLE_CUSTOMER';
 
 -- Manufacturers
 INSERT INTO manufacturers (name, country) VALUES
-                                              ('Ipsen Pharma',     'Pháp'),
-                                              ('Bayer',            'Đức'),
-                                              ('Janssen',          'Bỉ'),
-                                              ('Pfizer',           'Mỹ'),
-                                              ('Blackmores',       'Úc'),
-                                              ('Dược Hậu Giang',   'Việt Nam'),
-                                              ('Traphaco',         'Việt Nam'),
-                                              ('Omron',            'Nhật Bản');
+                                              ('Ipsen Pharma',     N'Pháp'),
+                                              ('Bayer',            N'Đức'),
+                                              ('Janssen',          N'Bỉ'),
+                                              ('Pfizer',           N'Mỹ'),
+                                              ('Blackmores',       N'Úc'),
+                                              ('Dược Hậu Giang',   N'Việt Nam'),
+                                              ('Traphaco',         N'Việt Nam'),
+                                              ('Omron',            N'Nhật Bản');
 
 -- Categories
 INSERT INTO categories (name, slug) VALUES
-                                        ('Thuốc tiêu hoá',        'thuoc-tieu-hoa'),
-                                        ('Vitamin & Khoáng chất', 'vitamin-khoang-chat'),
-                                        ('Thuốc hô hấp',          'thuoc-ho-hap'),
-                                        ('Thuốc tim mạch',        'thuoc-tim-mach'),
-                                        ('Dược mỹ phẩm',          'duoc-my-pham'),
-                                        ('Thiết bị y tế',         'thiet-bi-y-te');
+                                        (N'Thuốc tiêu hoá',        'thuoc-tieu-hoa'),
+                                        (N'Vitamin & Khoáng chất', 'vitamin-khoang-chat'),
+                                        (N'Thuốc hô hấp',          'thuoc-ho-hap'),
+                                        (N'Thuốc tim mạch',        'thuoc-tim-mach'),
+                                        (N'Dược mỹ phẩm',          'duoc-my-pham'),
+                                        (N'Thiết bị y tế',         'thiet-bi-y-te');
 
 -- Medicines
 INSERT INTO medicines (name, slug, description, price, unit, category_id, manufacturer_id, status)
 VALUES
     ('Smecta 3g', 'smecta-3g',
-     'Điều trị tiêu chảy cấp và mãn tính', 85000, 'Hộp 30 gói',
+     N'Điều trị tiêu chảy cấp và mãn tính', 85000, 'Hộp 30 gói',
      (SELECT category_id FROM categories WHERE slug = 'thuoc-tieu-hoa'),
      (SELECT manufacturer_id FROM manufacturers WHERE name = 'Ipsen Pharma'), 'ACTIVE'),
 
     ('Motilium-M 10mg', 'motilium-m-10mg',
-     'Điều trị buồn nôn, nôn, đầy bụng', 120000, 'Hộp 30 viên',
+     N'Điều trị buồn nôn, nôn, đầy bụng', 120000, 'Hộp 30 viên',
      (SELECT category_id FROM categories WHERE slug = 'thuoc-tieu-hoa'),
      (SELECT manufacturer_id FROM manufacturers WHERE name = 'Janssen'), 'ACTIVE'),
 
     ('Vitamin C 1000mg Redoxon', 'vitamin-c-1000mg-redoxon',
-     'Bổ sung vitamin C, tăng sức đề kháng', 180000, 'Hộp 10 ống sủi',
+     N'Bổ sung vitamin C, tăng sức đề kháng', 180000, 'Hộp 10 ống sủi',
      (SELECT category_id FROM categories WHERE slug = 'vitamin-khoang-chat'),
      (SELECT manufacturer_id FROM manufacturers WHERE name = 'Bayer'), 'ACTIVE'),
 
     ('Centrum Silver', 'centrum-silver',
-     'Vitamin tổng hợp cho người trên 50 tuổi', 450000, 'Hộp 30 viên',
+     N'Vitamin tổng hợp cho người trên 50 tuổi', 450000, 'Hộp 30 viên',
      (SELECT category_id FROM categories WHERE slug = 'vitamin-khoang-chat'),
      (SELECT manufacturer_id FROM manufacturers WHERE name = 'Pfizer'), 'ACTIVE'),
 
     ('Blackmores Fish Oil 1000mg', 'blackmores-fish-oil-1000mg',
-     'Omega-3 hỗ trợ tim mạch và não bộ', 320000, 'Hộp 60 viên',
+     N'Omega-3 hỗ trợ tim mạch và não bộ', 320000, 'Hộp 60 viên',
      (SELECT category_id FROM categories WHERE slug = 'vitamin-khoang-chat'),
      (SELECT manufacturer_id FROM manufacturers WHERE name = 'Blackmores'), 'ACTIVE'),
 
     ('Tiffy Forte', 'tiffy-forte',
-     'Điều trị cảm cúm, sổ mũi, nghẹt mũi', 45000, 'Hộp 24 viên',
+     N'Điều trị cảm cúm, sổ mũi, nghẹt mũi', 45000, 'Hộp 24 viên',
      (SELECT category_id FROM categories WHERE slug = 'thuoc-ho-hap'),
      (SELECT manufacturer_id FROM manufacturers WHERE name = 'Dược Hậu Giang'), 'ACTIVE'),
 
     ('Broncol 5mg', 'broncol-5mg',
-     'Điều trị ho, long đờm', 78000, 'Hộp 20 viên',
+     N'Điều trị ho, long đờm', 78000, 'Hộp 20 viên',
      (SELECT category_id FROM categories WHERE slug = 'thuoc-ho-hap'),
      (SELECT manufacturer_id FROM manufacturers WHERE name = 'Dược Hậu Giang'), 'ACTIVE'),
 
     ('Máy đo huyết áp Omron HEM-7120', 'may-do-huyet-ap-omron-7120',
-     'Đo huyết áp bắp tay tự động, kết quả chính xác', 890000, 'Cái',
+     N'Đo huyết áp bắp tay tự động, kết quả chính xác', 890000, 'Cái',
      (SELECT category_id FROM categories WHERE slug = 'thiet-bi-y-te'),
      (SELECT manufacturer_id FROM manufacturers WHERE name = 'Omron'), 'ACTIVE');
 
