@@ -1,4 +1,4 @@
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
 import { env } from "../config/env.js";
 import * as jwt from "../utils/jwt.js";
 import * as authRepository from "../repositories/auth.repository.js";
@@ -70,7 +70,6 @@ export const register = async ({
 };
 
 export const login = async ({ email, password }) => {
-  console.time("login");
   const user = await authRepository.findUserByEmail(email);
   if (!user) throw { status: 401, message: "Invalid email or password" };
   if (!user.isActive) throw { status: 403, message: "Account is inactive" };
@@ -85,7 +84,6 @@ export const login = async ({ email, password }) => {
 
   await authRepository.saveRefreshToken(user.userId, refreshToken, expireAt);
   await authRepository.updateLastActivity(user.userId);
-  console.timeEnd("login");
   return { accessToken, refreshToken, user: formatUser(user) };
 };
 

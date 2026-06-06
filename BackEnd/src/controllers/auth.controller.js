@@ -29,7 +29,9 @@ export const login = async (req, res) => {
     );
     res.cookie(REFRESH_TOKEN_COOKIE, refreshToken, cookieOptions);
     return sendSuccess(res, { accessToken, user }, "Login successful");
-  } catch (error) {}
+  } catch (error) {
+    sendError(res, error.message, error.status || 500);
+  }
 };
 
 export const refreshToken = async (req, res) => {
