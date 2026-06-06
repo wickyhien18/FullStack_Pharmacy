@@ -133,7 +133,7 @@ export const logoutAll = async (userId) => {
   await authRepository.deleteRefreshTokensByUserId(userId);
 };
 
-export const getCurrentUser = async (userId) => {
+export const getProfile = async (userId) => {
   const user = await authRepository.findUserById(userId);
   if (!user) throw { status: 404, message: "User not found" };
   if (!user.isActive) throw { status: 403, message: "Account is inactive" };

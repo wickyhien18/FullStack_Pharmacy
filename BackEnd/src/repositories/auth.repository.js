@@ -29,7 +29,7 @@ export const findUserById = (userId) => {
 
 export const createUser = (userData) => {
   return prisma.user.create({
-    userData,
+    data: userData,
     include: { role: true },
   });
 };
