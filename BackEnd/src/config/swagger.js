@@ -1,5 +1,5 @@
 import swaggerJsdoc from "swagger-jsdoc";
-import authDocs from "../docs/auth.docs.js";
+import { authDocs } from "../docs/auth.docs.js";
 
 // Gộp tất cả docs lại
 const paths = {
