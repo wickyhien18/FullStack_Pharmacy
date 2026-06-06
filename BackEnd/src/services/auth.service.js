@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import * as jwt from "../utils/jwt.js";
 import * as authRepository from "../repositories/auth.repository.js";
 
