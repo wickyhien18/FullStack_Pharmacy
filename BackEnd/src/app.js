@@ -11,6 +11,8 @@ import { swaggerSpec } from "./config/swagger.js";
 import { env } from "./config/env.js";
 import { errorHandler, notFound } from "./middlewares/error.middleware.js";
 
+import authRoutes from "./routes/auth.routes.js";
+
 // --- Import routes (thêm dần khi làm Phase 2) ---
 // import authRoutes     from './routes/auth.routes.js';
 // import medicineRoutes from './routes/medicine.routes.js';
