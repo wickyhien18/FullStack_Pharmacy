@@ -1,4 +1,5 @@
 import bcrypt from "bcryptjs";
+import { env } from "../config/env.js";
 import * as jwt from "../utils/jwt.js";
 import * as authRepository from "../repositories/auth.repository.js";
 
@@ -32,19 +33,23 @@ export const register = async ({
   phone,
   password,
 }) => {
-  const existEmail = await authRepository.findUserByEmail(email);
-  if (existEmail) throw { status: 409, message: "Email already exists" };
-
-  const existUserName = await authRepository.findUserByUserName(userName);
-  if (existUserName) throw { status: 409, message: "Username already exists" };
-
-  const existPhone = await authRepository.findUserByPhone(phone);
-  if (existPhone) throw { status: 409, message: "Phone number already exists" };
+  const existingUser = await authRepository.existUser(email, userName, phone);
+  if (existingUser) {
+    if (existingUser.email === email) {
+      throw { status: 400, message: "Email already in use" };
+    }
+    if (existingUser.userName === userName) {
+      throw { status: 400, message: "Username already in use" };
+    }
+    if (existingUser.phone === phone) {
+      throw { status: 400, message: "Phone number already in use" };
+    }
+  }
 
   const role = await authRepository.findRoleByName("ROLE_CUSTOMER");
   if (!role) throw { status: 500, message: "Role not found" };
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const hashedPassword = await bcrypt.hash(password, env.BCRYPT_ROUNDS);
   const user = await authRepository.createUser({
     userName,
     fullName,
@@ -60,7 +65,7 @@ export const register = async ({
   const expireAt = getRefreshTokenExpiry();
 
   await authRepository.saveRefreshToken(user.userId, refreshToken, expireAt);
-  authRepository.updateLastLogin(user.userId);
+  await authRepository.updateLastActivity(user.userId);
   return { accessToken, refreshToken, user: formatUser(user) };
 };
 
@@ -78,7 +83,7 @@ export const login = async ({ email, password }) => {
   const expireAt = getRefreshTokenExpiry();
 
   await authRepository.saveRefreshToken(user.userId, refreshToken, expireAt);
-  authRepository.updateLastLogin(user.userId);
+  await authRepository.updateLastActivity(user.userId);
   return { accessToken, refreshToken, user: formatUser(user) };
 };
 

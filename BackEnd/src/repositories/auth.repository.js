@@ -36,7 +36,15 @@ export const createUser = (userData) => {
 
 export const findRoleByName = (name) => {
   return prisma.role.findUnique({
-    where: { name },
+    where: { roleName: name },
+  });
+};
+
+export const existUser = (email, userName, phone) => {
+  return prisma.user.findFirst({
+    where: {
+      OR: [{ email }, { userName }, { phone }],
+    },
   });
 };
 
@@ -44,15 +52,15 @@ export const saveRefreshToken = (userId, refreshToken, expiresAt) => {
   return prisma.refreshToken.create({
     data: {
       userId,
-      refreshToken,
-      expiresAt,
+      token: refreshToken,
+      expireAt: expiresAt,
     },
   });
 };
 
 export const findRefreshToken = (refreshToken) => {
   return prisma.refreshToken.findUnique({
-    where: { refreshToken },
+    where: { token: refreshToken },
     include: {
       user: {
         include: { role: true },
@@ -63,7 +71,7 @@ export const findRefreshToken = (refreshToken) => {
 
 export const deleteRefreshToken = (refreshToken) => {
   return prisma.refreshToken.delete({
-    where: { refreshToken },
+    where: { token: refreshToken },
   });
 };
 
