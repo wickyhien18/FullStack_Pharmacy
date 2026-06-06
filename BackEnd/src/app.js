@@ -58,7 +58,7 @@ app.get("/health", (_req, res) => {
 // ── Swagger UI ───────────────────────────────────────────────────
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // ── Routes ────────────────────────────────────────────────────────
-// app.use('/api/auth',      authRoutes);
+app.use("/api/auth", authRoutes);
 // app.use('/api/medicines', medicineRoutes);
 // app.use('/api/cart',      cartRoutes);
 // app.use('/api/orders',    orderRoutes);
