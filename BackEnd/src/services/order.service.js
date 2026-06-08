@@ -1,11 +1,10 @@
 // ================================================================
-// order.service.js — Business logic cho orders
+// order.service.js — v2, khớp 100% với schema hiện tại
 // ================================================================
 import { prisma } from "../config/prisma.js";
 import * as orderRepo from "../repositories/order.repository.js";
 import { buildPaginatedResponse } from "../utils/pagination.js";
 
-// Tạo mã đơn hàng dạng: ORD-20240615-XXXXX
 const generateOrderCode = () => {
   const date = new Date().toISOString().slice(0, 10).replace(/-/g, "");
   const random = Math.random().toString(36).substring(2, 7).toUpperCase();
@@ -16,9 +15,6 @@ const formatOrder = (order) => ({
   orderId: order.orderId.toString(),
   orderCode: order.orderCode,
   totalPrice: Number(order.totalPrice),
-  originalPrice: Number(order.originalPrice || order.totalPrice),
-  discountAmount: Number(order.discountAmount || 0),
-  paymentMethod: order.paymentMethod,
   orderStatus: order.orderStatus,
   paymentStatus: order.paymentStatus,
   shippingAddress: order.shippingAddress,
@@ -26,25 +22,21 @@ const formatOrder = (order) => ({
   createdAt: order.createdAt,
   items: order.items?.map((i) => ({
     orderItemId: i.orderItemId.toString(),
-    medicineName: i.medicineName || "Sản phẩm không còn tồn tại",
-    medicineUnit: i.medicineUnit,
+    // Lấy từ relation thay vì column snapshot (không có trong schema)
+    medicineName: i.medicine?.name || "Sản phẩm không còn tồn tại",
+    medicineUnit: i.medicine?.unit || "Hộp",
     quantity: i.quantity,
     unitPrice: Number(i.unitPrice),
     totalPrice: Number(i.totalPrice),
   })),
 });
 
-// Tạo đơn hàng
-export const createOrder = async (
-  userId,
-  { items, shippingAddress, paymentMethod, note },
-) => {
+export const createOrder = async (userId, { items, shippingAddress, note }) => {
   if (!items?.length)
     throw { status: 400, message: "Đơn hàng không có sản phẩm" };
   if (!shippingAddress)
     throw { status: 400, message: "Vui lòng nhập địa chỉ giao hàng" };
 
-  // Tính tổng tiền — lấy giá thật từ DB tránh client gửi giá giả
   const medicineIds = items.map((i) => BigInt(i.medicineId));
   const medicines = await prisma.medicine.findMany({
     where: { medicineId: { in: medicineIds }, deletedAt: null },
@@ -59,22 +51,23 @@ export const createOrder = async (
     return sum + Number(med.price) * item.quantity;
   }, 0);
 
-  const orderCode = generateOrderCode();
-
   const order = await orderRepo.createOrder({
     userId: BigInt(userId),
-    orderCode,
+    orderCode: generateOrderCode(),
     items: items.map((i) => ({ ...i, medicineId: BigInt(i.medicineId) })),
     shippingAddress,
-    paymentMethod: paymentMethod || "COD",
     note,
     totalPrice,
+    // paymentMethod bỏ vì không có trong schema
   });
 
-  return { orderId: order.orderId.toString(), orderCode, totalPrice };
+  return {
+    orderId: order.orderId.toString(),
+    orderCode: order.orderCode,
+    totalPrice,
+  };
 };
 
-// Lấy lịch sử đơn hàng
 export const getMyOrders = async (userId, { page, limit, skip }) => {
   const [orders, total] = await Promise.all([
     orderRepo.findOrdersByUser(BigInt(userId), { skip, limit }),
@@ -83,7 +76,6 @@ export const getMyOrders = async (userId, { page, limit, skip }) => {
   return buildPaginatedResponse(orders.map(formatOrder), total, page, limit);
 };
 
-// Lấy chi tiết đơn hàng
 export const getOrderDetail = async (orderId, userId) => {
   const order = await orderRepo.findOrderById(BigInt(orderId), BigInt(userId));
   if (!order) throw { status: 404, message: "Không tìm thấy đơn hàng" };
