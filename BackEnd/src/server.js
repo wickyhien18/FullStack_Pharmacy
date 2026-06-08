@@ -8,20 +8,27 @@ BigInt.prototype.toJSON = function () {
 };
 
 const start = async () => {
-  try {
-    // Test DB connection
-    await prisma.$connect();
-    console.log("[DB] Connected to PostgreSQL (Supabase)");
-
-    app.listen(env.PORT, () => {
-      console.log(`[Server] Running on http://localhost:${env.PORT}`);
-      console.log(`[Server] Environment: ${env.NODE_ENV}`);
-    });
-  } catch (err) {
-    console.error("[Server] Failed to start:", err);
-    await prisma.$disconnect();
-    process.exit(1);
+  // Thử kết nối tối đa 3 lần
+  for (let i = 1; i <= 3; i++) {
+    try {
+      await prisma.$connect();
+      console.log("[DB] Connected to PostgreSQL (Supabase)");
+      break; // kết nối được thì thoát vòng lặp
+    } catch (err) {
+      console.log(`[DB] Attempt ${i} failed, retrying...`);
+      if (i === 3) {
+        console.error("[Server] Failed to start:", err);
+        process.exit(1);
+      }
+      // Chờ 2 giây trước khi thử lại
+      await new Promise((r) => setTimeout(r, 2000));
+    }
   }
+
+  app.listen(env.PORT, () => {
+    console.log(`[Server] Running on http://localhost:${env.PORT}`);
+    console.log(`[Server] Environment: ${env.NODE_ENV}`);
+  });
 };
 
 // Graceful shutdown
