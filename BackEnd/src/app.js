@@ -12,13 +12,13 @@ import { env } from "./config/env.js";
 import { errorHandler, notFound } from "./middlewares/error.middleware.js";
 
 import authRoutes from "./routes/auth.routes.js";
+import medicineRoutes from "./routes/medicine.routes.js";
+import orderRoutes from "./routes/order.routes.js";
+import adminRoutes from "./routes/admin.routes.js";
+import categoryRoutes from "./routes/category.routes.js";
 
 // --- Import routes (thêm dần khi làm Phase 2) ---
-// import authRoutes     from './routes/auth.routes.js';
-// import medicineRoutes from './routes/medicine.routes.js';
 // import cartRoutes     from './routes/cart.routes.js';
-// import orderRoutes    from './routes/order.routes.js';
-// import adminRoutes    from './routes/admin.routes.js';
 
 const app = express();
 
@@ -58,10 +58,11 @@ app.get("/health", (_req, res) => {
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // ── Routes ────────────────────────────────────────────────────────
 app.use("/api/auth", authRoutes);
-// app.use('/api/medicines', medicineRoutes);
+app.use("/api/medicines", medicineRoutes);
+app.use("/api/categories", categoryRoutes);
 // app.use('/api/cart',      cartRoutes);
-// app.use('/api/orders',    orderRoutes);
-// app.use('/api/admin',     adminRoutes);
+app.use("/api/orders", orderRoutes);
+app.use("/api/admin", adminRoutes);
 
 // ── Error handling ────────────────────────────────────────────────
 app.use(notFound);
