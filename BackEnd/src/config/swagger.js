@@ -1,10 +1,15 @@
 import swaggerJsdoc from "swagger-jsdoc";
 import { authDocs } from "../docs/auth.docs.js";
+import { medicineDocs } from "../docs/medicine.docs.js";
+import { orderDocs } from "../docs/order.docs.js";
+import { adminDocs } from "../docs/admin.docs.js";
 
 // Gộp tất cả docs lại
 const paths = {
   ...authDocs,
-  // ...medicineDocs,
+  ...medicineDocs,
+  ...orderDocs,
+  ...adminDocs,
 };
 
 const options = {
