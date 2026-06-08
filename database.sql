@@ -81,6 +81,14 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION set_last_updated()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.last_updated = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE TRIGGER trg_users_updated_at
     BEFORE UPDATE ON users
     FOR EACH ROW EXECUTE FUNCTION set_updated_at();
@@ -161,9 +169,9 @@ CREATE TABLE inventory (
     FOREIGN KEY (medicine_id) REFERENCES medicines(medicine_id) ON DELETE CASCADE
 );
 
-CREATE TRIGGER trg_inventory_last_updated
+CREATE OR REPLACE TRIGGER trg_inventory_last_updated
     BEFORE UPDATE ON inventory
-    FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+    FOR EACH ROW EXECUTE FUNCTION set_last_updated();
 
 -- ----------------------------------------------------------------
 -- 8. INVENTORY_LOGS
