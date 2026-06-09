@@ -76,7 +76,7 @@ export const register = async ({
 };
 
 // ── LOGIN ─────────────────────────────────────────────────────────
-export const login = async (email, password, userAgent) => {
+export const login = async ({ email, password }, userAgent) => {
   const user = await authRepository.findUserByEmail(email);
   if (!user) throw { status: 401, message: "Email hoặc mật khẩu không đúng" };
   if (!user.isActive) throw { status: 403, message: "Tài khoản đang bị khóa" };

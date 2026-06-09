@@ -1,8 +1,8 @@
 import { prisma } from "../config/prisma.js";
 
-export const findUserByEmail = (email) => {
+export const findUserByEmail = (mail) => {
   return prisma.user.findUnique({
-    where: { email },
+    where: { email: mail },
     include: { role: true },
   });
 };
@@ -43,7 +43,7 @@ export const findRoleByName = (name) => {
 // Tìm token theo device — để biết device này đã login chưa
 export const findTokenByDevice = (userId, deviceInfo) => {
   return prisma.refreshToken.findFirst({
-    where: { userId, deviceInfo },
+    where: { userId, deviceInfo: deviceInfo },
   });
 };
 
