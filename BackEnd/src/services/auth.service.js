@@ -36,7 +36,7 @@ export const getDeviceInfo = (req) => {
 
 // ── GET MY DEVICES ────────────────────────────────────────────────
 export const getMyDevices = async (userId) => {
-  const tokens = await authRepo.findAllTokensByUser(BigInt(userId));
+  const tokens = await authRepository.findAllTokensByUser(BigInt(userId));
   return tokens.map((t) => ({
     id: t.id.toString(),
     deviceInfo: t.deviceInfo,
@@ -98,7 +98,7 @@ export const login = async ({ email, password }, deviceInfo) => {
   const expireAt = getRefreshTokenExpiry();
 
   // Tìm xem device này đã có token chưa (đã login trước, chưa logout)
-  const existingToken = await authRepo.findTokenByDevice(
+  const existingToken = await authRepository.findTokenByDevice(
     user.userId,
     deviceInfo,
   );
@@ -106,14 +106,14 @@ export const login = async ({ email, password }, deviceInfo) => {
   if (existingToken) {
     // Device đã login, chưa logout
     // → cập nhật nội dung token + gia hạn thời gian, GIỮ NGUYÊN id
-    await authRepo.updateRefreshTokenById(
+    await authRepository.updateRefreshTokenById(
       existingToken.id,
       refreshToken,
       expireAt,
     );
   } else {
     // Device mới hoàn toàn → tạo record mới
-    await authRepo.saveRefreshToken(
+    await authRepository.saveRefreshToken(
       user.userId,
       refreshToken,
       expireAt,
@@ -147,7 +147,7 @@ export const refreshToken = async (refreshToken) => {
 
   // Rotate: cập nhật nội dung token + gia hạn thêm 7 ngày
   // Giữ nguyên id + deviceInfo — chỉ đổi token string + expireAt
-  await authRepo.updateRefreshTokenById(tokenData.id, newToken, expireAt);
+  await authRepository.updateRefreshTokenById(tokenData.id, newToken, expireAt);
 
   const accessToken = jwt.generateAccessTokens(
     buildTokenPayload(tokenData.user),
