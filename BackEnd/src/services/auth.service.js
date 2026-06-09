@@ -34,6 +34,18 @@ export const getDeviceInfo = (req) => {
   return `${ua} | ${ip}`;
 };
 
+// ── GET MY DEVICES ────────────────────────────────────────────────
+export const getMyDevices = async (userId) => {
+  const tokens = await authRepo.findAllTokensByUser(BigInt(userId));
+  return tokens.map((t) => ({
+    id: t.id.toString(),
+    deviceInfo: t.deviceInfo,
+    createdAt: t.createdAt,
+    expireAt: t.expireAt,
+  }));
+};
+
+// ── REGISTER ──────────────────────────────────────────────────────
 export const register = async ({
   userName,
   fullName,
@@ -44,18 +56,18 @@ export const register = async ({
   const existingUser = await authRepository.existUser(email, userName, phone);
   if (existingUser) {
     if (existingUser.email === email) {
-      throw { status: 400, message: "Email already in use" };
+      throw { status: 400, message: "Email đã được sử dụng" };
     }
     if (existingUser.userName === userName) {
-      throw { status: 400, message: "Username already in use" };
+      throw { status: 400, message: "Tên đăng nhập đã được sử dụng" };
     }
     if (existingUser.phone === phone) {
-      throw { status: 400, message: "Phone number already in use" };
+      throw { status: 400, message: "Số điện thoại đã được sử dụng" };
     }
   }
 
   const role = await authRepository.findRoleByName("ROLE_CUSTOMER");
-  if (!role) throw { status: 500, message: "Role not found" };
+  if (!role) throw { status: 500, message: "Không tìm thấy role mặc định" };
 
   const hashedPassword = await bcrypt.hash(password, env.BCRYPT_ROUNDS);
   const user = await authRepository.createUser({
@@ -67,89 +79,108 @@ export const register = async ({
     roleId: role.roleId,
   });
 
-  const payload = buildTokenPayload(user);
-  const accessToken = jwt.generateAccessTokens(payload);
-  const refreshToken = jwt.generateRefreshToken();
-  const expireAt = getRefreshTokenExpiry();
-
-  await authRepository.saveRefreshToken(user.userId, refreshToken, expireAt);
-  await authRepository.updateLastActivity(user.userId);
-  return { accessToken, refreshToken, user: formatUser(user) };
+  return { user: formatUser(user) };
 };
 
-export const login = async ({ email, password }) => {
+// ── LOGIN ─────────────────────────────────────────────────────────
+export const login = async ({ email, password }, deviceInfo) => {
   const user = await authRepository.findUserByEmail(email);
-  if (!user) throw { status: 401, message: "Invalid email or password" };
-  if (!user.isActive) throw { status: 403, message: "Account is inactive" };
+  if (!user) throw { status: 401, message: "Email hoặc mật khẩu không đúng" };
+  if (!user.isActive) throw { status: 403, message: "Tài khoản đang bị khóa" };
 
   const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) throw { status: 401, message: "Invalid email or password" };
+  if (!isMatch)
+    throw { status: 401, message: "Email hoặc mật khẩu không đúng" };
 
   const payload = buildTokenPayload(user);
   const accessToken = jwt.generateAccessTokens(payload);
   const refreshToken = jwt.generateRefreshToken();
   const expireAt = getRefreshTokenExpiry();
 
-  await authRepository.saveRefreshToken(user.userId, refreshToken, expireAt);
+  // Tìm xem device này đã có token chưa (đã login trước, chưa logout)
+  const existingToken = await authRepo.findTokenByDevice(
+    user.userId,
+    deviceInfo,
+  );
+
+  if (existingToken) {
+    // Device đã login, chưa logout
+    // → cập nhật nội dung token + gia hạn thời gian, GIỮ NGUYÊN id
+    await authRepo.updateRefreshTokenById(
+      existingToken.id,
+      refreshToken,
+      expireAt,
+    );
+  } else {
+    // Device mới hoàn toàn → tạo record mới
+    await authRepo.saveRefreshToken(
+      user.userId,
+      refreshToken,
+      expireAt,
+      deviceInfo,
+    );
+  }
   await authRepository.updateLastActivity(user.userId);
   return { accessToken, refreshToken, user: formatUser(user) };
 };
 
 export const refreshToken = async (refreshToken) => {
   if (!refreshToken)
-    throw { status: 401, message: "Refresh token is required" };
+    throw { status: 401, message: "Refresh token không tồn tại" };
 
   const tokenData = await authRepository.findRefreshToken(refreshToken);
-  if (!tokenData) throw { status: 401, message: "Invalid refresh token" };
+  if (!tokenData) throw { status: 401, message: "Refresh token không hợp lệ" };
 
   if (tokenData.expireAt && tokenData.expireAt < new Date()) {
     await authRepository.deleteRefreshToken(refreshToken);
     throw {
       status: 401,
-      message: "Refresh token has expired. Please log in again.",
+      message: "Refresh token đã hết hạn, vui lòng đăng nhập lại",
     };
   }
 
   if (!tokenData.user.isActive)
-    throw { status: 403, message: "Account is inactive" };
+    throw { status: 403, message: "Tài khoản đang bị khóa" };
 
-  const payload = buildTokenPayload(tokenData.user);
-  const accessToken = jwt.generateAccessTokens(payload);
-  await authRepository.deleteRefreshToken(refreshToken);
-  const newRefreshToken = jwt.generateRefreshToken();
+  const newToken = jwt.generateRefreshToken();
   const expireAt = getRefreshTokenExpiry();
 
-  await authRepository.saveRefreshToken(
-    tokenData.user.userId,
-    newRefreshToken,
-    expireAt,
+  // Rotate: cập nhật nội dung token + gia hạn thêm 7 ngày
+  // Giữ nguyên id + deviceInfo — chỉ đổi token string + expireAt
+  await authRepo.updateRefreshTokenById(tokenData.id, newToken, expireAt);
+
+  const accessToken = jwt.generateAccessTokens(
+    buildTokenPayload(tokenData.user),
   );
 
   return {
     accessToken,
-    refreshToken: newRefreshToken,
+    refreshToken: newToken,
     user: formatUser(tokenData.user),
   };
 };
 
+// ── LOGOUT ────────────────────────────────────────────────────────
 export const logout = async (refreshToken) => {
   if (!refreshToken)
-    throw { status: 401, message: "Refresh token is required" };
+    throw { status: 400, message: "Refresh token không tồn tại" };
 
   const tokenData = await authRepository.findRefreshToken(refreshToken);
-  if (!tokenData) throw { status: 401, message: "Invalid refresh token" };
+  if (!tokenData) throw { status: 400, message: "Refresh token không hợp lệ" };
 
   await authRepository.deleteRefreshToken(refreshToken);
 };
 
+// ── LOGOUT ALL DEVICES ────────────────────────────────────────────
 export const logoutAll = async (userId) => {
   await authRepository.deleteRefreshTokensByUserId(userId);
 };
 
+// ── GET PROFILE ───────────────────────────────────────────────────
 export const getProfile = async (userId) => {
   const user = await authRepository.findUserById(userId);
-  if (!user) throw { status: 404, message: "User not found" };
-  if (!user.isActive) throw { status: 403, message: "Account is inactive" };
+  if (!user) throw { status: 404, message: "Không tìm thấy người dùng" };
+  if (!user.isActive) throw { status: 403, message: "Tài khoản đang bị khóa" };
 
   return formatUser(user);
 };
