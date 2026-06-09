@@ -79,16 +79,6 @@ export const existUser = (email, userName, phone) => {
   });
 };
 
-export const saveRefreshToken = (userId, refreshToken, expiresAt) => {
-  return prisma.refreshToken.create({
-    data: {
-      userId,
-      token: refreshToken,
-      expireAt: expiresAt,
-    },
-  });
-};
-
 export const findRefreshToken = (refreshToken) => {
   return prisma.refreshToken.findUnique({
     where: { token: refreshToken },
