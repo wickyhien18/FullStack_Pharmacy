@@ -79,17 +79,6 @@ export const existUser = (email, userName, phone) => {
   });
 };
 
-export const findRefreshToken = (refreshToken) => {
-  return prisma.refreshToken.findUnique({
-    where: { token: refreshToken },
-    include: {
-      user: {
-        include: { role: true },
-      },
-    },
-  });
-};
-
 export const deleteRefreshToken = (refreshToken) => {
   return prisma.refreshToken.delete({
     where: { token: refreshToken },
