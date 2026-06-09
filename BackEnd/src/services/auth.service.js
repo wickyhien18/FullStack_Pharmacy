@@ -26,6 +26,14 @@ const buildTokenPayload = (user) => ({
   role: user.role ? user.role.roleName : "ROLE_CUSTOMER",
 });
 
+// Lấy deviceInfo từ User-Agent + IP
+// Dùng để phân biệt các thiết bị / browser khác nhau
+export const getDeviceInfo = (req) => {
+  const ua = (req.headers["user-agent"] || "unknown").substring(0, 100);
+  const ip = req.ip || req.socket?.remoteAddress || "unknown";
+  return `${ua} | ${ip}`;
+};
+
 export const register = async ({
   userName,
   fullName,

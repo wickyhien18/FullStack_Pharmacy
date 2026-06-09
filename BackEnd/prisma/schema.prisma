@@ -43,7 +43,7 @@ model RefreshToken {
   userId      BigInt    @map("user_id")
   expireAt    DateTime? @map("expire_at") @db.Timestamp(6)
   createdAt   DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
-  device_info String?   @db.VarChar(255)
+  deviceInfo  String?   @map("device_info") @db.VarChar(255)  // ← thêm dòng này
   user        User      @relation(fields: [userId], references: [userId], onDelete: Cascade, onUpdate: NoAction)
 
   @@map("refresh_tokens")
