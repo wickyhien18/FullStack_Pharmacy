@@ -21,9 +21,12 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
-    const { accessToken, refreshToken, user } = await authService.login(
-      req.body,
-    );
+    const userAgent = req.headers["user-agent"];
+
+    const { accessToken, refreshToken, user } = await authService.login({
+      ...req.body,
+      userAgent,
+    });
     res.cookie(REFRESH_TOKEN_COOKIE, refreshToken, cookieOptions);
     return sendSuccess(res, { accessToken, user }, "Login successful");
   } catch (error) {

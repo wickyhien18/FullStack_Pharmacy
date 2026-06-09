@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import { env } from "../config/env.js";
 import * as jwt from "../utils/jwt.js";
+import { getDeviceInfo } from "../utils/device.js";
 import * as authRepository from "../repositories/auth.repository.js";
 
 const getRefreshTokenExpiry = () => {
@@ -25,14 +26,6 @@ const buildTokenPayload = (user) => ({
   userName: user.userName,
   role: user.role ? user.role.roleName : "ROLE_CUSTOMER",
 });
-
-// Lấy deviceInfo từ User-Agent + IP
-// Dùng để phân biệt các thiết bị / browser khác nhau
-export const getDeviceInfo = (req) => {
-  const ua = (req.headers["user-agent"] || "unknown").substring(0, 100);
-  const ip = req.ip || req.socket?.remoteAddress || "unknown";
-  return `${ua} | ${ip}`;
-};
 
 // ── GET MY DEVICES ────────────────────────────────────────────────
 export const getMyDevices = async (userId) => {
@@ -83,7 +76,7 @@ export const register = async ({
 };
 
 // ── LOGIN ─────────────────────────────────────────────────────────
-export const login = async ({ email, password }, deviceInfo) => {
+export const login = async (email, password, userAgent) => {
   const user = await authRepository.findUserByEmail(email);
   if (!user) throw { status: 401, message: "Email hoặc mật khẩu không đúng" };
   if (!user.isActive) throw { status: 403, message: "Tài khoản đang bị khóa" };
@@ -92,6 +85,7 @@ export const login = async ({ email, password }, deviceInfo) => {
   if (!isMatch)
     throw { status: 401, message: "Email hoặc mật khẩu không đúng" };
 
+  const deviceInfo = getDeviceInfo(userAgent);
   const payload = buildTokenPayload(user);
   const accessToken = jwt.generateAccessTokens(payload);
   const refreshToken = jwt.generateRefreshToken();
