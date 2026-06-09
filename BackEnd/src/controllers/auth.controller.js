@@ -12,10 +12,7 @@ const cookieOptions = {
 
 export const register = async (req, res) => {
   try {
-    const { accessToken, refreshToken, user } = await authService.register(
-      req.body,
-    );
-    res.cookie(REFRESH_TOKEN_COOKIE, refreshToken, cookieOptions);
+    const user = await authService.register(req.body);
     return sendSuccess(res, user, "User registered successfully", 201);
   } catch (error) {
     sendError(res, error.message, error.status || 500);
