@@ -1,8 +1,8 @@
 import { prisma } from "../config/prisma.js";
 
-export const findUserByEmail = (mail) => {
+export const findUserByEmail = (email) => {
   return prisma.user.findUnique({
-    where: { email: mail },
+    where: { email },
     include: { role: true },
   });
 };
