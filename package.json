@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "bootstrap": "^5.3.8",
+    "swiper": "^12.2.0",
     "ua-parser-js": "^2.0.10"
   }
 }
