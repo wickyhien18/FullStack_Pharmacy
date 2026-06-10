@@ -1,0 +1,24 @@
+/* Tailwind base directives — bắt buộc phải có */
+@tailwind base; /* reset CSS mặc định */
+@tailwind components; /* class component tái sử dụng */
+@tailwind utilities; /* utility classes như p-4, text-xl... */
+
+/* Custom global styles */
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    @apply font-sans text-gray-800 bg-gray-50;
+  }
+  /* Scrollbar mỏng trên Chrome */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-100;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 rounded-full;
+  }
+}
