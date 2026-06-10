@@ -1,31 +1,39 @@
-// ================================================================
-// tailwind.config.js — cấu hình TailwindCSS
-// ================================================================
 /** @type {import('tailwindcss').Config} */
 export default {
-  // content: chỉ định file nào Tailwind sẽ scan để tìm class
-  // Chỉ những class được dùng mới được đưa vào CSS build → file nhỏ hơn
   content: ["./index.html", "./src/**/*.{js,jsx}"],
   theme: {
+    screens: {
+      sm: "540px",
+      md: "768px",
+      lg: "1024px",
+      xl: "1280px",
+      "2xl": "1536px",
+    },
     extend: {
-      // Màu chủ đạo của app — lấy màu xanh lá của NhathuocLongChau
       colors: {
-        primary: {
-          50: "#f0fdf4",
-          100: "#dcfce7",
-          200: "#bbf7d0",
-          300: "#86efac",
-          400: "#4ade80",
-          500: "#22c55e", // màu chính
-          600: "#16a34a",
-          700: "#15803d",
-          800: "#166534",
-          900: "#14532d",
-        },
+        // Màu từ theme.json của bigspring
+        primary: "#0aa8a7",
+        secondary: "#0aa8a7",
+        dark: "#222",
+        text: "#777",
+        light: "#999",
+        border: "#e9e9e9",
+        body: "#fff",
+        "theme-light": "#edf6f5",
       },
-      // Font chữ
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
+        primary: ["Lato", "sans-serif"],
+      },
+      fontSize: {
+        h1: "2.441rem",
+        "h1-sm": "1.953rem",
+        h2: "1.953rem",
+        "h2-sm": "1.563rem",
+        h3: "1.563rem",
+        "h3-sm": "1.25rem",
+        h4: "1.25rem",
+        h5: "1rem",
+        h6: "0.8rem",
       },
     },
   },

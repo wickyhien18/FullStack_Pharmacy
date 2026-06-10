@@ -1,24 +1,124 @@
-/* Tailwind base directives — bắt buộc phải có */
-@tailwind base; /* reset CSS mặc định */
-@tailwind components; /* class component tái sử dụng */
-@tailwind utilities; /* utility classes như p-4, text-xl... */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* Custom global styles */
+/* Google Font Lato */
+@import url("https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap");
+
 @layer base {
-  * {
-    box-sizing: border-box;
+  html {
+    @apply text-base;
   }
   body {
-    @apply font-sans text-gray-800 bg-gray-50;
+    @apply bg-body font-primary font-normal leading-relaxed text-text;
   }
-  /* Scrollbar mỏng trên Chrome */
-  ::-webkit-scrollbar {
-    width: 6px;
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-primary font-bold leading-tight text-dark;
   }
-  ::-webkit-scrollbar-track {
-    @apply bg-gray-100;
+  h1 {
+    @apply text-h1-sm md:text-h1;
   }
-  ::-webkit-scrollbar-thumb {
-    @apply bg-gray-300 rounded-full;
+  h2 {
+    @apply text-h2-sm md:text-h2;
+  }
+  h3 {
+    @apply text-h3-sm md:text-h3;
+  }
+  h4 {
+    @apply text-h4;
+  }
+  h5 {
+    @apply text-h5;
+  }
+  h6 {
+    @apply text-h6;
+  }
+}
+
+@layer components {
+  /* Section & Container */
+  .section {
+    @apply pt-[70px] pb-[70px];
+  }
+  .container {
+    @apply mx-auto max-w-[1140px] px-4;
+  }
+
+  /* Buttons */
+  .btn {
+    @apply inline-block font-primary font-bold border px-7 py-[17px] leading-[18px] transition;
+  }
+  .btn-primary {
+    @apply bg-primary text-white border-transparent rounded-[30px] relative z-[1]
+           hover:shadow-[0_12px_24px_-6px_rgba(45,67,121,.1)] transition-all;
+  }
+  .btn-outline-primary {
+    @apply relative text-text border border-primary bg-transparent rounded-[30px]
+           hover:border-transparent hover:text-primary transition-all;
+  }
+
+  /* Header & Nav */
+  .header {
+    @apply bg-white py-[14px] px-4 md:px-0 md:py-[9px];
+  }
+  .navbar {
+    @apply relative flex flex-wrap items-center justify-between;
+  }
+  .navbar-nav {
+    @apply text-center md:text-left;
+  }
+  .nav-item {
+    @apply lg:mx-3;
+  }
+  .nav-link {
+    @apply py-3 px-2 font-primary text-base font-bold text-dark transition
+           hover:text-primary md:py-4 lg:px-3;
+  }
+  .nav-link-active {
+    @apply text-primary;
+  }
+
+  /* Dropdown */
+  .nav-dropdown-list {
+    @apply absolute top-full left-0 bg-white shadow-lg rounded-lg py-2 min-w-[160px] z-50;
+  }
+  .nav-dropdown-link {
+    @apply px-4 py-2 text-sm text-dark hover:text-primary hover:bg-theme-light transition;
+  }
+
+  /* Feature card */
+  .feature-card {
+    @apply transition-all duration-200 ease-in-out hover:shadow;
+  }
+
+  /* Swiper pagination */
+  .service-carousel .swiper-pagination {
+    @apply flex justify-center mt-4;
+  }
+  .service-carousel .swiper-pagination span {
+    @apply mx-[5px] inline-block h-[10px] w-[10px] cursor-pointer rounded-full border border-primary;
+  }
+  .service-carousel .swiper-pagination span.swiper-pagination-bullet-active {
+    @apply bg-primary;
+  }
+
+  /* CTA link */
+  .cta-link {
+    @apply inline-flex items-center text-primary font-semibold;
+  }
+
+  /* Card */
+  .card {
+    @apply mt-10 rounded-[4px] border border-[rgba(0,0,0,.125)] bg-white px-5 py-12 shadow md:mt-0;
+  }
+
+  /* Row dùng tailwind-bootstrap-grid */
+  .row {
+    @apply flex flex-wrap -mx-4;
   }
 }
