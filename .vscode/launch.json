@@ -16,7 +16,7 @@
       "name": "Frontend",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
-      "cwd": "${workspaceFolder}/FrontEnd",
+      "cwd": "${workspaceFolder}/FrontEnd/E-Commerce",
       "console": "integratedTerminal"
     }
   ],
