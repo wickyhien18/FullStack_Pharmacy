@@ -1,12 +1,11 @@
 // ================================================================
-// OrderHistoryPage.jsx — Lịch sử đơn hàng
+// OrderHistoryPage.jsx — Style theo Bigspring
 // ================================================================
 import { useQuery } from "@tanstack/react-query";
 import { Package } from "lucide-react";
 import api from "@/lib/axios.js";
 import { formatPrice } from "@/components/medicine/MedicineCard.jsx";
 
-// Map status sang màu badge
 const STATUS_CONFIG = {
   PENDING: { label: "Chờ xác nhận", color: "bg-yellow-100 text-yellow-700" },
   CONFIRMED: { label: "Đã xác nhận", color: "bg-blue-100 text-blue-700" },
@@ -17,7 +16,7 @@ const STATUS_CONFIG = {
     label: "Yêu cầu hoàn",
     color: "bg-orange-100 text-orange-700",
   },
-  RETURNED: { label: "Đã hoàn", color: "bg-gray-100 text-gray-700" },
+  RETURNED: { label: "Đã hoàn", color: "bg-theme-light text-text" },
 };
 
 export default function OrderHistoryPage() {
@@ -28,81 +27,77 @@ export default function OrderHistoryPage() {
 
   if (isLoading)
     return (
-      <div className="max-w-3xl mx-auto px-4 py-12 space-y-4">
-        {Array(3)
-          .fill(0)
-          .map((_, i) => (
-            <div
-              key={i}
-              className="bg-gray-100 rounded-xl h-32 animate-pulse"
-            />
-          ))}
-      </div>
+      <section className="section">
+        <div className="container max-w-3xl space-y-4">
+          {Array(3)
+            .fill(0)
+            .map((_, i) => (
+              <div
+                key={i}
+                className="bg-theme-light rounded-xl h-32 animate-pulse"
+              />
+            ))}
+        </div>
+      </section>
     );
 
   if (!data?.items?.length)
     return (
-      <div className="max-w-3xl mx-auto px-4 py-20 text-center">
-        <Package className="mx-auto mb-4 text-gray-300" size={64} />
-        <h2 className="text-xl font-semibold text-gray-600 mb-2">
-          Chưa có đơn hàng nào
-        </h2>
-      </div>
+      <section className="section">
+        <div className="container text-center py-20">
+          <Package className="mx-auto mb-4 text-border" size={64} />
+          <h3 className="font-normal text-text mb-2">Chưa có đơn hàng nào</h3>
+        </div>
+      </section>
     );
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">
-        Lịch sử đơn hàng
-      </h1>
-      <div className="space-y-4">
-        {data.items.map((order) => {
-          const status = STATUS_CONFIG[order.orderStatus] || {
-            label: order.orderStatus,
-            color: "bg-gray-100 text-gray-700",
-          };
-          return (
-            <div
-              key={order.orderId}
-              className="bg-white rounded-xl border border-gray-100 p-5"
-            >
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <p className="font-semibold text-gray-700">
-                    #{order.orderCode}
-                  </p>
-                  <p className="text-xs text-gray-400 mt-0.5">
-                    {new Date(order.createdAt).toLocaleDateString("vi-VN")}
-                  </p>
+    <section className="section">
+      <div className="container" style={{ maxWidth: "768px" }}>
+        <h1 className="font-normal mb-8">Lịch sử đơn hàng</h1>
+        <div className="space-y-4">
+          {data.items.map((order) => {
+            const status = STATUS_CONFIG[order.orderStatus] || {
+              label: order.orderStatus,
+              color: "bg-theme-light text-text",
+            };
+            return (
+              <div key={order.orderId} className="card mt-0">
+                <div className="flex items-start justify-between mb-3">
+                  <div>
+                    <p className="font-bold text-dark">#{order.orderCode}</p>
+                    <p className="text-xs text-light mt-0.5">
+                      {new Date(order.createdAt).toLocaleDateString("vi-VN")}
+                    </p>
+                  </div>
+                  <span
+                    className={`text-xs font-bold px-3 py-1 rounded-full ${status.color}`}
+                  >
+                    {status.label}
+                  </span>
                 </div>
-                <span
-                  className={`text-xs font-semibold px-3 py-1 rounded-full ${status.color}`}
-                >
-                  {status.label}
-                </span>
-              </div>
 
-              {/* Danh sách sản phẩm trong đơn */}
-              <div className="space-y-1 mb-3">
-                {order.items?.map((item) => (
-                  <p key={item.orderItemId} className="text-sm text-gray-600">
-                    {item.medicineName} × {item.quantity}
-                  </p>
-                ))}
-              </div>
+                <div className="space-y-1 mb-3">
+                  {order.items?.map((item) => (
+                    <p key={item.orderItemId} className="text-sm text-text">
+                      {item.medicineName} × {item.quantity}
+                    </p>
+                  ))}
+                </div>
 
-              <div className="flex items-center justify-between border-t pt-3">
-                <span className="text-sm text-gray-500">
-                  {order.paymentMethod} • {order.items?.length} sản phẩm
-                </span>
-                <span className="font-bold text-primary-600">
-                  {formatPrice(order.totalPrice)}
-                </span>
+                <div className="flex items-center justify-between border-t border-border pt-3">
+                  <span className="text-sm text-light">
+                    {order.items?.length} sản phẩm
+                  </span>
+                  <span className="font-bold text-primary">
+                    {formatPrice(order.totalPrice)}
+                  </span>
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
-    </div>
+    </section>
   );
 }

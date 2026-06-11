@@ -1,5 +1,5 @@
 // ================================================================
-// RegisterPage.jsx — Trang đăng ký tài khoản
+// RegisterPage.jsx — Style theo Bigspring
 // ================================================================
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -35,18 +35,16 @@ export default function RegisterPage() {
     if (form.password !== form.confirmPassword)
       errs.confirmPassword = "Mật khẩu không khớp";
     setErrors(errs);
-    return Object.keys(errs).length === 0;
+    return !Object.keys(errs).length;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!validate()) return;
-    // Bỏ confirmPassword trước khi gửi lên API
     const { confirmPassword, ...data } = form;
     register(data);
   };
 
-  // Dùng mảng để render field tránh lặp code
   const fields = [
     {
       name: "userName",
@@ -87,17 +85,15 @@ export default function RegisterPage() {
   ];
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4 py-8">
-      <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">
-            Tạo tài khoản
-          </h1>
-          <p className="text-gray-500 text-sm mb-6">
+    <section className="section">
+      <div className="container" style={{ maxWidth: "560px" }}>
+        <div className="card mt-0">
+          <h2 className="text-center mb-2">Tạo tài khoản</h2>
+          <p className="text-center text-text text-sm mb-6">
             Đã có tài khoản?{" "}
             <Link
               to="/login"
-              className="text-primary-600 hover:underline font-medium"
+              className="text-primary font-bold hover:underline"
             >
               Đăng nhập
             </Link>
@@ -106,7 +102,7 @@ export default function RegisterPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {fields.map(({ name, label, type, placeholder }) => (
               <div key={name}>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-bold text-dark mb-1">
                   {label}
                 </label>
                 <input
@@ -115,9 +111,7 @@ export default function RegisterPage() {
                   value={form[name]}
                   onChange={handleChange}
                   placeholder={placeholder}
-                  className={`w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none
-                    focus:ring-2 focus:ring-primary-300 transition
-                    ${errors[name] ? "border-red-400" : "border-gray-200"}`}
+                  className={`form-input w-full rounded ${errors[name] ? "border-red-400" : ""}`}
                 />
                 {errors[name] && (
                   <p className="text-red-500 text-xs mt-1">{errors[name]}</p>
@@ -128,14 +122,13 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={isRegistering}
-              className="w-full bg-primary-500 text-white py-2.5 rounded-lg text-sm font-medium
-                         hover:bg-primary-600 transition disabled:opacity-60 disabled:cursor-not-allowed mt-2"
+              className="btn btn-primary w-full disabled:opacity-60 mt-2"
             >
               {isRegistering ? "Đang đăng ký..." : "Đăng ký"}
             </button>
           </form>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

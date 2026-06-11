@@ -1,192 +1,145 @@
+
 // ================================================================
-// MedicineListPage.jsx — Trang danh sách sản phẩm
+// MedicineListPage.jsx — Style theo Bigspring
 // ================================================================
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Search, SlidersHorizontal } from "lucide-react";
 import { useMedicines, useCategories } from "@/hooks/useMedicines.js";
 import MedicineCard from "@/components/medicine/MedicineCard.jsx";
+import Pagination from "@/components/common/Pagination.jsx";
 
 export default function MedicineListPage() {
-  // useSearchParams: đọc/ghi query string trên URL (?search=...&categoryId=...)
-  // Giúp user có thể share link với filter đang chọn
   const [searchParams, setSearchParams] = useSearchParams();
+  const [search, setSearch]   = useState(searchParams.get("search") || "");
+  const [page, setPage]       = useState(1);
+  const categoryId            = searchParams.get("categoryId") || "";
+  const sort                  = searchParams.get("sort") || "";
 
-  const [search, setSearch] = useState(searchParams.get("search") || "");
-  const [page, setPage] = useState(1);
-
-  // Lấy params từ URL
-  const categoryId = searchParams.get("categoryId") || "";
-  const sort = searchParams.get("sort") || "";
-
-  const { data, isLoading } = useMedicines({
-    page,
-    limit: 20,
-    search,
-    categoryId,
-    sort,
-  });
-  const { data: categoriesData } = useCategories();
+  const { data, isLoading }          = useMedicines({ page, limit: 20, search, categoryId, sort });
+  const { data: categoriesData }     = useCategories();
 
   const handleSearch = (e) => {
     e.preventDefault();
     setSearchParams((prev) => {
-      if (search) prev.set("search", search);
-      else prev.delete("search");
+      search ? prev.set("search", search) : prev.delete("search");
       return prev;
     });
-    setPage(1); // reset về trang 1 khi search mới
+    setPage(1);
   };
 
   const handleCategory = (id) => {
     setSearchParams((prev) => {
-      if (id) prev.set("categoryId", id);
-      else prev.delete("categoryId");
+      id ? prev.set("categoryId", id) : prev.delete("categoryId");
       return prev;
     });
     setPage(1);
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <div className="flex gap-6">
-        {/* ── Sidebar filter ────────────────────────────────── */}
-        <aside className="hidden md:block w-56 shrink-0">
-          <div className="bg-white rounded-xl border border-gray-100 p-4">
-            <h3 className="font-semibold text-gray-700 mb-3 flex items-center gap-2">
-              <SlidersHorizontal size={16} /> Danh mục
-            </h3>
-            <ul className="space-y-1">
-              {/* Tất cả */}
-              <li>
-                <button
-                  onClick={() => handleCategory("")}
-                  className={`w-full text-left px-3 py-2 rounded-lg text-sm transition
-                    ${!categoryId ? "bg-primary-50 text-primary-600 font-medium" : "text-gray-600 hover:bg-gray-50"}`}
-                >
-                  Tất cả sản phẩm
-                </button>
-              </li>
-              {categoriesData?.items?.map((cat) => (
-                <li key={cat.categoryId}>
+    <section className="section">
+      <div className="container">
+        <h1 className="text-center font-normal mb-8">Danh sách sản phẩm</h1>
+
+        <div className="row">
+          {/* ── Sidebar ─────────────────────────────────────── */}
+          <aside className="hidden md:block w-full md:w-1/4 px-4">
+            <div className="shadow rounded-xl p-5">
+              <h4 className="flex items-center gap-2 mb-4">
+                <SlidersHorizontal size={16} /> Danh mục
+              </h4>
+              <ul className="space-y-1">
+                <li>
                   <button
-                    onClick={() => handleCategory(cat.categoryId)}
+                    onClick={() => handleCategory("")}
                     className={`w-full text-left px-3 py-2 rounded-lg text-sm transition
-                      ${
-                        categoryId == cat.categoryId
-                          ? "bg-primary-50 text-primary-600 font-medium"
-                          : "text-gray-600 hover:bg-gray-50"
-                      }`}
+                      ${!categoryId ? "bg-primary text-white" : "text-text hover:bg-theme-light"}`}
                   >
-                    {cat.name}
+                    Tất cả sản phẩm
                   </button>
                 </li>
-              ))}
-            </ul>
-          </div>
-        </aside>
+                {categoriesData?.items?.map((cat) => (
+                  <li key={cat.categoryId}>
+                    <button
+                      onClick={() => handleCategory(cat.categoryId)}
+                      className={`w-full text-left px-3 py-2 rounded-lg text-sm transition
+                        ${categoryId == cat.categoryId
+                          ? "bg-primary text-white"
+                          : "text-text hover:bg-theme-light"}`}
+                    >
+                      {cat.name}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </aside>
 
-        {/* ── Main content ──────────────────────────────────── */}
-        <div className="flex-1 min-w-0">
-          {/* Search + sort bar */}
-          <div className="flex gap-3 mb-6">
-            <form onSubmit={handleSearch} className="flex-1 flex gap-2">
-              <div className="relative flex-1">
-                <Search
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                  size={16}
-                />
-                <input
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Tìm kiếm thuốc..."
-                  className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm
-                             focus:outline-none focus:border-primary-400"
-                />
-              </div>
-              <button
-                type="submit"
-                className="bg-primary-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-primary-600"
-              >
-                Tìm
-              </button>
-            </form>
-
-            {/* Sort */}
-            <select
-              value={sort}
-              onChange={(e) =>
-                setSearchParams((prev) => {
-                  prev.set("sort", e.target.value);
-                  return prev;
-                })
-              }
-              className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none"
-            >
-              <option value="">Mặc định</option>
-              <option value="price_asc">Giá tăng dần</option>
-              <option value="price_desc">Giá giảm dần</option>
-              <option value="newest">Mới nhất</option>
-            </select>
-          </div>
-
-          {/* Kết quả */}
-          {isLoading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {Array(12)
-                .fill(0)
-                .map((_, i) => (
-                  <div
-                    key={i}
-                    className="bg-gray-100 rounded-xl h-64 animate-pulse"
+          {/* ── Main ────────────────────────────────────────── */}
+          <div className="w-full md:w-3/4 px-4">
+            {/* Search + Sort */}
+            <div className="flex gap-3 mb-6">
+              <form onSubmit={handleSearch} className="flex-1 flex gap-2">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-light" size={16} />
+                  <input
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Tìm kiếm thuốc..."
+                    className="form-input w-full pl-9 rounded"
                   />
-                ))}
+                </div>
+                <button type="submit" className="btn btn-primary py-2 px-5 text-sm">
+                  Tìm
+                </button>
+              </form>
+
+              <select
+                value={sort}
+                onChange={(e) => {
+                  setSearchParams((prev) => { prev.set("sort", e.target.value); return prev; });
+                }}
+                className="form-input rounded border border-border px-3 py-2 text-sm"
+              >
+                <option value="">Mặc định</option>
+                <option value="price_asc">Giá tăng dần</option>
+                <option value="price_desc">Giá giảm dần</option>
+                <option value="newest">Mới nhất</option>
+              </select>
             </div>
-          ) : data?.items?.length === 0 ? (
-            <div className="text-center py-20 text-gray-500">
-              <p className="text-4xl mb-4">🔍</p>
-              <p>Không tìm thấy sản phẩm nào</p>
-            </div>
-          ) : (
-            <>
-              <p className="text-sm text-gray-500 mb-4">
-                Tìm thấy{" "}
-                <span className="font-semibold text-gray-700">
-                  {data?.total}
-                </span>{" "}
-                sản phẩm
-              </p>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                {data?.items?.map((medicine) => (
-                  <MedicineCard key={medicine.medicineId} medicine={medicine} />
+
+            {/* Results */}
+            {isLoading ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
+                {Array(12).fill(0).map((_, i) => (
+                  <div key={i} className="bg-theme-light rounded-xl h-64 animate-pulse" />
                 ))}
               </div>
-
-              {/* Pagination */}
-              {data?.totalPages > 1 && (
-                <div className="flex justify-center gap-2 mt-8">
-                  {Array.from({ length: data.totalPages }, (_, i) => i + 1).map(
-                    (p) => (
-                      <button
-                        key={p}
-                        onClick={() => setPage(p)}
-                        className={`w-9 h-9 rounded-lg text-sm font-medium transition
-                        ${
-                          p === page
-                            ? "bg-primary-500 text-white"
-                            : "bg-white border border-gray-200 text-gray-600 hover:border-primary-400"
-                        }`}
-                      >
-                        {p}
-                      </button>
-                    ),
-                  )}
+            ) : data?.items?.length === 0 ? (
+              <div className="text-center py-20 text-text">
+                <p className="text-5xl mb-4">🔍</p>
+                <p>Không tìm thấy sản phẩm nào</p>
+              </div>
+            ) : (
+              <>
+                <p className="text-sm text-text mb-4">
+                  Tìm thấy <span className="font-bold text-dark">{data?.total}</span> sản phẩm
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
+                  {data?.items?.map((medicine) => (
+                    <MedicineCard key={medicine.medicineId} medicine={medicine} />
+                  ))}
                 </div>
-              )}
-            </>
-          )}
+                <Pagination
+                  currentPage={page}
+                  totalPages={data?.totalPages || 1}
+                  onPageChange={setPage}
+                />
+              </>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }
