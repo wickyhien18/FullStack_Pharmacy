@@ -58,7 +58,7 @@ function ProductListPage() {
 
   const medicinesList = medicinesData?.items || [];
   const liveMedicines = medicinesList.map((m, index) => ({
-    id: m.medicineId,
+    id: m.slug || m.medicineId,
     name: m.name,
     brand: m.manufacturerName || "Dược phẩm",
     category: m.categorySlug || "medicines",

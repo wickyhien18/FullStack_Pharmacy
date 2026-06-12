@@ -93,7 +93,7 @@ function HomePage() {
 
   const medicinesList = medicinesData?.items || [];
   const liveMedicines = medicinesList.map((m, index) => ({
-    id: m.medicineId,
+    id: m.slug || m.medicineId,
     name: m.name,
     brand: m.manufacturerName || "Dược phẩm",
     category: m.categorySlug || "medicines",
@@ -113,9 +113,9 @@ function HomePage() {
     isFeatured: index >= 8
   }));
 
-  const flashSale = liveMedicines.filter(p => p.isFlashSale);
-  const bestSellers = liveMedicines.filter(p => p.isBestSeller);
-  const featured = liveMedicines.filter(p => p.isFeatured);
+  const flashSale = liveMedicines.slice(0, 4);
+  const bestSellers = liveMedicines.slice(4, 8).length > 0 ? liveMedicines.slice(4, 8) : liveMedicines.slice(0, 4);
+  const featured = liveMedicines.slice(8, 12).length > 0 ? liveMedicines.slice(8, 12) : (liveMedicines.length > 2 ? liveMedicines.slice(2, 6) : liveMedicines.slice(0, 4));
 
   if (isLoadingMedicines || isLoadingCategories) {
     return (
