@@ -18,6 +18,7 @@ function SearchPage() {
     if (!q || !medicinesData?.items) return [];
     return medicinesData.items.map((m, index) => ({
       id: m.slug,
+      medicineId: m.medicineId,
       name: m.name,
       brand: m.manufacturerName || "Dược phẩm",
       category: m.categorySlug || "medicines",

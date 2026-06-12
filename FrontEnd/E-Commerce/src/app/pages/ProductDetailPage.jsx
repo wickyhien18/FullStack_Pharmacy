@@ -6,6 +6,8 @@ import { ProductCard } from "../components/ProductCard";
 import { useCart } from "../context/CartContext";
 import { useMedicine, useMedicines } from "../../hooks/useMedicines.js";
 
+import NotFoundPage from "./NotFoundPage";
+
 const tabs = ["Mô tả", "Thành phần", "Hướng dẫn sử dụng", "Đánh giá"];
 
 function ProductDetailPage() {
@@ -33,6 +35,7 @@ function ProductDetailPage() {
 
   const product = m ? {
     id: m.slug,
+    medicineId: m.medicineId,
     name: m.name,
     brand: m.manufacturerName || "Dược phẩm",
     category: m.categorySlug || "medicines",
@@ -55,11 +58,7 @@ function ProductDetailPage() {
   } : null;
 
   if (!product) {
-    return <div className="max-w-7xl mx-auto px-4 py-16 text-center">
-        <div className="text-6xl mb-4">😕</div>
-        <h2 className="font-bold text-gray-800 mb-2">Không tìm thấy sản phẩm</h2>
-        <Link to="/products" className="text-blue-700 hover:underline">← Quay lại danh sách</Link>
-      </div>;
+    return <NotFoundPage />;
   }
 
   const related = relatedData?.items

@@ -12,6 +12,14 @@ import AccountPage from "./pages/AccountPage";
 import PharmaciesPage from "./pages/PharmaciesPage";
 import SearchPage from "./pages/SearchPage";
 import NotFoundPage from "./pages/NotFoundPage";
+
+// Admin imports
+import AdminLayout from "./components/AdminLayout";
+import AdminDashboard from "./pages/admin/DashboardPage";
+import AdminProducts from "./pages/admin/ProductsPage";
+import AdminOrders from "./pages/admin/OrdersPage";
+import AdminUsers from "./pages/admin/UsersPage";
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -29,6 +37,16 @@ const router = createBrowserRouter([
       { path: "pharmacies", Component: PharmaciesPage },
       { path: "search", Component: SearchPage },
       { path: "*", Component: NotFoundPage }
+    ]
+  },
+  {
+    path: "/admin",
+    Component: AdminLayout,
+    children: [
+      { index: true, Component: AdminDashboard },
+      { path: "products", Component: AdminProducts },
+      { path: "orders", Component: AdminOrders },
+      { path: "users", Component: AdminUsers }
     ]
   }
 ]);

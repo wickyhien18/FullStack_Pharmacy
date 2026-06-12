@@ -3,26 +3,32 @@ import { Link, useNavigate } from "react-router";
 import { ChevronRight, Check, MapPin, CreditCard, Package } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { formatPrice } from "../data/products";
-const steps = ["\u0110\u1ECBa ch\u1EC9 giao h\xE0ng", "Thanh to\xE1n", "X\xE1c nh\u1EADn"];
+import api from "../../lib/axios.js";
+import { useAuthStore } from "../../stores/auth.store.js";
+import toast from "react-hot-toast";
+
+const steps = ["Địa chỉ giao hàng", "Thanh toán", "Xác nhận"];
 const paymentMethods = [
-  { id: "cod", label: "Thanh to\xE1n khi nh\u1EADn h\xE0ng (COD)", icon: "\u{1F4B5}" },
-  { id: "vnpay", label: "VNPAY - QR Code", icon: "\u{1F4F1}" },
-  { id: "momo", label: "V\xED MoMo", icon: "\u{1F49C}" },
-  { id: "bank", label: "Th\u1EBB ng\xE2n h\xE0ng / Th\u1EBB qu\u1ED1c t\u1EBF", icon: "\u{1F4B3}" }
+  { id: "cod", label: "Thanh toán khi nhận hàng (COD)", icon: "💵" },
+  { id: "vnpay", label: "VNPAY - QR Code", icon: "📱" },
+  { id: "momo", label: "Ví MoMo", icon: "💜" },
+  { id: "bank", label: "Thẻ ngân hàng / Thẻ quốc tế", icon: "💳" }
 ];
 function CheckoutPage() {
   const { items, totalPrice, totalItems, clearCart } = useCart();
+  const { isAuthenticated } = useAuthStore();
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState("cod");
   const [placed, setPlaced] = useState(false);
+  const [orderCode, setOrderCode] = useState("");
   const [form, setForm] = useState({
     name: "",
     phone: "",
     email: "",
-    province: "H\xE0 N\u1ED9i",
-    district: "C\u1EA7u Gi\u1EA5y",
-    ward: "D\u1ECBch V\u1ECDng",
+    province: "Hà Nội",
+    district: "Cầu Giấy",
+    ward: "Dịch Vọng",
     address: "",
     note: ""
   });
@@ -34,20 +40,53 @@ function CheckoutPage() {
   const handleNext = () => {
     if (step < 2) setStep(step + 1);
   };
-  const handlePlaceOrder = () => {
-    setPlaced(true);
-    clearCart();
-    setTimeout(() => navigate("/"), 3e3);
+  const handlePlaceOrder = async () => {
+    if (!form.name || !form.phone || !form.address) {
+      toast.error("Vui lòng điền đầy đủ các thông tin giao hàng bắt buộc");
+      setStep(0);
+      return;
+    }
+
+    try {
+      const payload = {
+        items: items.map(item => ({
+          medicineId: item.product.medicineId,
+          quantity: item.quantity
+        })),
+        shippingAddress: `${form.address}, ${form.ward}, ${form.district}, ${form.province}`,
+        note: form.note || ""
+      };
+
+      const response = await api.post("/orders", payload);
+      setOrderCode(response.data.data.orderCode);
+      setPlaced(true);
+      clearCart();
+      setTimeout(() => navigate("/"), 5000);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Đặt hàng thất bại");
+    }
   };
+
+  if (!isAuthenticated) {
+    return <div className="max-w-md mx-auto px-4 py-16 text-center bg-white rounded-2xl my-10 shadow-sm">
+        <div className="text-5xl mb-4">🔑</div>
+        <h2 className="font-bold text-gray-800 mb-2">Vui lòng đăng nhập</h2>
+        <p className="text-gray-500 text-sm mb-6">Bạn cần đăng nhập tài khoản để thực hiện thanh toán đơn hàng.</p>
+        <Link to="/account" className="inline-block px-6 py-3 rounded-xl text-white font-semibold text-sm" style={{ backgroundColor: "#1250dc" }}>
+          Đăng nhập ngay
+        </Link>
+      </div>;
+  }
+
   if (placed) {
     return <div className="max-w-lg mx-auto px-4 py-16 text-center">
         <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-5 bg-green-100">
           <Check size={40} className="text-green-600" />
         </div>
         <h2 className="font-bold text-gray-800 mb-2" style={{ fontSize: "1.4rem" }}>Đặt hàng thành công!</h2>
-        <p className="text-gray-600 mb-2">Mã đơn hàng: <span className="font-semibold" style={{ color: "#1250dc" }}>#LC2026061201</span></p>
+        <p className="text-gray-600 mb-2">Mã đơn hàng: <span className="font-semibold" style={{ color: "#1250dc" }}>#{orderCode || "LC2026061201"}</span></p>
         <p className="text-gray-500 text-sm mb-6">Chúng tôi sẽ liên hệ xác nhận trong vài phút. Cảm ơn bạn đã tin dùng Long Châu!</p>
-        <div className="text-sm text-gray-400">Tự động chuyển về trang chủ sau 3 giây...</div>
+        <div className="text-sm text-gray-400">Tự động chuyển về trang chủ sau 5 giây...</div>
       </div>;
   }
   if (items.length === 0) {
