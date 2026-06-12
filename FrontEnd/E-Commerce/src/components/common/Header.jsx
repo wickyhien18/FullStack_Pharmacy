@@ -7,7 +7,7 @@
 //   Thêm auth state: hiện tên user + nút logout khi đã đăng nhập
 // ================================================================
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/stores/auth.store.js";
 import { useAuth } from "@/hooks/useAuth.js";
 import { useCartStore } from "@/stores/cart.store.js";
@@ -37,10 +37,21 @@ const mainMenu = [
 
 const Header = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [navOpen, setNavOpen] = useState(false);
+  const [query, setQuery] = useState("");
   const { isAuthenticated, user } = useAuthStore();
   const { logout } = useAuth();
   const { items } = useCartStore();
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (query.trim()) {
+      navigate(`/medicines?search=${encodeURIComponent(query.trim())}`);
+    } else {
+      navigate("/medicines");
+    }
+  };
 
   // Tổng số lượng sản phẩm trong giỏ
   const totalItems = items.reduce((sum, i) => sum + i.quantity, 0);
