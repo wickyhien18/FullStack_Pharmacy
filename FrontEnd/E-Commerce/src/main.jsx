@@ -9,6 +9,7 @@ import { Toaster } from "react-hot-toast";
 import App from "./App.jsx";
 import AuthInitializer from "./components/AuthInitializer.jsx";
 import "./index.css";
+import "./styles/index.css";
 
 const queryClient = new QueryClient({
   defaultOptions: {

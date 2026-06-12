@@ -19,11 +19,7 @@ function figmaAssetResolver() {
 }
 
 export default defineConfig({
-  plugins: [
-    react(),
-    // tailwindcss(),
-    // figmaAssetResolver()
-  ],
+  plugins: [react(), tailwindcss(), figmaAssetResolver()],
 
   resolve: {
     alias: {
