@@ -1,15 +1,14 @@
 import { useParams, Link } from "react-router";
 import { Clock, ChevronRight, Tag, ArrowLeft } from "lucide-react";
 import { blogPosts } from "../data/products";
+import NotFoundPage from "./NotFoundPage";
+
 function BlogDetailPage() {
   const { slug } = useParams();
   const post = blogPosts.find((p) => p.slug === slug);
   const related = blogPosts.filter((p) => p.slug !== slug).slice(0, 3);
   if (!post) {
-    return <div className="max-w-7xl mx-auto px-4 py-16 text-center">
-        <h2 className="font-bold text-gray-800 mb-4">Không tìm thấy bài viết</h2>
-        <Link to="/blog" className="text-blue-700 hover:underline">← Quay lại góc sức khỏe</Link>
-      </div>;
+    return <NotFoundPage />;
   }
   return <div className="max-w-7xl mx-auto px-4 py-5">
       <nav className="flex items-center gap-2 text-sm text-gray-500 mb-5">
