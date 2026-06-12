@@ -8,7 +8,6 @@
 // ================================================================
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ShoppingCart, User, LogOut } from "lucide-react";
 import { useAuthStore } from "@/stores/auth.store.js";
 import { useAuth } from "@/hooks/useAuth.js";
 import { useCartStore } from "@/stores/cart.store.js";
@@ -26,6 +25,7 @@ import {
   Package,
   FileText,
   Stethoscope,
+  LogOut,
 } from "lucide-react";
 
 // Menu điều hướng — tuỳ chỉnh theo project pharmacy
