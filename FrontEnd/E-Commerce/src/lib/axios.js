@@ -44,7 +44,11 @@ api.interceptors.response.use(
     const originalRequest = error.config;
 
     // Nếu lỗi 401 và chưa thử refresh (tránh loop vô tận)
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !originalRequest.url.includes("/auth/refresh-token")
+    ) {
       // Nếu đang refresh rồi → đưa request vào hàng đợi chờ
       if (isRefreshing) {
         return new Promise((resolve, reject) => {

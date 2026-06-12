@@ -32,8 +32,17 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           position="top-right"
           toastOptions={{
             duration: 3000,
-            style: { fontSize: "14px" },
-            success: { iconTheme: { primary: "#22c55e", secondary: "#fff" } },
+            unstyled: true, // bỏ toàn bộ style mặc định
+            className:
+              "flex items-center gap-3 bg-white border border-border rounded px-4 py-3 shadow-md text-sm font-primary text-dark",
+            success: {
+              className:
+                "flex items-center gap-3 bg-white border border-primary rounded px-4 py-3 shadow-md text-sm font-primary text-dark",
+            },
+            error: {
+              className:
+                "flex items-center gap-3 bg-white border border-red-400 rounded px-4 py-3 shadow-md text-sm font-primary text-dark",
+            },
           }}
         />
       </BrowserRouter>

@@ -1,4 +1,3 @@
-
 // ================================================================
 // AuthInitializer.jsx — Tự động khôi phục session khi reload trang
 //
@@ -9,34 +8,41 @@
 //
 // Component này bọc toàn bộ app, chạy 1 lần duy nhất khi mount
 // ================================================================
-import { useEffect, useState } from 'react';
-import { useAuthStore } from '@/stores/auth.store.js';
-import api from '@/lib/axios.js';
+import { useEffect, useState, useRef } from "react";
+import { useAuthStore } from "@/stores/auth.store.js";
+import api from "@/lib/axios.js";
 
 export default function AuthInitializer({ children }) {
   // isInitialized: flag để biết đã check xong chưa
   // Trong lúc đang check → hiện loading, tránh flash màn hình login
   const [isInitialized, setIsInitialized] = useState(false);
   const { setAuth, clearAuth } = useAuthStore();
+  const hasFetched = useRef(false);
 
   useEffect(() => {
+    if (hasFetched.current) return; // already ran, skip
+    hasFetched.current = true;
     const initAuth = async () => {
       try {
         // Gọi refresh-token — cookie tự động gửi kèm nhờ withCredentials
         // Nếu cookie còn hạn → nhận accessToken + user mới
-        const { data } = await api.post('/auth/refresh-token');
+        const { data } = await api.post("/auth/refresh-token");
 
         if (data?.data?.accessToken) {
           // Lấy thêm thông tin profile để có đầy đủ user object
-          const profileRes = await api.get('/auth/profile', {
+          const profileRes = await api.get("/auth/profile", {
             headers: { Authorization: `Bearer ${data.data.accessToken}` },
           });
 
           setAuth(profileRes.data.data, data.data.accessToken);
         }
-      } catch {
+      } catch (err) {
         // Refresh thất bại (cookie hết hạn hoặc không có)
         // → về trạng thái chưa đăng nhập, không cần làm gì
+        // 401 = no valid session = normal case, don't log it
+        if (err.response?.status !== 401) {
+          console.error("[AuthInitializer] Unexpected error:", err);
+        }
         clearAuth();
       } finally {
         // Dù thành công hay thất bại → đánh dấu đã init xong
@@ -53,8 +59,10 @@ export default function AuthInitializer({ children }) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 border-4 border-primary-500 border-t-transparent
-                          rounded-full animate-spin" />
+          <div
+            className="w-10 h-10 border-4 border-primary-500 border-t-transparent
+                          rounded-full animate-spin"
+          />
           <p className="text-sm text-gray-500">Đang tải...</p>
         </div>
       </div>
