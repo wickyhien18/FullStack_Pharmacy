@@ -12,6 +12,21 @@ import { ShoppingCart, User, LogOut } from "lucide-react";
 import { useAuthStore } from "@/stores/auth.store.js";
 import { useAuth } from "@/hooks/useAuth.js";
 import { useCartStore } from "@/stores/cart.store.js";
+import {
+  Search,
+  ShoppingCart,
+  Heart,
+  User,
+  Phone,
+  MapPin,
+  ChevronDown,
+  Menu,
+  X,
+  Bell,
+  Package,
+  FileText,
+  Stethoscope,
+} from "lucide-react";
 
 // Menu điều hướng — tuỳ chỉnh theo project pharmacy
 const mainMenu = [
@@ -31,7 +46,47 @@ const Header = () => {
   const totalItems = items.reduce((sum, i) => sum + i.quantity, 0);
 
   return (
-    <header className="header sticky top-0 z-50 shadow-sm">
+    <header className="sticky top-0 z-50 bg-white shadow-sm">
+      {/* Top bar */}
+      <div
+        style={{ backgroundColor: "#1250dc" }}
+        className="text-white py-1.5 px-4 text-xs"
+      >
+        <div className="max-w-7xl mx-auto flex justify-between items-center gap-4">
+          <div className="flex items-center gap-4">
+            <a
+              href="tel:18006928"
+              className="flex items-center gap-1 hover:text-blue-200 transition-colors"
+            >
+              <Phone size={12} />
+              <span>Hotline: 1800 6928 (Miễn phí)</span>
+            </a>
+            <span className="hidden md:flex items-center gap-1">
+              <Package size={12} />
+              <Link
+                to="/account"
+                className="hover:text-blue-200 transition-colors"
+              >
+                Tra cứu đơn hàng
+              </Link>
+            </span>
+          </div>
+          <div className="flex items-center gap-4">
+            <span className="hidden md:flex items-center gap-1">
+              <Bell size={12} />
+              <span>Nhận thông báo khuyến mãi</span>
+            </span>
+            <Link
+              to="/pharmacies"
+              className="flex items-center gap-1 hover:text-blue-200 transition-colors"
+            >
+              <MapPin size={12} />
+              <span>Tìm nhà thuốc</span>
+            </Link>
+          </div>
+        </div>
+      </div>
+      {/* Main header */}
       <nav className="navbar container">
         {/* Logo */}
         <div className="order-0">
