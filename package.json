@@ -1,7 +1,19 @@
 {
+  "name": "fullstack-pharmacy",
+  "version": "1.0.0",
+  "description": "Pharmacy Fullstack Application root",
+  "scripts": {
+    "install:all": "npm install --prefix BackEnd && npm install --prefix FrontEnd/E-Commerce",
+    "dev:backend": "npm run dev --prefix BackEnd",
+    "dev:frontend": "npm run dev --prefix FrontEnd/E-Commerce",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\""
+  },
   "dependencies": {
     "bootstrap": "^5.3.8",
     "swiper": "^12.2.0",
     "ua-parser-js": "^2.0.10"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
   }
 }
