@@ -3,26 +3,33 @@
 // ================================================================
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 
+function figmaAssetResolver() {
+  return {
+    name: "figma-asset-resolver",
+    resolveId(id) {
+      if (id.startsWith("figma:asset/")) {
+        const filename = id.replace("figma:asset/", "");
+        return path.resolve(__dirname, "src/assets", filename);
+      }
+    },
+  };
+}
+
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    // tailwindcss(),
+    // figmaAssetResolver()
+  ],
 
   resolve: {
     alias: {
       // Đặt alias @ = thư mục src
       // Thay vì import '../../components/Button' → import '@/components/Button'
       "@": path.resolve(__dirname, "./src"),
-      "@layouts": path.resolve(__dirname, "./layouts"),
-      "@components": path.resolve(__dirname, "./layouts/components"),
-      "@partials": path.resolve(__dirname, "./layouts/partials"),
-      "@shortcodes": path.resolve(__dirname, "./layouts/shortcodes"),
-      "@config": path.resolve(__dirname, "./config"),
-      "@json": path.resolve(__dirname, "./json"),
-      "@hooks": path.resolve(__dirname, "./hooks"),
-      "@lib": path.resolve(__dirname, "./lib"),
-      "@styles": path.resolve(__dirname, "./styles"),
-      "@content": path.resolve(__dirname, "./content"),
     },
   },
 
