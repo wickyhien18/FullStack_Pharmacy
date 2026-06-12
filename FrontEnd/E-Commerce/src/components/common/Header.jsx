@@ -87,16 +87,116 @@ const Header = () => {
         </div>
       </div>
       {/* Main header */}
-      <nav className="navbar container">
-        {/* Logo */}
-        <div className="order-0">
-          <Link to="/" className="navbar-brand flex items-center gap-2">
-            <span className="text-2xl font-bold text-primary font-primary">
-              💊 Nhà Thuốc
-            </span>
+      <div className="bg-white border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center gap-4">
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-2 shrink-0">
+            <div
+              style={{ backgroundColor: "#1250dc" }}
+              className="p-2 rounded-xl"
+            >
+              <span className="text-white text-xl">💊</span>
+            </div>
+            <div>
+              <div
+                style={{ color: "#1250dc" }}
+                className="font-bold text-lg leading-tight"
+              >
+                Long Châu
+              </div>
+              <div className="text-xs text-gray-500 leading-tight">
+                Nhà thuốc FPT
+              </div>
+            </div>
           </Link>
-        </div>
 
+          {/* Search */}
+          <form onSubmit={handleSearch} className="flex-1 max-w-2xl">
+            <div className="relative flex items-center">
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Tìm kiếm thuốc, thực phẩm chức năng, sản phẩm..."
+                className="w-full pl-4 pr-12 py-2.5 border-2 rounded-xl text-sm focus:outline-none transition-colors"
+                style={{ borderColor: "#1250dc" }}
+              />
+              <button
+                type="submit"
+                className="absolute right-0 top-0 bottom-0 px-4 rounded-r-xl text-white transition-colors"
+                style={{ backgroundColor: "#1250dc" }}
+              >
+                <Search size={18} />
+              </button>
+            </div>
+          </form>
+
+          {/* Services icons */}
+          {/* <div className="hidden lg:flex items-center gap-1 text-xs text-gray-600">
+            <div className="flex flex-col items-center gap-0.5 cursor-pointer hover:text-blue-700 px-2 py-1 rounded-lg hover:bg-blue-50">
+              <FileText size={20} className="text-gray-500" />
+              <span>Đơn thuốc</span>
+            </div>
+            <div className="flex flex-col items-center gap-0.5 cursor-pointer hover:text-blue-700 px-2 py-1 rounded-lg hover:bg-blue-50">
+              <Stethoscope size={20} className="text-gray-500" />
+              <span>Tư vấn</span>
+            </div>
+          </div> */}
+
+          {/* Action icons */}
+          <div className="flex items-center gap-2">
+            <Link
+              to="/account"
+              className="flex flex-col items-center gap-0.5 text-xs text-gray-600 hover:text-blue-700 cursor-pointer px-2 py-1 rounded-lg hover:bg-blue-50 hidden md:flex"
+            >
+              <User size={20} />
+              <span>Tài khoản</span>
+            </Link>
+            {/* <Link
+              to="/wishlist"
+              className="relative flex flex-col items-center gap-0.5 text-xs text-gray-600 hover:text-blue-700 cursor-pointer px-2 py-1 rounded-lg hover:bg-blue-50 hidden md:flex"
+            >
+              <div className="relative">
+                <Heart size={20} />
+                {wishlist.length > 0 && (
+                  <span
+                    className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center"
+                    style={{ fontSize: "9px" }}
+                  >
+                    {wishlist.length}
+                  </span>
+                )}
+              </div>
+              <span>Yêu thích</span>
+            </Link> */}
+            <Link
+              to="/cart"
+              className="relative flex flex-col items-center gap-0.5 text-xs text-gray-600 hover:text-blue-700 cursor-pointer px-2 py-1 rounded-lg hover:bg-blue-50"
+            >
+              <div className="relative">
+                <ShoppingCart size={20} />
+                {totalItems > 0 && (
+                  <span
+                    className="absolute -top-1.5 -right-1.5 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center"
+                    style={{ backgroundColor: "#f05a22", fontSize: "9px" }}
+                  >
+                    {totalItems}
+                  </span>
+                )}
+              </div>
+              <span>Giỏ hàng</span>
+            </Link>
+            <button
+              className="md:hidden p-2 rounded-lg hover:bg-gray-100"
+              onClick={() => setNavOpen(!navOpen)}
+            >
+              {navOpen ? <X size={22} /> : <Menu size={22} />}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <nav className="navbar container">
         {/* Mobile toggle button */}
         <button
           className="order-2 flex cursor-pointer items-center md:order-1 md:hidden"
