@@ -3,7 +3,7 @@
 // Component chỉ cần gọi useAuth() thay vì import nhiều thứ.
 // ================================================================
 import { useMutation } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import toast from "react-hot-toast";
 import { useAuthStore } from "@/stores/auth.store.js";
 import api from "@/lib/axios.js";
