@@ -10,6 +10,7 @@ import { swaggerSpec } from "./config/swagger.js";
 
 import { env } from "./config/env.js";
 import { errorHandler, notFound } from "./middlewares/error.middleware.js";
+import { sanitizeInput } from "./middlewares/security.middleware.js";
 
 import authRoutes from "./routes/auth.routes.js";
 import medicineRoutes from "./routes/medicine.routes.js";
@@ -41,6 +42,7 @@ app.use(
 
 // ── Body parsing ──────────────────────────────────────────────────
 app.use(express.json({ limit: "10mb" })); //Parse JSON bodies with a size limit of 10MB
+app.use(sanitizeInput);
 app.use(express.urlencoded({ extended: true })); //Parse URL-encoded bodies (for form submissions)
 app.use(cookieParser()); //Parse cookies from incoming requests
 app.use(compression()); //Compress response bodies for all requests to improve performance
