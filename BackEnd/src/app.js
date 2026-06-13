@@ -17,9 +17,6 @@ import orderRoutes from "./routes/order.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import categoryRoutes from "./routes/category.routes.js";
 
-// --- Import routes (thêm dần khi làm Phase 2) ---
-// import cartRoutes     from './routes/cart.routes.js';
-
 const app = express();
 
 // ── Security ─────────────────────────────────────────────────────
@@ -60,7 +57,6 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/api/auth", authRoutes);
 app.use("/api/medicines", medicineRoutes);
 app.use("/api/categories", categoryRoutes);
-// app.use('/api/cart',      cartRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/admin", adminRoutes);
 
