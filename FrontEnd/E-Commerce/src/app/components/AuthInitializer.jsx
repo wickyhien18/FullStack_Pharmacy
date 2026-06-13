@@ -23,6 +23,13 @@ export default function AuthInitializer({ children }) {
     if (hasFetched.current) return; // already ran, skip
     hasFetched.current = true;
     const initAuth = async () => {
+      // Nếu chưa từng đăng nhập / đã logout → bỏ qua, không gọi API
+      const hasSession = localStorage.getItem("hasSession");
+      if (!hasSession) {
+        setIsInitialized(true);
+        return;
+      }
+
       try {
         // Gọi refresh-token — cookie tự động gửi kèm nhờ withCredentials
         // Nếu cookie còn hạn → nhận accessToken + user mới
