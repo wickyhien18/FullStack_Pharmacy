@@ -43,11 +43,13 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // Nếu lỗi 401 và chưa thử refresh (tránh loop vô tận)
+    // Nếu lỗi 401 và chưa thử refresh (tránh loop vô tận), và không phải request login/register
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
-      !originalRequest.url.includes("/auth/refresh-token")
+      !originalRequest.url.includes("/auth/refresh-token") &&
+      !originalRequest.url.includes("/auth/login") &&
+      !originalRequest.url.includes("/auth/register")
     ) {
       // Nếu đang refresh rồi → đưa request vào hàng đợi chờ
       if (isRefreshing) {
@@ -80,7 +82,9 @@ api.interceptors.response.use(
         // Refresh thất bại → logout
         processQueue(refreshError, null);
         useAuthStore.getState().clearAuth();
-        window.location.href = "/login";
+        if (window.location.pathname !== "/account") {
+          window.location.href = "/account";
+        }
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
