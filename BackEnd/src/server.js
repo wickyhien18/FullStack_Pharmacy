@@ -8,19 +8,19 @@ BigInt.prototype.toJSON = function () {
 };
 
 const start = async () => {
-  // Thử kết nối tối đa 3 lần
+  // Try connecting to the database with 3 retries
   for (let i = 1; i <= 3; i++) {
     try {
       await prisma.$connect();
       console.log("[DB] Connected to PostgreSQL (Supabase)");
-      break; // kết nối được thì thoát vòng lặp
+      break; // connected successfully, exit the loop
     } catch (err) {
       console.log(`[DB] Attempt ${i} failed, retrying...`);
       if (i === 3) {
         console.error("[Server] Failed to start:", err);
         process.exit(1);
       }
-      // Chờ 2 giây trước khi thử lại
+      // Wait 2 seconds before retrying
       await new Promise((r) => setTimeout(r, 2000));
     }
   }
