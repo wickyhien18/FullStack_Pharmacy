@@ -45,7 +45,7 @@ app.use(express.urlencoded({ extended: true })); //Parse URL-encoded bodies (for
 app.use(cookieParser()); //Parse cookies from incoming requests
 app.use(compression()); //Compress response bodies for all requests to improve performance
 // ── Logging ───────────────────────────────────────────────────────
-if (env.isDev) app.use(morgan("dev"));
+if (env.isDev) app.use(morgan("dev")); //Log HTTP requests in development mode
 
 // ── Health check ──────────────────────────────────────────────────
 app.get("/health", (_req, res) => {
