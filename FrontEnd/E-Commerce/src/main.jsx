@@ -26,10 +26,10 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <App />
       </AuthInitializer>
       <Toaster
-        position="top-right"
+        position="top"
         toastOptions={{
           duration: 3000,
-          style: { fontSize: "14px" },
+          style: { fontSize: "30px" },
           success: { iconTheme: { primary: "#22c55e", secondary: "#fff" } },
         }}
       />
