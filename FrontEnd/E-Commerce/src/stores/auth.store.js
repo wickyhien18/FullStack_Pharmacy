@@ -14,21 +14,23 @@ export const useAuthStore = create((set) => ({
   // ── Actions ───────────────────────────────────────────────────
 
   // Gọi sau khi login thành công
-  setAuth: (user, accessToken) =>
+  setAuth: (user, accessToken) => {
+    localStorage.setItem("hasSession", true); // set flag to indicate we have a session (for debugging)
     set({
       user,
       accessToken,
       isAuthenticated: true,
-    }),
-
+    });
+  },
   // Gọi sau khi logout
-  clearAuth: () =>
+  clearAuth: () => {
+    localStorage.removeItem("hasSession");
     set({
       user: null,
       accessToken: null,
       isAuthenticated: false,
-    }),
-
+    });
+  },
   // Gọi sau khi refresh token — chỉ cập nhật accessToken
   setAccessToken: (accessToken) => set({ accessToken }),
 }));
