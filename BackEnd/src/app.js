@@ -40,10 +40,10 @@ app.use(
 );
 
 // ── Body parsing ──────────────────────────────────────────────────
-app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
-app.use(compression());
+app.use(express.json({ limit: "10mb" })); //Parse JSON bodies with a size limit of 10MB
+app.use(express.urlencoded({ extended: true })); //Parse URL-encoded bodies (for form submissions)
+app.use(cookieParser()); //Parse cookies from incoming requests
+app.use(compression()); //Compress response bodies for all requests to improve performance
 // ── Logging ───────────────────────────────────────────────────────
 if (env.isDev) app.use(morgan("dev"));
 
