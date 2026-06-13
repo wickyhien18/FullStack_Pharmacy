@@ -24,7 +24,7 @@ app.use(helmet());
 app.use(
   cors({
     origin: env.CLIENT_URL,
-    credentials: true, // Cần cho cookie refresh token
+    credentials: true, // Allow storing cookies from client
   }),
 );
 
