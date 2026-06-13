@@ -5,7 +5,6 @@ export const validate =
   (schema, target = "body") =>
   (req, res, next) => {
     try {
-      console.log("/n VALIDATE START /n");
       const result = schema.parse(req[target]);
       req[target] = result;
       return next();
