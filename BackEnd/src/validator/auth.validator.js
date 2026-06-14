@@ -19,8 +19,11 @@ export const registerSchema = z.object({
     .regex(/^(0[3|5|7|8|9])+([0-9]{8})$/, "Invalid Vietnamese phone number"),
   password: z
     .string()
-    .min(6, "Password must be at least 6 characters")
-    .max(128, "Password must be at most 128 characters"),
+    .max(128, "Password must be at most 128 characters")
+    .regex(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[_@$!%*?&])[A-Za-z\d_@$!%*?&]{8,}$/,
+      "Password must have at least 8 characters, including at least 1 uppercase letter, 1 lowercase letter, 1 number, 1 special characer such as: _, @, $, !, %, *, ?, & ",
+    ),
 });
 
 export const loginSchema = z.object({
