@@ -4,12 +4,14 @@ import * as jwt from "../utils/jwt.js";
 import { getDeviceInfo } from "../utils/device.js";
 import * as authRepository from "../repositories/auth.repository.js";
 
+// ── GET REFRESHTOKEN EXPIRY ────────────────────────────────────────────────
 const getRefreshTokenExpiry = () => {
   const expiry = new Date();
   expiry.setDate(expiry.getDate() + 7); // Set expiry to 7 days from now
   return expiry;
 };
 
+//── FORMAT USER ────────────────────────────────────────────────
 const formatUser = (user) => ({
   userId: user.userId.toString(),
   userName: user.userName,
@@ -21,6 +23,7 @@ const formatUser = (user) => ({
   createdAt: user.createdAt,
 });
 
+// ── BUILD TOKEN PAYLOAD ────────────────────────────────────────────────
 const buildTokenPayload = (user) => ({
   userId: Number(user.userId),
   userName: user.userName,
