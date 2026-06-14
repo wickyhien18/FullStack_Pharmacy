@@ -5,7 +5,7 @@ import { prisma } from "../config/prisma.js";
 
 // Thống kê tổng quan dashboard
 export const getDashboardStats = async () => {
-  // Promise.all: chạy song song 4 query thay vì tuần tự → nhanh hơn ~4x
+  // Promise.all: run 4 queries in parallel instead of sequentially -> approximately 4x faster
   const [totalOrders, totalUsers, totalProducts, revenueResult] =
     await Promise.all([
       prisma.order.count(),
