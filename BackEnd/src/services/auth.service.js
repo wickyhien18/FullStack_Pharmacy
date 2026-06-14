@@ -51,6 +51,7 @@ export const register = async ({
 }) => {
   const existingUser = await authRepository.existUser(email, userName, phone);
   if (existingUser) {
+    //409 - Conflict data in database
     if (existingUser.email === email) {
       throw { status: 409, message: "Email đã được sử dụng" };
     }
