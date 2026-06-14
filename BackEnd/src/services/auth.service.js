@@ -94,22 +94,18 @@ export const login = async ({ email, password }, userAgent) => {
   const refreshToken = jwt.generateRefreshToken();
   const expireAt = getRefreshTokenExpiry();
 
-  // Tìm xem device này đã có token chưa (đã login trước, chưa logout)
   const existingToken = await authRepository.findTokenByDevice(
     user.userId,
     deviceInfo,
   );
 
   if (existingToken) {
-    // Device đã login, chưa logout
-    // → cập nhật nội dung token + gia hạn thời gian, GIỮ NGUYÊN id
     await authRepository.updateRefreshTokenById(
       existingToken.id,
       refreshToken,
       expireAt,
     );
   } else {
-    // Device mới hoàn toàn → tạo record mới
     await authRepository.saveRefreshToken(
       user.userId,
       refreshToken,
