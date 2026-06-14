@@ -90,8 +90,7 @@ export const login = async ({ email, password }, userAgent) => {
     throw { status: 401, message: "Email hoặc mật khẩu không đúng" };
 
   const deviceInfo = getDeviceInfo(userAgent);
-  const payload = buildTokenPayload(user);
-  const accessToken = jwt.generateAccessTokens(payload);
+  const accessToken = jwt.generateAccessTokens(buildTokenPayload(user));
   const refreshToken = jwt.generateRefreshToken();
   const expireAt = getRefreshTokenExpiry();
 
