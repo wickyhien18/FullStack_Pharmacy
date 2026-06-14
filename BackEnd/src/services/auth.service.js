@@ -82,7 +82,9 @@ export const register = async ({
 // ── LOGIN ─────────────────────────────────────────────────────────
 export const login = async ({ email, password }, userAgent) => {
   const user = await authRepository.findUserByEmail(email);
+  //401 - Unauthorized - incorrect email or password in database => NOT sure you have account?
   if (!user) throw { status: 401, message: "Email hoặc mật khẩu không đúng" };
+  //403 - Forbidden - can't let you use website probarly
   if (!user.isActive) throw { status: 403, message: "Tài khoản đang bị khóa" };
 
   const isMatch = await bcrypt.compare(password, user.password);
