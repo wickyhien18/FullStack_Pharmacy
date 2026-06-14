@@ -82,9 +82,10 @@ export const register = async ({
 // ── LOGIN ─────────────────────────────────────────────────────────
 export const login = async ({ email, password }, userAgent) => {
   const user = await authRepository.findUserByEmail(email);
+
   //401 - Unauthorized - incorrect email or password in database => NOT sure you have account?
   if (!user) throw { status: 401, message: "Email hoặc mật khẩu không đúng" };
-  //403 - Forbidden - can't let you use website probarly
+
   if (!user.isActive) throw { status: 403, message: "Tài khoản đang bị khóa" };
 
   const isMatch = await bcrypt.compare(password, user.password);
@@ -120,6 +121,7 @@ export const login = async ({ email, password }, userAgent) => {
 };
 
 export const refreshToken = async (refreshToken) => {
+  //401 - Unauthorized - can't find token or token is expired => can't know you are?
   if (!refreshToken)
     throw { status: 401, message: "Refresh token không tồn tại" };
 
@@ -140,8 +142,6 @@ export const refreshToken = async (refreshToken) => {
   const newToken = jwt.generateRefreshToken();
   const expireAt = getRefreshTokenExpiry();
 
-  // Rotate: cập nhật nội dung token + gia hạn thêm 7 ngày
-  // Giữ nguyên id + deviceInfo — chỉ đổi token string + expireAt
   await authRepository.updateRefreshTokenById(tokenData.id, newToken, expireAt);
 
   const accessToken = jwt.generateAccessTokens(
@@ -157,6 +157,7 @@ export const refreshToken = async (refreshToken) => {
 
 // ── LOGOUT ────────────────────────────────────────────────────────
 export const logout = async (refreshToken) => {
+  //400 - Bad request - can't find token or invalid token => can't do next action
   if (!refreshToken)
     throw { status: 400, message: "Refresh token không tồn tại" };
 
