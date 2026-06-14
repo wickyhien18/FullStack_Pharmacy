@@ -49,13 +49,13 @@ export const register = async ({
   const existingUser = await authRepository.existUser(email, userName, phone);
   if (existingUser) {
     if (existingUser.email === email) {
-      throw { status: 400, message: "Email đã được sử dụng" };
+      throw { status: 409, message: "Email đã được sử dụng" };
     }
     if (existingUser.userName === userName) {
-      throw { status: 400, message: "Tên đăng nhập đã được sử dụng" };
+      throw { status: 409, message: "Tên đăng nhập đã được sử dụng" };
     }
     if (existingUser.phone === phone) {
-      throw { status: 400, message: "Số điện thoại đã được sử dụng" };
+      throw { status: 409, message: "Số điện thoại đã được sử dụng" };
     }
   }
 
