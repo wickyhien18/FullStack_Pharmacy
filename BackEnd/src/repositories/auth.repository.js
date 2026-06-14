@@ -40,14 +40,12 @@ export const findRoleByName = (name) => {
   });
 };
 
-// Tìm token theo device — để biết device này đã login chưa
 export const findTokenByDevice = (userId, deviceInfo) => {
   return prisma.refreshToken.findFirst({
     where: { userId, deviceInfo: deviceInfo },
   });
 };
 
-// Tìm token theo token string — dùng khi verify refresh
 export const findRefreshToken = (token) => {
   return prisma.refreshToken.findUnique({
     where: { token },
@@ -55,15 +53,12 @@ export const findRefreshToken = (token) => {
   });
 };
 
-// Tạo token mới — dùng khi device này chưa từng login
 export const saveRefreshToken = (userId, token, expireAt, deviceInfo) => {
   return prisma.refreshToken.create({
     data: { userId, token, expireAt, deviceInfo },
   });
 };
 
-// Cập nhật token theo id — giữ nguyên id, chỉ đổi nội dung + gia hạn
-// Dùng khi: login lại cùng device chưa logout, hoặc rotate khi refresh
 export const updateRefreshTokenById = (id, newToken, newExpireAt) => {
   return prisma.refreshToken.update({
     where: { id },
