@@ -1,14 +1,13 @@
-
 // ================================================================
 // order.test.js — Integration tests cho Order API
 // Lưu ý / Note: cần có user test + medicines trong DB
 // ================================================================
-import request from 'supertest';
-import app from '../app.js';
-import { prisma } from '../config/prisma.js';
+import request from "supertest";
+import app from "../app.js";
+import { prisma } from "../config/prisma.js";
 
-let accessToken = '';
-let createdOrderId = '';
+let accessToken = "";
+let createdOrderId = "";
 
 // Đăng nhập trước để lấy token / Login first to get token
 beforeAll(async () => {
@@ -17,8 +16,8 @@ beforeAll(async () => {
   // Dùng account test đã tạo ở auth.test.js
   // Hoặc tạo mới nếu chưa có / Or create new if not exists
   const res = await request(app)
-    .post('/api/auth/login')
-    .send({ email: 'test_jest@test.pharmacy', password: 'password123' });
+    .post("/api/auth/login")
+    .send({ email: "wicky@gmail.com", password: "giaphien_Gmail18" });
 
   accessToken = res.body.data?.accessToken;
 });
@@ -30,62 +29,61 @@ afterAll(async () => {
       where: { orderId: BigInt(createdOrderId) },
     });
     await prisma.order.deleteMany({
-      where: { orderCode: { startsWith: 'ORD-TEST-' } },
+      where: { orderCode: { startsWith: "ORD-TEST-" } },
     });
   }
   await prisma.$disconnect();
 });
 
 // ── CREATE ORDER ──────────────────────────────────────────────────
-describe('POST /api/orders', () => {
-
-  it('should return 401 without token', async () => {
+describe("POST /api/orders", () => {
+  it("should return 401 without token", async () => {
     const res = await request(app)
-      .post('/api/orders')
-      .send({ items: [], shippingAddress: 'Test address' });
+      .post("/api/orders")
+      .send({ items: [], shippingAddress: "Test address" });
 
     expect(res.status).toBe(401);
   });
 
-  it('should return 400 if items is empty', async () => {
+  it("should return 400 if items is empty", async () => {
     const res = await request(app)
-      .post('/api/orders')
-      .set('Authorization', `Bearer ${accessToken}`)
-      .send({ items: [], shippingAddress: '99 Nguyen Chi Thanh' });
+      .post("/api/orders")
+      .set("Authorization", `Bearer ${accessToken}`)
+      .send({ items: [], shippingAddress: "99 Nguyen Chi Thanh" });
 
     expect(res.status).toBe(400);
     expect(res.body.success).toBe(false);
   });
 
-  it('should return 400 if shippingAddress is missing', async () => {
+  it("should return 400 if shippingAddress is missing", async () => {
     const res = await request(app)
-      .post('/api/orders')
-      .set('Authorization', `Bearer ${accessToken}`)
-      .send({ items: [{ medicineId: 1, quantity: 1 }], shippingAddress: '' });
+      .post("/api/orders")
+      .set("Authorization", `Bearer ${accessToken}`)
+      .send({ items: [{ medicineId: 1, quantity: 1 }], shippingAddress: "" });
 
     expect(res.status).toBe(400);
   });
 
-  it('should create order successfully with valid data', async () => {
+  it("should create order successfully with valid data", async () => {
     // Lấy medicine đầu tiên trong DB để test / Get first medicine to test
     const medicine = await prisma.medicine.findFirst({
-      where: { deletedAt: null, status: 'ACTIVE' },
+      where: { deletedAt: null, status: "ACTIVE" },
       include: { inventory: true },
     });
 
     // Bỏ qua nếu không có medicine / Skip if no medicine available
     if (!medicine || (medicine.inventory?.quantity ?? 0) < 1) {
-      console.warn('[Test] No available medicine to test order creation');
+      console.warn("[Test] No available medicine to test order creation");
       return;
     }
 
     const res = await request(app)
-      .post('/api/orders')
-      .set('Authorization', `Bearer ${accessToken}`)
+      .post("/api/orders")
+      .set("Authorization", `Bearer ${accessToken}`)
       .send({
         items: [{ medicineId: medicine.medicineId.toString(), quantity: 1 }],
-        shippingAddress: '99 Nguyen Chi Thanh, Q1, TP.HCM',
-        note: 'Test order from Jest',
+        shippingAddress: "99 Nguyen Chi Thanh, Q1, TP.HCM",
+        note: "Test order from Jest",
       });
 
     expect(res.status).toBe(201);
@@ -99,27 +97,26 @@ describe('POST /api/orders', () => {
 });
 
 // ── GET MY ORDERS ─────────────────────────────────────────────────
-describe('GET /api/orders/my', () => {
-
-  it('should return 401 without token', async () => {
-    const res = await request(app).get('/api/orders/my');
+describe("GET /api/orders/my", () => {
+  it("should return 401 without token", async () => {
+    const res = await request(app).get("/api/orders/my");
     expect(res.status).toBe(401);
   });
 
-  it('should return order list for authenticated user', async () => {
+  it("should return order list for authenticated user", async () => {
     const res = await request(app)
-      .get('/api/orders/my')
-      .set('Authorization', `Bearer ${accessToken}`);
+      .get("/api/orders/my")
+      .set("Authorization", `Bearer ${accessToken}`);
 
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
     expect(Array.isArray(res.body.data.items)).toBe(true);
   });
 
-  it('should return paginated results', async () => {
+  it("should return paginated results", async () => {
     const res = await request(app)
-      .get('/api/orders/my')
-      .set('Authorization', `Bearer ${accessToken}`)
+      .get("/api/orders/my")
+      .set("Authorization", `Bearer ${accessToken}`)
       .query({ page: 1, limit: 5 });
 
     expect(res.body.data.page).toBe(1);
@@ -128,30 +125,29 @@ describe('GET /api/orders/my', () => {
 });
 
 // ── GET ORDER DETAIL ──────────────────────────────────────────────
-describe('GET /api/orders/:orderId', () => {
-
-  it('should return 401 without token', async () => {
-    const res = await request(app).get('/api/orders/1');
+describe("GET /api/orders/:orderId", () => {
+  it("should return 401 without token", async () => {
+    const res = await request(app).get("/api/orders/1");
     expect(res.status).toBe(401);
   });
 
-  it('should return 404 for non-existent order', async () => {
+  it("should return 404 for non-existent order", async () => {
     const res = await request(app)
-      .get('/api/orders/999999999')
-      .set('Authorization', `Bearer ${accessToken}`);
+      .get("/api/orders/999999999")
+      .set("Authorization", `Bearer ${accessToken}`);
 
     expect(res.status).toBe(404);
   });
 
-  it('should return order detail for valid orderId', async () => {
+  it("should return order detail for valid orderId", async () => {
     if (!createdOrderId) {
-      console.warn('[Test] No order created yet, skipping detail test');
+      console.warn("[Test] No order created yet, skipping detail test");
       return;
     }
 
     const res = await request(app)
       .get(`/api/orders/${createdOrderId}`)
-      .set('Authorization', `Bearer ${accessToken}`);
+      .set("Authorization", `Bearer ${accessToken}`);
 
     expect(res.status).toBe(200);
     expect(res.body.data.orderId).toBe(createdOrderId);
