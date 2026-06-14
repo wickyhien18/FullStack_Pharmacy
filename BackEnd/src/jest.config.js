@@ -1,4 +1,3 @@
-
 // ================================================================
 // jest.config.js — Cấu hình Jest / Jest configuration
 //
@@ -8,15 +7,17 @@
 //   Project uses ES modules — Jest defaults to CommonJS
 // ================================================================
 export default {
-  testEnvironment: 'node',
+  testEnvironment: "node",
 
   // Chỉ chạy file .test.js trong thư mục tests/
   // Only run .test.js files in tests/ directory
-  testMatch: ['**/tests/**/*.test.js'],
+  testMatch: ["**/tests/**/*.test.js"],
 
   // Timeout 30 giây vì có DB query / 30s timeout for DB queries
   testTimeout: 30000,
 
   // Hiển thị chi tiết từng test / Show detailed output per test
   verbose: true,
+  runInBand: true, // ← run test files sequentially, not parallel
+  // ensures auth.test.js creates user BEFORE order.test.js runs
 };
