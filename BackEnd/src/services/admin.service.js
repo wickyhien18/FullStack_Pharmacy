@@ -1,10 +1,9 @@
-
 // ================================================================
 // admin.service.js — Business logic cho admin
 // ================================================================
-import * as adminRepo from '../repositories/admin.repository.js';
-import * as medicineRepo from '../repositories/medicine.repository.js';
-import { buildPaginatedResponse } from '../utils/pagination.js';
+import * as adminRepo from "../repositories/admin.repository.js";
+import * as medicineRepo from "../repositories/medicine.repository.js";
+import { buildPaginatedResponse } from "../utils/pagination.js";
 
 // Dashboard stats
 export const getDashboardStats = () => adminRepo.getDashboardStats();
@@ -17,17 +16,24 @@ export const getAllOrders = async ({ page, limit, skip }) => {
   ]);
 
   const items = orders.map((o) => ({
-    orderId:        o.orderId.toString(),
-    orderCode:      o.orderCode,
-    totalPrice:     Number(o.totalPrice),
-    orderStatus:    o.orderStatus,
-    paymentStatus:  o.paymentStatus,
-    paymentMethod:  o.paymentMethod,
-    createdAt:      o.createdAt,
-    user:           o.user
-      ? { userId: o.user.userId.toString(), fullName: o.user.fullName, email: o.user.email }
+    orderId: o.orderId.toString(),
+    orderCode: o.orderCode,
+    totalPrice: Number(o.totalPrice),
+    orderStatus: o.orderStatus,
+    paymentStatus: o.paymentStatus,
+    paymentMethod: o.paymentMethod,
+    createdAt: o.createdAt,
+    user: o.user
+      ? {
+          userId: o.user.userId.toString(),
+          fullName: o.user.fullName,
+          email: o.user.email,
+        }
       : null,
-    items: o.items?.map((i) => ({ medicineName: i.medicineName, quantity: i.quantity })),
+    items: o.items?.map((i) => ({
+      medicineName: i.medicine?.name || "N/A",
+      quantity: i.quantity,
+    })),
   }));
 
   return buildPaginatedResponse(items, total, page, limit);
@@ -35,9 +41,15 @@ export const getAllOrders = async ({ page, limit, skip }) => {
 
 // Cập nhật status đơn hàng
 export const updateOrderStatus = async (orderId, orderStatus) => {
-  const validStatuses = ['PENDING','CONFIRMED','SHIPPING','DELIVERED','CANCELLED'];
+  const validStatuses = [
+    "PENDING",
+    "CONFIRMED",
+    "SHIPPING",
+    "DELIVERED",
+    "CANCELLED",
+  ];
   if (!validStatuses.includes(orderStatus)) {
-    throw { status: 400, message: 'Trạng thái đơn hàng không hợp lệ' };
+    throw { status: 400, message: "Trạng thái đơn hàng không hợp lệ" };
   }
   const order = await adminRepo.updateOrderStatus(BigInt(orderId), orderStatus);
   return { orderId: order.orderId.toString(), orderStatus: order.orderStatus };
@@ -51,13 +63,13 @@ export const getAllUsers = async ({ page, limit, skip }) => {
   ]);
 
   const items = users.map((u) => ({
-    userId:   u.userId.toString(),
+    userId: u.userId.toString(),
     userName: u.userName,
     fullName: u.fullName,
-    email:    u.email,
-    phone:    u.phone,
+    email: u.email,
+    phone: u.phone,
     isActive: u.isActive,
-    role:     { roleName: u.role?.roleName },
+    role: { roleName: u.role?.roleName },
     createdAt: u.createdAt,
   }));
 
@@ -78,13 +90,13 @@ export const getAllMedicines = async ({ page, limit, skip }) => {
   ]);
 
   const items = medicines.map((m) => ({
-    medicineId:   m.medicineId.toString(),
-    name:         m.name,
-    slug:         m.slug,
-    price:        Number(m.price),
-    status:       m.status,
+    medicineId: m.medicineId.toString(),
+    name: m.name,
+    slug: m.slug,
+    price: Number(m.price),
+    status: m.status,
     categoryName: m.category?.name || null,
-    stock:        m.inventory?.quantity ?? 0,
+    stock: m.inventory?.quantity ?? 0,
   }));
 
   return buildPaginatedResponse(items, total, page, limit);
