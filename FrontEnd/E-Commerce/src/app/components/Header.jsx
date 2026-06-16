@@ -119,10 +119,10 @@ function Header() {
                 style={{ color: "#1250dc" }}
                 className="font-bold text-lg leading-tight"
               >
-                Long Châu
+                WICKY HIEN
               </div>
               <div className="text-xs text-gray-500 leading-tight">
-                Nhà thuốc FPT
+                Dự án Nhà thuốc
               </div>
             </div>
           </Link>
