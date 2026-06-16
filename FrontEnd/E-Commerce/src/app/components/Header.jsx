@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { useCategories } from "../../hooks/useMedicines.js";
+import { useAuth } from "../../hooks/useAuth.js";
 
 const navLinks = [
   { label: "Thuốc tiêu hóa", href: "/products?category=thuoc-tieu-hoa" },
@@ -30,6 +31,8 @@ function Header() {
   const [query, setQuery] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
+
+  const { user, isAuthenticated } = useAuth();
 
   const { data: categoriesData } = useCategories();
   const categoryIconMap = {
@@ -177,7 +180,10 @@ function Header() {
               className="flex flex-col items-center gap-0.5 text-xs text-gray-600 hover:text-blue-700 cursor-pointer px-2 py-1 rounded-lg hover:bg-blue-50 hidden md:flex"
             >
               <User size={20} />
-              <span>Tài khoản </span>
+              <span>
+                {" "}
+                {user && isAuthenticated ? user.userName : "Đăng Nhập"}{" "}
+              </span>
             </Link>
             {/* <Link
               to="/wishlist"
