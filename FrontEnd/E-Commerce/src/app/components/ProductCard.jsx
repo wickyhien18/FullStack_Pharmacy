@@ -4,19 +4,19 @@ import { ShoppingCart, Heart, Star } from "lucide-react";
 import { formatPrice } from "../data/products";
 import { useCart } from "../context/CartContext";
 function ProductCard({ product, showDiscount = true }) {
-  const { addToCart, wishlist, toggleWishlist } = useCart();
+  const { addToCart } = useCart();
   const [added, setAdded] = useState(false);
-  const isWishlisted = wishlist.includes(product.id);
+  // const isWishlisted = wishlist.includes(product.id);
   const handleAddToCart = (e) => {
     e.preventDefault();
     addToCart(product);
     setAdded(true);
     setTimeout(() => setAdded(false), 1500);
   };
-  const handleWishlist = (e) => {
-    e.preventDefault();
-    toggleWishlist(product.id);
-  };
+  // const handleWishlist = (e) => {
+  //   e.preventDefault();
+  //   toggleWishlist(product.id);
+  // };
   return (
     <Link
       to={`/products/${product.id}`}
