@@ -60,20 +60,23 @@ function Header() {
         style={{ backgroundColor: "#1250dc" }}
         className="text-white py-1.5 px-4 text-xs overflow-hidden"
       >
-        <div className="flex items-center gap-4">
-          <Link
-            to="https://github.com/wickyhien18/FullStack_Pharmacy"
-            target="_blank"
-            className="hover:text-blue-200 transition-colors"
-          >
-            <Github size={20} />
-            <span className="text-sm animate-marquee">
-              {" WICKY HIEN — SOURCE CODE GITHUB \u00a0\u00a0\u00a0•\u00a0\u00a0\u00a0".repeat(
-                10,
-              )}
-            </span>
-          </Link>
-        </div>
+        <Link
+          to="https://github.com/wickyhien18/FullStack_Pharmacy"
+          target="_blank"
+          className="hover:text-blue-200 transition-colors"
+        >
+          <span className="animate-marquee text-sm inline-flex items-center gap-2">
+            {Array(10)
+              .fill(null)
+              .map((_, i) => (
+                <span key={i} className="inline-flex items-center gap-2">
+                  <Github size={14} />
+                  WICKY HIEN — SOURCE CODE GITHUB
+                  <span className="mx-3">•</span>
+                </span>
+              ))}
+          </span>
+        </Link>
 
         {/* <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-4">
