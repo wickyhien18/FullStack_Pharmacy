@@ -20,12 +20,6 @@ import { useCart } from "../context/CartContext";
 import { useCategories } from "../../hooks/useMedicines.js";
 import { useAuth } from "../../hooks/useAuth.js";
 
-const navLinks = [
-  { label: "Thuốc tiêu hóa", href: "/products?category=thuoc-tieu-hoa" },
-  { label: "TPCN", href: "/products?category=vitamin-khoang-chat" },
-  { label: "Làm đẹp", href: "/products?category=duoc-my-pham" },
-  { label: "Thiết bị y tế", href: "/products?category=thiet-bi-y-te" },
-];
 function Header() {
   const { totalItems, wishlist } = useCart();
   const [query, setQuery] = useState("");
@@ -50,7 +44,6 @@ function Header() {
       name: c.name,
       icon: categoryIconMap[c.slug] || "💊",
       slug: c.slug,
-      count: 100,
     })) || [];
 
   const handleSearch = (e) => {
@@ -235,29 +228,13 @@ function Header() {
         <div className="max-w-7xl mx-auto px-4">
           <nav className="flex items-center gap-0 overflow-x-auto scrollbar-hide hide-scrollbar overflow-hidden">
             <div className="group relative">
-              <div className="absolute top-full left-0 bg-white shadow-xl rounded-b-xl border border-t-0 border-gray-100 z-50 w-64 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                {liveCategories.map((cat) => (
-                  <Link
-                    key={cat.id}
-                    to={`/products?category=${cat.id}`}
-                    className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors"
-                  >
-                    <span className="text-lg">{cat.icon}</span>
-                    <div>
-                      <div className="font-medium">{cat.name}</div>
-                      <div className="text-xs text-gray-400">
-                        {cat.count.toLocaleString()} sản phẩm
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
+              <div className="absolute top-full left-0 bg-white shadow-xl rounded-b-xl border border-t-0 border-gray-100 z-50 w-64 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200"></div>
             </div>
             {liveCategories.map((link) => (
               <Link
                 key={link.name}
                 to={"/products?category=" + link.slug}
-                className={`px-3 py-3 text-sm font-medium whitespace-nowrap transition-colors border-b-2 border-transparent hover:border-blue-700 ${link.highlight ? "text-red-500 hover:text-red-600 hover:border-red-500" : "text-gray-700 hover:text-blue-700"}`}
+                className={`px-3 first:pl-0 py-3 text-sm font-medium whitespace-nowrap transition-colors border-b-2 border-transparent hover:border-blue-700 ${link.highlight ? "text-red-500 hover:text-red-600 hover:border-red-500" : "text-gray-700 hover:text-blue-700"}`}
               >
                 {link.name}
               </Link>
