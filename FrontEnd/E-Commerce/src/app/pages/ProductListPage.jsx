@@ -13,12 +13,10 @@ import {
   useCategoriesWithCount,
 } from "../../hooks/useMedicines.js";
 const sortOptions = [
-  { value: "popular", label: "Ph\u1ED5 bi\u1EBFn nh\u1EA5t" },
+  { value: "newest", label: "M\u1EDBi nh\u1EA5t" },
   { value: "bestseller", label: "B\xE1n ch\u1EA1y nh\u1EA5t" },
   { value: "price-asc", label: "Gi\xE1 t\u0103ng d\u1EA7n" },
   { value: "price-desc", label: "Gi\xE1 gi\u1EA3m d\u1EA7n" },
-  { value: "rating", label: "\u0110\xE1nh gi\xE1 cao" },
-  { value: "newest", label: "M\u1EDBi nh\u1EA5t" },
 ];
 const priceRanges = [
   { label: "D\u01B0\u1EDBi 100.000\u0111", min: 0, max: 1e5 },
@@ -30,7 +28,7 @@ const priceRanges = [
 const ITEMS_PER_PAGE = 12;
 function ProductListPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [sort, setSort] = useState("popular");
+  const [sort, setSort] = useState("newest");
   const [priceRange, setPriceRange] = useState(null);
   const [showFilter, setShowFilter] = useState(false);
   const [page, setPage] = useState(1);
