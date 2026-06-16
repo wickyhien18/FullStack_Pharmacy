@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { useCategories } from "../../hooks/useMedicines.js";
+import "../../styles/ticker.css";
 
 const navLinks = [
   { label: "Thuốc tiêu hóa", href: "/products?category=thuoc-tieu-hoa" },
@@ -58,14 +59,14 @@ function Header() {
       {/* Top bar */}
       <div
         style={{ backgroundColor: "#1250dc" }}
-        className="text-white py-1.5 px-4 text-xs text-center "
+        className="text-white py-1.5 px-4 text-xs text-center ticker"
       >
         <Link
           to="https://github.com/wickyhien18/FullStack_Pharmacy"
           target="_blank"
           className="hover:text-blue-200 transition-colors"
         >
-          <span className="text-sm">WICKY HIEN - SOURCE CODE GITHUB</span>
+          <span className="text-sm ">WICKY HIEN - SOURCE CODE GITHUB</span>
         </Link>
 
         {/* <div className="max-w-7xl mx-auto flex justify-between items-center">
@@ -169,7 +170,7 @@ function Header() {
               <User size={20} />
               <span>Tài khoản</span>
             </Link>
-            <Link
+            {/* <Link
               to="/wishlist"
               className="relative flex flex-col items-center gap-0.5 text-xs text-gray-600 hover:text-blue-700 cursor-pointer px-2 py-1 rounded-lg hover:bg-blue-50 hidden md:flex"
             >
@@ -185,7 +186,7 @@ function Header() {
                 )}
               </div>
               <span>Yêu thích</span>
-            </Link>
+            </Link> */}
             <Link
               to="/cart"
               className="relative flex flex-col items-center gap-0.5 text-xs text-gray-600 hover:text-blue-700 cursor-pointer px-2 py-1 rounded-lg hover:bg-blue-50"
@@ -218,11 +219,6 @@ function Header() {
         <div className="max-w-7xl mx-auto px-4">
           <nav className="flex items-center gap-0 overflow-x-auto scrollbar-hide">
             <div className="group relative">
-              <button className="flex items-center gap-1 px-3 py-3 text-sm font-medium text-gray-700 hover:text-blue-700 whitespace-nowrap transition-colors border-b-2 border-transparent hover:border-blue-700">
-                <Menu size={16} />
-                Danh mục
-                <ChevronDown size={14} />
-              </button>
               <div className="absolute top-full left-0 bg-white shadow-xl rounded-b-xl border border-t-0 border-gray-100 z-50 w-64 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                 {liveCategories.map((cat) => (
                   <Link

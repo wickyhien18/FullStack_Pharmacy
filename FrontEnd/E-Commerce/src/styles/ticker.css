@@ -1,0 +1,15 @@
+.ticker {
+  white-space: nowrap;
+  display: inline-block;
+  animation: ticker 15s linear infinite;
+}
+
+@keyframes ticker {
+  from {
+    transform: translateX(100vw);
+  }
+
+  to {
+    transform: translateX(-100%);
+  }
+}
