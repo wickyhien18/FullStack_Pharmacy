@@ -138,7 +138,7 @@ function Header() {
           </Link>
 
           {/* Search */}
-          <form onSubmit={handleSearch} className="flex-1 max-w-2xl">
+          <form onSubmit={handleSearch} className="flex-1 max-w-5xl">
             <div className="relative flex items-center">
               <input
                 type="text"
