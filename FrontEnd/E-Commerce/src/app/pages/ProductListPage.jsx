@@ -195,7 +195,7 @@ function ProductListPage() {
                   <span
                     className={`text-xs ${category === cat.id ? "text-white/70" : "text-gray-400"}`}
                   >
-                    {cat.count}
+                    {cat.count || "0"}
                   </span>
                 </button>
               ))}
