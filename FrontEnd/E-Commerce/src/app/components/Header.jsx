@@ -7,6 +7,7 @@ import {
   User,
   Phone,
   MapPin,
+  Github,
   ChevronDown,
   Menu,
   X,
@@ -57,14 +58,14 @@ function Header() {
       {/* Top bar */}
       <div
         style={{ backgroundColor: "#1250dc" }}
-        className="text-white py-1.5 px-4 text-xs text-center"
+        className="text-white py-1.5 px-4 text-xs text-center "
       >
         <Link
           to="https://github.com/wickyhien18/FullStack_Pharmacy"
           target="_blank"
           className="hover:text-blue-200 transition-colors"
         >
-          <span>WICKY HIEN - SOURCE CODE GITHUB</span>
+          <span className="text-sm">WICKY HIEN - SOURCE CODE GITHUB</span>
         </Link>
 
         {/* <div className="max-w-7xl mx-auto flex justify-between items-center">
