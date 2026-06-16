@@ -226,7 +226,7 @@ function Header() {
       {/* Category nav */}
       <div className="bg-white border-b border-gray-100 hidden md:block">
         <div className="max-w-7xl mx-auto px-4">
-          <nav className="flex items-center gap-0 overflow-x-auto scrollbar-hide">
+          <nav className="flex items-center gap-0 overflow-x-auto scrollbar-hide hide-scrollbar">
             <div className="group relative">
               <div className="absolute top-full left-0 bg-white shadow-xl rounded-b-xl border border-t-0 border-gray-100 z-50 w-64 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                 {liveCategories.map((cat) => (

@@ -16,3 +16,11 @@
   animation: marquee 18s linear infinite;
   white-space: nowrap;
 }
+
+.hide-scrollbar {
+  -ms-overflow-style: none; /* IE, Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
