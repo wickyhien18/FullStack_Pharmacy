@@ -49,6 +49,7 @@ function Header() {
       id: c.slug,
       name: c.name,
       icon: categoryIconMap[c.slug] || "💊",
+      slug: c.slug,
       count: 100,
     })) || [];
 
@@ -252,13 +253,13 @@ function Header() {
                 ))}
               </div>
             </div>
-            {navLinks.map((link) => (
+            {liveCategories.map((link) => (
               <Link
-                key={link.label}
-                to={link.href}
+                key={link.name}
+                to={"/products?category=" + link.slug}
                 className={`px-3 py-3 text-sm font-medium whitespace-nowrap transition-colors border-b-2 border-transparent hover:border-blue-700 ${link.highlight ? "text-red-500 hover:text-red-600 hover:border-red-500" : "text-gray-700 hover:text-blue-700"}`}
               >
-                {link.label}
+                {link.name}
               </Link>
             ))}
           </nav>
@@ -291,14 +292,14 @@ function Header() {
             </div>
           </form>
           <div className="divide-y divide-gray-100">
-            {navLinks.map((link) => (
+            {liveCategories.map((link) => (
               <Link
-                key={link.label}
-                to={link.href}
+                key={link.name}
+                to={"/products?category=" + link.slug}
                 onClick={() => setMenuOpen(false)}
                 className={`block px-4 py-3 text-sm font-medium ${link.highlight ? "text-red-500" : "text-gray-700"}`}
               >
-                {link.label}
+                {link.name}
               </Link>
             ))}
             <Link
@@ -306,7 +307,8 @@ function Header() {
               onClick={() => setMenuOpen(false)}
               className="block px-4 py-3 text-sm text-gray-700"
             >
-              Tài khoản
+              {" "}
+              {user && isAuthenticated ? user.userName : "Đăng Nhập"}{" "}
             </Link>
             <Link
               to="/cart"
