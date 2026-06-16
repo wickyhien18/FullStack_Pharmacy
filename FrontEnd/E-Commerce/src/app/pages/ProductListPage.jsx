@@ -68,6 +68,10 @@ function ProductListPage() {
 
   const category = categorySlug;
   const activeCategory = liveCategories.find((c) => c.id === categorySlug);
+  const totalMedicineCount = liveCategories.reduce(
+    (total, cat) => total + (Number(cat.count) || 0),
+    0,
+  );
 
   const medicinesList = medicinesData?.items || [];
   const liveMedicines = medicinesList.map((m, index) => ({
@@ -175,10 +179,15 @@ function ProductListPage() {
             <div className="space-y-1">
               <button
                 onClick={() => handleCategoryChange("")}
-                className={`w-full text-left text-sm px-3 py-2 rounded-lg transition-colors ${!category ? "text-white font-medium" : "text-gray-700 hover:bg-gray-50"}`}
+                className={`w-full text-left text-sm px-3 py-2 rounded-lg transition-colors flex items-center justify-between ${!category ? "text-white font-medium" : "text-gray-700 hover:bg-gray-50"}`}
                 style={!category ? { backgroundColor: "#1250dc" } : {}}
               >
-                Tất cả sản phẩm
+                <span>Tất cả sản phẩm</span>
+                <span
+                  className={`text-xs ${!category ? "text-white/70" : "text-gray-400"}`}
+                >
+                  {totalMedicineCount}
+                </span>
               </button>
               {liveCategories.map((cat) => (
                 <button
@@ -293,7 +302,7 @@ function ProductListPage() {
                   className={`text-sm px-3 py-2 rounded-lg text-left ${!category ? "text-white" : "bg-gray-50 text-gray-700"}`}
                   style={!category ? { backgroundColor: "#1250dc" } : {}}
                 >
-                  Tất cả
+                  Tất cả ({totalMedicineCount})
                 </button>
                 {liveCategories.map((cat) => (
                   <button
