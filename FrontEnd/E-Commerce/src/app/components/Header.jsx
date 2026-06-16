@@ -177,7 +177,7 @@ function Header() {
               className="flex flex-col items-center gap-0.5 text-xs text-gray-600 hover:text-blue-700 cursor-pointer px-2 py-1 rounded-lg hover:bg-blue-50 hidden md:flex"
             >
               <User size={20} />
-              <span>Tài khoản</span>
+              <span>Tài khoản </span>
             </Link>
             {/* <Link
               to="/wishlist"
