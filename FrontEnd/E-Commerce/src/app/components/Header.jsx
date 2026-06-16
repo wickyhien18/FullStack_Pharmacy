@@ -40,6 +40,7 @@ function Header() {
     "vitamin-khoang-chat": "💊",
   };
 
+  //Change category of medicines count
   const liveCategories =
     categoriesData?.items?.map((c) => ({
       id: c.slug,
