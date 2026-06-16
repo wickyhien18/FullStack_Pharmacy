@@ -58,7 +58,7 @@ function Header() {
       {/* Top bar */}
       <div
         style={{ backgroundColor: "#1250dc" }}
-        className="text-white py-1.5 px-4 text-xs text-center "
+        className="text-white py-1.5 px-4 text-xs text-center overflow-hidden"
       >
         <Link
           to="https://github.com/wickyhien18/FullStack_Pharmacy"
@@ -66,7 +66,7 @@ function Header() {
           className="hover:text-blue-200 transition-colors"
         >
           <span className="text-sm animate-marquee">
-            WICKY HIEN - SOURCE CODE GITHUB{" "}
+            WICKY HIEN - SOURCE CODE GITHUB
           </span>
         </Link>
 
