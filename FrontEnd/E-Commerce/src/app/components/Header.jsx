@@ -149,7 +149,7 @@ function Header() {
           </form>
 
           {/* Services icons */}
-          <div className="hidden lg:flex items-center gap-1 text-xs text-gray-600">
+          {/* <div className="hidden lg:flex items-center gap-1 text-xs text-gray-600">
             <div className="flex flex-col items-center gap-0.5 cursor-pointer hover:text-blue-700 px-2 py-1 rounded-lg hover:bg-blue-50">
               <FileText size={20} className="text-gray-500" />
               <span>Đơn thuốc</span>
@@ -158,7 +158,7 @@ function Header() {
               <Stethoscope size={20} className="text-gray-500" />
               <span>Tư vấn</span>
             </div>
-          </div>
+          </div> */}
 
           {/* Action icons */}
           <div className="flex items-center gap-2">
