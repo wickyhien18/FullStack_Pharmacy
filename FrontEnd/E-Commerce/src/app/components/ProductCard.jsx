@@ -53,13 +53,13 @@ function ProductCard({ product, showDiscount = true }) {
       </div>
 
       <div className="p-3 flex flex-col flex-1">
-        <div className="text-xs text-gray-400 mb-1">{product.brand}</div>
+        {/* <div className="text-xs text-gray-400 mb-1">{product.brand}</div> */}
         <h3 className="text-sm text-gray-800 mb-2 line-clamp-2 flex-1 group-hover:text-blue-700 transition-colors">
           {product.name}
         </h3>
         <div className="text-xs text-gray-400 mb-2">{product.unit}</div>
 
-        <div className="flex items-center gap-1 mb-2">
+        {/* <div className="flex items-center gap-1 mb-2">
           <Star size={12} fill="#fbbf24" className="text-yellow-400" />
           <span className="text-xs text-gray-600">{product.rating}</span>
           <span className="text-xs text-gray-400">
@@ -71,7 +71,7 @@ function ProductCard({ product, showDiscount = true }) {
               ? `${(product.sold / 1e3).toFixed(1)}k`
               : product.sold}
           </span>
-        </div>
+        </div> */}
 
         <div className="flex items-center justify-center gap-2 mb-3">
           <span
