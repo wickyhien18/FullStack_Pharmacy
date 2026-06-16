@@ -40,7 +40,6 @@ function Header() {
     "vitamin-khoang-chat": "💊",
   };
 
-  //Change category of medicines count
   const liveCategories =
     categoriesData?.items?.map((c) => ({
       id: c.slug,
@@ -58,9 +57,17 @@ function Header() {
       {/* Top bar */}
       <div
         style={{ backgroundColor: "#1250dc" }}
-        className="text-white py-1.5 px-4 text-xs"
+        className="text-white py-1.5 px-4 text-xs text-center"
       >
-        <div className="max-w-7xl mx-auto flex justify-between items-center gap-4">
+        <Link
+          to="https://github.com/wickyhien18/FullStack_Pharmacy"
+          target="_blank"
+          className="hover:text-blue-200 transition-colors"
+        >
+          <span>WICKY HIEN - SOURCE CODE GITHUB</span>
+        </Link>
+
+        {/* <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-4">
             <a
               href="tel:18006928"
@@ -92,7 +99,7 @@ function Header() {
               <span>Tìm nhà thuốc</span>
             </Link>
           </div>
-        </div>
+        </div> */}
       </div>
 
       {/* Main header */}
