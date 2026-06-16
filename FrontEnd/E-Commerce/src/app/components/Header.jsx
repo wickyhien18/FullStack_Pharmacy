@@ -144,7 +144,7 @@ function Header() {
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Tìm kiếm thuốc, thực phẩm chức năng, sản phẩm...."
+                placeholder="Tìm kiếm thuốc, thực phẩm chức năng, sản phẩm..."
                 className="w-full pl-4 pr-12 py-2.5 border-2 rounded-xl text-sm focus:outline-none transition-colors"
                 style={{ borderColor: "#1250dc" }}
               />
