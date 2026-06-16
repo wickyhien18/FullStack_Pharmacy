@@ -3,9 +3,8 @@ import {
   Phone,
   Mail,
   MapPin,
-  Facebook,
-  Youtube,
-  Instagram,
+  Github,
+  Linkedin,
   Shield,
   Award,
   Clock,
@@ -48,57 +47,43 @@ function Footer() {
               </div>
               <div>
                 <div style={{ color: "#1250dc" }} className="font-bold text-lg">
-                  Long Châu
+                  WICKY HIEN
                 </div>
-                <div className="text-xs text-gray-500">Nhà thuốc FPT</div>
+                <div className="text-xs text-gray-500">Dự án Nhà thuốc</div>
               </div>
             </Link>
             <p className="text-sm text-gray-600 mb-4 leading-relaxed">
-              Hệ thống nhà thuốc Long Châu với hơn 3.200 nhà thuốc trên toàn
-              quốc. Cam kết cung cấp thuốc chính hãng, giá tốt nhất.
+              Dự án Website clone từ trang website Nhà thuốc Long Châu. Vui lòng
+              không đặt mua thuốc nếu có hay không có ý định mua thuốc
             </p>
             <div className="space-y-2 text-sm text-gray-600">
               <div className="flex items-center gap-2">
-                <Phone size={14} style={{ color: "#1250dc" }} />
-                <span>Hotline: 1800 6928 (Miễn phí 24/7)</span>
+                <Mail size={14} style={{ color: "#1250dc" }} />
+                <span>giaphienhap2005@gmail.com</span>
               </div>
               <div className="flex items-center gap-2">
-                <Mail size={14} style={{ color: "#1250dc" }} />
-                <span>cskh@nhathuoclongchau.com</span>
+                <Github size={14} style={{ color: "#1250dc" }} />
+
+                <Link to={"https://github.com/wickyhien18"} target="_blank">
+                  {" "}
+                  Wicky Hien{" "}
+                </Link>
               </div>
-              <div className="flex items-start gap-2">
-                <MapPin
-                  size={14}
-                  style={{ color: "#1250dc" }}
-                  className="mt-0.5 shrink-0"
-                />
-                <span>Tòa nhà FPT, 17 Duy Tân, Cầu Giấy, Hà Nội</span>
+              <div className="flex items-center gap-2">
+                <Linkedin size={14} style={{ color: "#1250dc" }} />
+                <Link
+                  to={"https://www.linkedin.com/in/hien-giap-wicky"}
+                  target="_blank"
+                >
+                  {" "}
+                  Hien Giap{" "}
+                </Link>
               </div>
-            </div>
-            <div className="flex items-center gap-3 mt-4">
-              <a
-                href="#"
-                className="w-9 h-9 bg-blue-600 rounded-full flex items-center justify-center text-white hover:bg-blue-700 transition-colors"
-              >
-                <Facebook size={16} />
-              </a>
-              <a
-                href="#"
-                className="w-9 h-9 bg-red-600 rounded-full flex items-center justify-center text-white hover:bg-red-700 transition-colors"
-              >
-                <Youtube size={16} />
-              </a>
-              <a
-                href="#"
-                className="w-9 h-9 bg-pink-600 rounded-full flex items-center justify-center text-white hover:bg-pink-700 transition-colors"
-              >
-                <Instagram size={16} />
-              </a>
             </div>
           </div>
 
           {/* Quick links */}
-          <div>
+          {/* <div>
             <h4 className="font-semibold text-gray-800 mb-4">Về Long Châu</h4>
             <ul className="space-y-2.5">
               {[
@@ -118,10 +103,10 @@ function Footer() {
                 </li>
               ))}
             </ul>
-          </div>
+          </div> */}
 
           {/* Services */}
-          <div>
+          {/* <div>
             <h4 className="font-semibold text-gray-800 mb-4">Dịch vụ</h4>
             <ul className="space-y-2.5">
               {[
@@ -141,10 +126,10 @@ function Footer() {
                 </li>
               ))}
             </ul>
-          </div>
+          </div> */}
 
           {/* Policy */}
-          <div>
+          {/* <div>
             <h4 className="font-semibold text-gray-800 mb-4">Hỗ trợ</h4>
             <ul className="space-y-2.5">
               {[
@@ -164,22 +149,7 @@ function Footer() {
                 </li>
               ))}
             </ul>
-          </div>
-        </div>
-      </div>
-
-      {/* Bottom bar */}
-      <div className="border-t border-gray-100 py-4 px-4">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-3 text-xs text-gray-500">
-          <span>
-            © 2026 Công ty Cổ phần Dược phẩm Long Châu (FPT Retail). Tất cả
-            quyền được bảo lưu.
-          </span>
-          <div className="flex items-center gap-4">
-            <span>GPKD: 0108750671</span>
-            <span>|</span>
-            <span>GPHD: 01-NH/HN-CBNB</span>
-          </div>
+          </div> */}
         </div>
       </div>
     </footer>
