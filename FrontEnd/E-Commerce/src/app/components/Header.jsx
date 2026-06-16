@@ -69,7 +69,7 @@ function Header() {
             {Array(10)
               .fill(null)
               .map((_, i) => (
-                <span key={i} className="inline-flex items-center gap-2">
+                <span key={i} className="inline-flex items-center gap-3">
                   <Github size={20} />
                   WICKY HIEN — SOURCE CODE GITHUB
                   <span className="mx-3">•</span>
