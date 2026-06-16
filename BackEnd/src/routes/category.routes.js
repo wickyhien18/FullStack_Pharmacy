@@ -7,8 +7,8 @@ import { sendSuccess, sendError } from "../utils/response.js";
 
 const router = Router();
 
-// GET /api/categories
-router.get("/", async (req, res) => {
+// GET /api/categories/count
+router.get("/count", async (req, res) => {
   try {
     const categories = await prisma.category.findMany({
       include: {
@@ -36,7 +36,8 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/count", async (req, res) => {
+// GET /api/categories
+router.get("/", async (req, res) => {
   try {
     const categories = await prisma.category.findMany({
       orderBy: { name: "asc" },
