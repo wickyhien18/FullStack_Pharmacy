@@ -14,7 +14,7 @@ router.get("/count", async (req, res) => {
       include: {
         _count: {
           select: {
-            medicine: true,
+            medicines: true,
           },
         },
       },
@@ -24,7 +24,7 @@ router.get("/count", async (req, res) => {
       categoryId: c.categoryId.toString(),
       name: c.name,
       slug: c.slug,
-      count: c._count.medicine,
+      count: c._count.medicines,
     }));
     return sendSuccess(
       res,
