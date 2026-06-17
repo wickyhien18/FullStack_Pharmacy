@@ -138,7 +138,9 @@ function CheckoutPage() {
       const response = await api.post("/orders", payload);
       setOrderCode(response.data.data.orderCode);
       setPlaced(true);
-      toast.success("Đơn hàng đang được xử lý. Vui lòng chờ xác nhận trong 5-10 phút.");
+      toast.success(
+        "Đơn hàng đang được xử lý. Vui lòng chờ xác nhận trong 5-10 phút.",
+      );
       clearCart();
     } catch (error) {
       toast.error(error.response?.data?.message || "Đặt hàng thất bại");
@@ -542,7 +544,10 @@ function CheckoutPage() {
                   className="flex-1 py-3 rounded-xl text-white font-semibold text-sm hover:opacity-90"
                   style={{ backgroundColor: "#1250dc" }}
                 >
-                  Xác nhận đặt hàng (
+                  {placed === true && (
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  )}
+                  (
                   {
                     // formatPrice(total)
                     formatPrice(totalPrice)
