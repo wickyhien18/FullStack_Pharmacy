@@ -330,9 +330,9 @@ function AccountPage() {
         <span className="text-gray-800">Tài khoản</span>
       </nav>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start max-w-4xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols gap-8 items-start max-w-4xl mx-auto">
         {/* Forms */}
-        <div className="bg-white rounded-2xl p-8 shadow-sm">
+        <div className="bg-white rounded-2xl p-8 shadow-sm ">
           <div className="flex rounded-xl overflow-hidden border border-gray-200 mb-6">
             {["login", "register"].map((t) => (
               <button
@@ -507,7 +507,7 @@ function AccountPage() {
         </div>
 
         {/* Benefits panel */}
-        <div className="space-y-4">
+        {/* <div className="space-y-4">
           <div
             className="rounded-2xl p-6 text-white shadow-sm animate-fade-in"
             style={{ backgroundColor: "#1250dc" }}
@@ -548,7 +548,7 @@ function AccountPage() {
               📞 1800 6928 (Miễn phí)
             </a>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );
