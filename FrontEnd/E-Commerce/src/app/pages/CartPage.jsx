@@ -84,7 +84,10 @@ function CartPage() {
             <div className="divide-y divide-gray-100">
               {items.map(({ product, quantity }) => (
                 <div key={product.id} className="p-5 flex gap-4">
-                  <Link to={`/products/${product.id}`} className="shrink-0">
+                  <Link
+                    to={`/products/${product.medicineId}`}
+                    className="shrink-0"
+                  >
                     <img
                       src={product.image}
                       alt={product.name}
