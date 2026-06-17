@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { ChevronRight, Check, MapPin, CreditCard, Package } from "lucide-react";
 import { useCart } from "../context/CartContext";
@@ -14,6 +14,22 @@ const paymentMethods = [
   { id: "momo", label: "Ví MoMo", icon: "💜" },
   { id: "bank", label: "Thẻ ngân hàng / Thẻ quốc tế", icon: "💳" },
 ];
+
+const validateShippingForm = (values) => {
+  const errors = {};
+  const phone = values.phone.trim();
+
+  if (!values.name.trim()) errors.name = "Vui lòng nhập họ và tên";
+  if (!phone) {
+    errors.phone = "Vui lòng nhập số điện thoại";
+  } else if (!/^(0|\+84)\d{9,10}$/.test(phone.replace(/\s/g, ""))) {
+    errors.phone = "Số điện thoại không hợp lệ";
+  }
+  if (!values.address.trim()) errors.address = "Vui lòng nhập địa chỉ cụ thể";
+
+  return errors;
+};
+
 function CheckoutPage() {
   const { items, totalPrice, totalItems, clearCart } = useCart();
   const { user, isAuthenticated } = useAuth();
@@ -32,17 +48,53 @@ function CheckoutPage() {
     address: "",
     note: "",
   });
+  const [touched, setTouched] = useState({});
+  const [errors, setErrors] = useState({});
   const shipping = totalPrice >= 15e4 ? 0 : 3e4;
   const total = totalPrice + shipping;
+
+  useEffect(() => {
+    if (!user) return;
+    setForm((current) => ({
+      ...current,
+      name: current.name || user.fullName || "",
+      phone: current.phone || user.phone || "",
+      email: current.email || user.email || "",
+    }));
+  }, [user]);
+
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    const nextForm = { ...form, [name]: value };
+    setForm(nextForm);
+
+    if (touched[name]) {
+      setErrors(validateShippingForm(nextForm));
+    }
+  };
+  const handleBlur = (e) => {
+    const nextTouched = { ...touched, [e.target.name]: true };
+    setTouched(nextTouched);
+    setErrors(validateShippingForm(form));
+  };
+  const validateBeforeLeavingShipping = () => {
+    const nextErrors = validateShippingForm(form);
+    setTouched({ ...touched, name: true, phone: true, address: true });
+    setErrors(nextErrors);
+
+    if (Object.keys(nextErrors).length > 0) {
+      toast.error("Vui lòng kiểm tra thông tin giao hàng");
+      return false;
+    }
+
+    return true;
   };
   const handleNext = () => {
+    if (step === 0 && !validateBeforeLeavingShipping()) return;
     if (step < 2) setStep(step + 1);
   };
   const handlePlaceOrder = async () => {
-    if (!form.name || !form.phone || !form.address) {
-      toast.error("Vui lòng điền đầy đủ các thông tin giao hàng bắt buộc");
+    if (!validateBeforeLeavingShipping()) {
       setStep(0);
       return;
     }
@@ -185,9 +237,13 @@ function CheckoutPage() {
                     name="name"
                     value={form.name}
                     onChange={handleChange}
+                    onBlur={handleBlur}
                     placeholder="Nguyễn Văn A"
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-400"
+                    className={`w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-400 ${errors.name ? "border-red-400" : "border-gray-200"}`}
                   />
+                  {errors.name && (
+                    <p className="mt-1 text-xs text-red-500">{errors.name}</p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">
@@ -197,9 +253,13 @@ function CheckoutPage() {
                     name="phone"
                     value={form.phone}
                     onChange={handleChange}
+                    onBlur={handleBlur}
                     placeholder="0912 345 678"
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-400"
+                    className={`w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-400 ${errors.phone ? "border-red-400" : "border-gray-200"}`}
                   />
+                  {errors.phone && (
+                    <p className="mt-1 text-xs text-red-500">{errors.phone}</p>
+                  )}
                 </div>
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">
@@ -209,6 +269,7 @@ function CheckoutPage() {
                     name="email"
                     value={form.email}
                     onChange={handleChange}
+                    onBlur={handleBlur}
                     placeholder="example@email.com"
                     className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-400"
                   />
@@ -271,9 +332,15 @@ function CheckoutPage() {
                     name="address"
                     value={form.address}
                     onChange={handleChange}
+                    onBlur={handleBlur}
                     placeholder="Số nhà, tên đường..."
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-400"
+                    className={`w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-400 ${errors.address ? "border-red-400" : "border-gray-200"}`}
                   />
+                  {errors.address && (
+                    <p className="mt-1 text-xs text-red-500">
+                      {errors.address}
+                    </p>
+                  )}
                 </div>
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">
