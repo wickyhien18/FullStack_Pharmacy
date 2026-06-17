@@ -27,7 +27,7 @@ const formatUser = (user) => ({
 const buildTokenPayload = (user) => ({
   userId: Number(user.userId),
   userName: user.userName,
-  role: user.role ? user.role.roleName : "ROLE_CUSTOMER",
+  role: user.role ? user.role : "ROLE_CUSTOMER",
 });
 
 // ── GET MY DEVICES ────────────────────────────────────────────────
