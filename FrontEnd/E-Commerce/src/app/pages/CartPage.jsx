@@ -104,7 +104,10 @@ function CartPage() {
                     className="shrink-0"
                   >
                     <img
-                      src={item.image}
+                      src={
+                        item.image ||
+                        "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&h=400&fit=crop&auto=format"
+                      }
                       alt={item.name}
                       className="w-20 h-20 object-cover rounded-xl border border-gray-100"
                     />
