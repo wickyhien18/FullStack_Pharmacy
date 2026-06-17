@@ -28,7 +28,7 @@ export default function AdminLayout() {
     }
   }, [isAuthenticated, user, navigate]);
 
-  if (!isAuthenticated || user?.role?.roleName !== "ROLE_ADMIN") {
+  if (!isAuthenticated || user?.role !== "ROLE_ADMIN") {
     return null;
   }
 
