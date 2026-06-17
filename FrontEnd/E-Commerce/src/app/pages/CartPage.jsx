@@ -203,26 +203,26 @@ function CartPage() {
                 <span>Tạm tính ({totalItems} sản phẩm)</span>
                 <span>{formatPrice(totalPrice)}</span>
               </div>
-              {discount > 0 && (
+              {/* {discount > 0 && (
                 <div className="flex justify-between text-green-600">
                   <span>Giảm giá (10%)</span>
                   <span>-{formatPrice(discount)}</span>
                 </div>
-              )}
-              <div className="flex justify-between text-gray-600">
+              )} */}
+              {/* <div className="flex justify-between text-gray-600">
                 <span>Phí vận chuyển</span>
                 <span
                   className={shipping === 0 ? "text-green-600 font-medium" : ""}
                 >
                   {shipping === 0 ? "Mi\u1EC5n ph\xED" : formatPrice(shipping)}
                 </span>
-              </div>
-              {totalPrice < 15e4 && (
+              </div> */}
+              {/* {totalPrice < 15e4 && (
                 <p className="text-xs text-blue-700 bg-blue-50 p-2 rounded-lg">
                   Thêm {formatPrice(15e4 - totalPrice)} để được miễn phí vận
                   chuyển
                 </p>
-              )}
+              )} */}
               <div className="border-t border-gray-100 pt-3 flex justify-between font-bold text-base">
                 <span>Tổng cộng</span>
                 <span style={{ color: "#e53935" }}>
