@@ -68,6 +68,8 @@ export const useCart = () => {
       updateMutation.mutate({ cartItemId, quantity }),
     removeItem: (cartItemId) => removeMutation.mutate(cartItemId),
 
+    clearCart: () => queryClient.invalidateQueries({ queryKey: ["cart"] }),
+
     isAdding: addMutation.isPending,
     isUpdating: updateMutation.isPending,
     isRemoving: removeMutation.isPending,

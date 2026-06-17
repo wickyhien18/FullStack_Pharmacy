@@ -510,27 +510,29 @@ function CheckoutPage() {
                 </div>
               </div>
               <div className="divide-y divide-gray-100 mb-5">
-                {items.map(({ product, quantity }) => (
+                {items.map((item) => (
                   <div
-                    key={product.id}
+                    key={item.cartItemId}
                     className="flex items-center gap-3 py-3"
                   >
                     <img
-                      src={product.image}
-                      alt={product.name}
+                      src={item.image}
+                      alt={item.name}
                       className="w-12 h-12 object-cover rounded-lg border border-gray-100"
                     />
                     <div className="flex-1 min-w-0">
                       <div className="text-sm text-gray-800 line-clamp-1">
-                        {product.name}
+                        {item.name}
                       </div>
-                      <div className="text-xs text-gray-500">x{quantity}</div>
+                      <div className="text-xs text-gray-500">
+                        x{item.quantity}
+                      </div>
                     </div>
                     <div
                       className="text-sm font-semibold"
                       style={{ color: "#1250dc" }}
                     >
-                      {formatPrice(product.price * quantity)}
+                      {formatPrice(item.price * item.quantity)}
                     </div>
                   </div>
                 ))}
@@ -563,21 +565,21 @@ function CheckoutPage() {
             Đơn hàng ({totalItems} sản phẩm)
           </h3>
           <div className="space-y-3 mb-4 max-h-64 overflow-y-auto">
-            {items.map(({ product, quantity }) => (
-              <div key={product.id} className="flex items-center gap-2">
+            {items.map((item) => (
+              <div key={item.cartItemId} className="flex items-center gap-2">
                 <img
-                  src={product.image}
+                  src={item.image}
                   alt=""
                   className="w-10 h-10 object-cover rounded-lg border border-gray-100 shrink-0"
                 />
                 <div className="flex-1 min-w-0">
                   <div className="text-xs text-gray-700 line-clamp-2">
-                    {product.name}
+                    {item.name}
                   </div>
-                  <div className="text-xs text-gray-400">x{quantity}</div>
+                  <div className="text-xs text-gray-400">x{item.quantity}</div>
                 </div>
                 <div className="text-xs font-semibold text-gray-800 shrink-0">
-                  {formatPrice(product.price * quantity)}
+                  {formatPrice(item.price * item.quantity)}
                 </div>
               </div>
             ))}
