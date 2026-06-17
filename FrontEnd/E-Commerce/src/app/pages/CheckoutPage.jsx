@@ -10,7 +10,7 @@ import {
   PhoneCall,
   Truck,
 } from "lucide-react";
-import { useCart } from "../context/CartContext";
+import { useCart } from "@/hooks/useCart.js";
 import { formatPrice } from "../data/products";
 import api from "../../lib/axios.js";
 import { useAuth } from "../../hooks/useAuth.js";

@@ -8,7 +8,7 @@ import {
   ChevronRight,
   ArrowLeft,
 } from "lucide-react";
-import { useCart } from "../context/CartContext";
+import { useCart } from "@/hooks/useCart.js";
 import { formatPrice } from "../data/products";
 import { useState } from "react";
 function CartPage() {

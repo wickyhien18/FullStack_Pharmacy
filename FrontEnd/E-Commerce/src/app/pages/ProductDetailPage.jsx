@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { formatPrice } from "../data/products";
 import { ProductCard } from "../components/ProductCard";
-import { useCart } from "../context/CartContext";
+import { useCart } from "@/hooks/useCart.js";
 import { useMedicine, useMedicines } from "../../hooks/useMedicines.js";
 
 import NotFoundPage from "./NotFoundPage";
