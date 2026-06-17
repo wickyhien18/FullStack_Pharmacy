@@ -67,13 +67,30 @@ export const register = async ({
   if (!role) throw { status: 500, message: "Không tìm thấy role mặc định" };
 
   const hashedPassword = await bcrypt.hash(password, env.BCRYPT_ROUNDS);
-  const user = await authRepository.createUser({
-    userName,
-    fullName,
-    email,
-    phone,
-    password: hashedPassword,
-    roleId: role.roleId,
+
+  // Dùng transaction để đảm bảo user và cart tạo cùng lúc
+  // Nếu 1 trong 2 fail → rollback cả 2
+  const { prisma } = await import("../config/prisma.js");
+
+  const user = await prisma.$transaction(async (tx) => {
+    const newUser = await tx.user.create({
+      data: {
+        userName,
+        fullName,
+        email,
+        phone,
+        password: hashedPassword,
+        roleId: role.roleId,
+      },
+      include: { role: true },
+    });
+
+    // Tạo cart ngay sau khi tạo user
+    await tx.cart.create({
+      data: { userId: newUser.userId },
+    });
+
+    return newUser;
   });
 
   return { user: formatUser(user) };
