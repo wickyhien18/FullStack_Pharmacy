@@ -411,3 +411,9 @@ INSERT INTO inventory (medicine_id, quantity)
 SELECT medicine_id, 180 FROM medicines WHERE slug = 'broncol-5mg';
 INSERT INTO inventory (medicine_id, quantity)
 SELECT medicine_id, 25  FROM medicines WHERE slug = 'may-do-huyet-ap-omron-7120';
+
+INSERT INTO carts (user_id, created_at)
+SELECT u.user_id, NOW()
+FROM users u
+LEFT JOIN carts c ON c.user_id = u.user_id
+WHERE c.cart_id IS NULL;
