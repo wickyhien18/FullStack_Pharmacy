@@ -53,7 +53,7 @@ function Footer() {
               </div>
             </Link>
             <p className="text-sm text-gray-600 mb-4 leading-relaxed">
-              Dự án Website clone từ trang website Nhà thuốc Long Châu. Vui lòng
+              Dự án Website CLONE từ trang website Nhà thuốc Long Châu. Vui lòng
               không đặt mua thuốc nếu có hay không có ý định mua thuốc
             </p>
             <div className="space-y-2 text-sm text-gray-600">
