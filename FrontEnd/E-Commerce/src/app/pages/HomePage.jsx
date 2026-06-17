@@ -11,7 +11,10 @@ import {
 } from "lucide-react";
 import { ProductCard } from "../components/ProductCard";
 import { formatPrice } from "../data/products";
-import { useMedicines, useCategories } from "../../hooks/useMedicines.js";
+import {
+  useMedicines,
+  useCategoriesWithCount,
+} from "../../hooks/useMedicines.js";
 const bannerSlides = [
   {
     id: 1,
@@ -120,7 +123,7 @@ function HomePage() {
     limit: 12,
   });
   const { data: categoriesData, isLoading: isLoadingCategories } =
-    useCategories();
+    useCategoriesWithCount();
 
   const categoryIconMap = {
     "duoc-my-pham": "✨",
@@ -136,7 +139,7 @@ function HomePage() {
       id: c.slug,
       name: c.name,
       icon: categoryIconMap[c.slug] || "💊",
-      count: 100,
+      count: c.count,
     })) || [];
 
   const medicinesList = medicinesData?.items || [];
@@ -192,13 +195,14 @@ function HomePage() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-4 space-y-6">
       {/* Banner + sidebar */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-        {/* Main banner */}
-        <div
+
+      {/* <div className="grid grid-cols-1 lg:grid-cols-4 gap-4"> */}
+      {/* Main banner */}
+      {/* <div
           className="lg:col-span-3 relative rounded-2xl overflow-hidden"
           style={{ height: "300px" }}
-        >
-          {bannerSlides.map((b, i) => (
+        > */}
+      {/* {bannerSlides.map((b, i) => (
             <div
               key={b.id}
               className={`absolute inset-0 transition-all duration-700 ${i === slide ? "opacity-100 z-10" : "opacity-0 z-0"}`}
@@ -238,9 +242,9 @@ function HomePage() {
                 </div>
               </div>
             </div>
-          ))}
-          {/* Controls */}
-          <button
+          ))} */}
+      {/* Controls */}
+      {/* <button
             onClick={() =>
               setSlide(
                 (s) => (s - 1 + bannerSlides.length) % bannerSlides.length,
@@ -249,14 +253,14 @@ function HomePage() {
             className="absolute left-3 top-1/2 -translate-y-1/2 z-20 bg-white/20 hover:bg-white/30 text-white rounded-full p-1.5 transition-colors"
           >
             <ChevronLeft size={20} />
-          </button>
-          <button
+          </button> */}
+      {/* <button
             onClick={() => setSlide((s) => (s + 1) % bannerSlides.length)}
             className="absolute right-3 top-1/2 -translate-y-1/2 z-20 bg-white/20 hover:bg-white/30 text-white rounded-full p-1.5 transition-colors"
           >
             <ChevronRight size={20} />
-          </button>
-          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+          </button> */}
+      {/* <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex gap-2">
             {bannerSlides.map((_, i) => (
               <button
                 key={i}
@@ -264,11 +268,11 @@ function HomePage() {
                 className={`h-2 rounded-full transition-all ${i === slide ? "bg-white w-6" : "bg-white/50 w-2"}`}
               />
             ))}
-          </div>
-        </div>
+          </div> */}
+      {/* </div> */}
 
-        {/* Side banners */}
-        <div className="hidden lg:flex flex-col gap-4">
+      {/* Side banners */}
+      {/* <div className="hidden lg:flex flex-col gap-4">
           <div
             className="rounded-xl overflow-hidden flex-1"
             style={{ background: "linear-gradient(135deg, #7b1fa2, #4a148c)" }}
@@ -309,11 +313,10 @@ function HomePage() {
               />
             </Link>
           </div>
-        </div>
-      </div>
-
+        </div> */}
+      {/* </div> */}
       {/* Quick services */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      {/* <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {quickServices.map((s) => (
           <Link
             key={s.title}
@@ -331,8 +334,7 @@ function HomePage() {
             </span>
           </Link>
         ))}
-      </div>
-
+      </div> */}
       {/* Categories */}
       <section className="bg-white rounded-2xl p-6">
         <div className="flex items-center justify-between mb-5">
@@ -362,98 +364,96 @@ function HomePage() {
                 {cat.name}
               </div>
               <div className="text-xs text-gray-400 mt-0.5">
-                {cat.count.toLocaleString()}+
+                {cat.count.toLocaleString()}
               </div>
             </Link>
           ))}
         </div>
       </section>
-
       {/* Flash Sale - hidden until promotion feature is ready */}
       {false && (
-      <section
-        className="rounded-2xl overflow-hidden"
-        style={{
-          background: "linear-gradient(135deg, #e53935 0%, #c62828 100%)",
-        }}
-      >
-        <div className="p-5">
-          <div className="flex items-center justify-between mb-5">
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 text-white">
-                <Zap size={22} fill="white" />
-                <span className="font-bold text-xl">FLASH SALE</span>
+        <section
+          className="rounded-2xl overflow-hidden"
+          style={{
+            background: "linear-gradient(135deg, #e53935 0%, #c62828 100%)",
+          }}
+        >
+          <div className="p-5">
+            <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 text-white">
+                  <Zap size={22} fill="white" />
+                  <span className="font-bold text-xl">FLASH SALE</span>
+                </div>
+                <CountdownTimer targetTime={flashSaleEnd} />
               </div>
-              <CountdownTimer targetTime={flashSaleEnd} />
-            </div>
-            <Link
-              to="/products?sale=flash"
-              className="text-white/80 hover:text-white text-sm flex items-center gap-1 transition-colors"
-            >
-              Xem thêm <ArrowRight size={14} />
-            </Link>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {flashSale.slice(0, 4).map((p) => (
               <Link
-                key={p.id}
-                to={`/products/${p.id}`}
-                className="bg-white rounded-xl p-3 hover:shadow-lg transition-shadow group"
+                to="/products?sale=flash"
+                className="text-white/80 hover:text-white text-sm flex items-center gap-1 transition-colors"
               >
-                <div className="relative">
-                  <img
-                    src={p.image}
-                    alt={p.name}
-                    className="w-full h-32 object-cover rounded-lg mb-2 group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <span
-                    className="absolute top-1 left-1 text-white text-xs font-bold px-1.5 py-0.5 rounded-md"
-                    style={{ backgroundColor: "#e53935" }}
-                  >
-                    -{p.discount}%
-                  </span>
-                </div>
-                <div className="text-xs text-gray-500 mb-1">{p.brand}</div>
-                <div className="text-sm font-medium text-gray-800 line-clamp-2 mb-2">
-                  {p.name}
-                </div>
-                <div className="flex items-center gap-1">
-                  <span
-                    className="font-bold text-sm"
-                    style={{ color: "#e53935" }}
-                  >
-                    {formatPrice(p.price)}
-                  </span>
-                </div>
-                {p.originalPrice && (
-                  <div className="text-xs text-gray-400 line-through">
-                    {formatPrice(p.originalPrice)}
-                  </div>
-                )}
-                {/* Stock bar */}
-                <div className="mt-2">
-                  <div className="text-xs text-gray-500 mb-1">
-                    Đã bán {p.sold}
-                  </div>
-                  <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                    <div
-                      className="h-full rounded-full"
-                      style={{
-                        backgroundColor: "#e53935",
-                        width: `${Math.min(90, (p.sold / (p.sold + p.stock)) * 100)}%`,
-                      }}
-                    />
-                  </div>
-                </div>
+                Xem thêm <ArrowRight size={14} />
               </Link>
-            ))}
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {flashSale.slice(0, 4).map((p) => (
+                <Link
+                  key={p.id}
+                  to={`/products/${p.id}`}
+                  className="bg-white rounded-xl p-3 hover:shadow-lg transition-shadow group"
+                >
+                  <div className="relative">
+                    <img
+                      src={p.image}
+                      alt={p.name}
+                      className="w-full h-32 object-cover rounded-lg mb-2 group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <span
+                      className="absolute top-1 left-1 text-white text-xs font-bold px-1.5 py-0.5 rounded-md"
+                      style={{ backgroundColor: "#e53935" }}
+                    >
+                      -{p.discount}%
+                    </span>
+                  </div>
+                  <div className="text-xs text-gray-500 mb-1">{p.brand}</div>
+                  <div className="text-sm font-medium text-gray-800 line-clamp-2 mb-2">
+                    {p.name}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span
+                      className="font-bold text-sm"
+                      style={{ color: "#e53935" }}
+                    >
+                      {formatPrice(p.price)}
+                    </span>
+                  </div>
+                  {p.originalPrice && (
+                    <div className="text-xs text-gray-400 line-through">
+                      {formatPrice(p.originalPrice)}
+                    </div>
+                  )}
+                  {/* Stock bar */}
+                  <div className="mt-2">
+                    <div className="text-xs text-gray-500 mb-1">
+                      Đã bán {p.sold}
+                    </div>
+                    <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full"
+                        style={{
+                          backgroundColor: "#e53935",
+                          width: `${Math.min(90, (p.sold / (p.sold + p.stock)) * 100)}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
       )}
-
       {/* Best Sellers */}
-      <section className="bg-white rounded-2xl p-6">
+      {/* <section className="bg-white rounded-2xl p-6">
         <div className="flex items-center justify-between mb-5">
           <h2
             className="font-bold text-gray-800"
@@ -474,8 +474,7 @@ function HomePage() {
             <ProductCard key={p.id} product={p} />
           ))}
         </div>
-      </section>
-
+      </section> */}
       {/* Featured */}
       <section className="bg-white rounded-2xl p-6">
         <div className="flex items-center justify-between mb-5">
@@ -499,109 +498,107 @@ function HomePage() {
           ))}
         </div>
       </section>
-
       {/* Promo banner - hidden until promotion feature is ready */}
       {false && (
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {[
-          {
-            label: "Giao nhanh 2H",
-            desc: "N\u1ED9i th\xE0nh",
-            color: "#1250dc",
-            img: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=400&h=200&fit=crop&auto=format",
-          },
-          {
-            label: "T\xEDch \u0111i\u1EC3m \u0111\u1ED5i qu\xE0",
-            desc: "M\u1ED7i \u0111\u01A1n h\xE0ng",
-            color: "#e65100",
-            img: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=200&fit=crop&auto=format",
-          },
-          {
-            label: "D\u01B0\u1EE3c s\u0129 t\u01B0 v\u1EA5n",
-            desc: "Mi\u1EC5n ph\xED 24/7",
-            color: "#2e7d32",
-            img: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=400&h=200&fit=crop&auto=format",
-          },
-        ].map((b) => (
-          <div
-            key={b.label}
-            className="relative rounded-2xl overflow-hidden h-32 cursor-pointer group"
-          >
-            <img
-              src={b.img}
-              alt={b.label}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[
+            {
+              label: "Giao nhanh 2H",
+              desc: "N\u1ED9i th\xE0nh",
+              color: "#1250dc",
+              img: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=400&h=200&fit=crop&auto=format",
+            },
+            {
+              label: "T\xEDch \u0111i\u1EC3m \u0111\u1ED5i qu\xE0",
+              desc: "M\u1ED7i \u0111\u01A1n h\xE0ng",
+              color: "#e65100",
+              img: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=200&fit=crop&auto=format",
+            },
+            {
+              label: "D\u01B0\u1EE3c s\u0129 t\u01B0 v\u1EA5n",
+              desc: "Mi\u1EC5n ph\xED 24/7",
+              color: "#2e7d32",
+              img: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=400&h=200&fit=crop&auto=format",
+            },
+          ].map((b) => (
             <div
-              className="absolute inset-0"
-              style={{ background: `${b.color}cc` }}
-            />
-            <div className="absolute inset-0 flex flex-col justify-center px-5 text-white">
-              <div className="font-bold text-lg">{b.label}</div>
-              <div className="text-sm text-white/80">{b.desc}</div>
+              key={b.label}
+              className="relative rounded-2xl overflow-hidden h-32 cursor-pointer group"
+            >
+              <img
+                src={b.img}
+                alt={b.label}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+              <div
+                className="absolute inset-0"
+                style={{ background: `${b.color}cc` }}
+              />
+              <div className="absolute inset-0 flex flex-col justify-center px-5 text-white">
+                <div className="font-bold text-lg">{b.label}</div>
+                <div className="text-sm text-white/80">{b.desc}</div>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
-      )}
-
-      {/* Health Blog - hidden until blog feature is ready */}
-      {false && (
-      <section className="bg-white rounded-2xl p-6">
-        <div className="flex items-center justify-between mb-5">
-          <h2
-            className="font-bold text-gray-800"
-            style={{ fontSize: "1.125rem" }}
-          >
-            📖 Góc sức khỏe
-          </h2>
-          <Link
-            to="/blog"
-            className="text-sm font-medium flex items-center gap-1 hover:gap-2 transition-all"
-            style={{ color: "#1250dc" }}
-          >
-            Xem tất cả <ArrowRight size={15} />
-          </Link>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {blogPosts.slice(0, 3).map((post) => (
-            <Link key={post.id} to={`/blog/${post.slug}`} className="group">
-              <div className="overflow-hidden rounded-xl mb-3">
-                <img
-                  src={post.image}
-                  alt={post.title}
-                  className="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-              </div>
-              <div className="flex items-center gap-2 mb-2">
-                <span
-                  className="text-xs font-medium px-2 py-0.5 rounded-full"
-                  style={{ backgroundColor: "#e8efff", color: "#1250dc" }}
-                >
-                  {post.category}
-                </span>
-                <span className="text-xs text-gray-400">
-                  {post.readTime} phút đọc
-                </span>
-              </div>
-              <h3 className="font-semibold text-gray-800 text-sm leading-snug mb-2 group-hover:text-blue-700 transition-colors line-clamp-2">
-                {post.title}
-              </h3>
-              <p className="text-xs text-gray-500 line-clamp-2">
-                {post.excerpt}
-              </p>
-              <div className="flex items-center gap-2 mt-3">
-                <img
-                  src={post.authorAvatar}
-                  alt={post.author}
-                  className="w-6 h-6 rounded-full object-cover"
-                />
-                <span className="text-xs text-gray-500">{post.author}</span>
-              </div>
-            </Link>
           ))}
         </div>
-      </section>
+      )}
+      {/* Health Blog - hidden until blog feature is ready */}
+      {false && (
+        <section className="bg-white rounded-2xl p-6">
+          <div className="flex items-center justify-between mb-5">
+            <h2
+              className="font-bold text-gray-800"
+              style={{ fontSize: "1.125rem" }}
+            >
+              📖 Góc sức khỏe
+            </h2>
+            <Link
+              to="/blog"
+              className="text-sm font-medium flex items-center gap-1 hover:gap-2 transition-all"
+              style={{ color: "#1250dc" }}
+            >
+              Xem tất cả <ArrowRight size={15} />
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {blogPosts.slice(0, 3).map((post) => (
+              <Link key={post.id} to={`/blog/${post.slug}`} className="group">
+                <div className="overflow-hidden rounded-xl mb-3">
+                  <img
+                    src={post.image}
+                    alt={post.title}
+                    className="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+                <div className="flex items-center gap-2 mb-2">
+                  <span
+                    className="text-xs font-medium px-2 py-0.5 rounded-full"
+                    style={{ backgroundColor: "#e8efff", color: "#1250dc" }}
+                  >
+                    {post.category}
+                  </span>
+                  <span className="text-xs text-gray-400">
+                    {post.readTime} phút đọc
+                  </span>
+                </div>
+                <h3 className="font-semibold text-gray-800 text-sm leading-snug mb-2 group-hover:text-blue-700 transition-colors line-clamp-2">
+                  {post.title}
+                </h3>
+                <p className="text-xs text-gray-500 line-clamp-2">
+                  {post.excerpt}
+                </p>
+                <div className="flex items-center gap-2 mt-3">
+                  <img
+                    src={post.authorAvatar}
+                    alt={post.author}
+                    className="w-6 h-6 rounded-full object-cover"
+                  />
+                  <span className="text-xs text-gray-500">{post.author}</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
       )}
     </div>
   );
