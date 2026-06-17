@@ -147,6 +147,7 @@ function CheckoutPage() {
       clearCart();
     } catch (error) {
       toast.error(error.response?.data?.message || "Đặt hàng thất bại");
+      setOrdered(false);
     }
   };
 
