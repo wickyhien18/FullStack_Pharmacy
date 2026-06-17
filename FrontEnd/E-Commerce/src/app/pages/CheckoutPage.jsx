@@ -130,10 +130,6 @@ function CheckoutPage() {
 
     try {
       const payload = {
-        items: items.map((item) => ({
-          medicineId: item.product.medicineId,
-          quantity: item.quantity,
-        })),
         shippingAddress: `${form.address}, ${form.ward}, ${form.district}, ${form.province}`,
         note: form.note || "",
       };
@@ -146,6 +142,7 @@ function CheckoutPage() {
       );
       clearCart();
     } catch (error) {
+      console.error("Order error:", error.response?.data);
       toast.error(error.response?.data?.message || "Đặt hàng thất bại");
       setOrdered(false);
     }
