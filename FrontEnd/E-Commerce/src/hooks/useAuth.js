@@ -31,14 +31,23 @@ export const useAuth = () => {
   // ── Register mutation ─────────────────────────────────────────
   const registerMutation = useMutation({
     mutationFn: (data) => api.post("/auth/register", data),
-    onSuccess: () => {
-      toast.success("Đăng ký thành công! Vui lòng đăng nhập.");
-      navigate("/login");
-    },
     onError: (error) => {
       toast.error(error.response?.data?.message || "Đăng ký thất bại");
     },
   });
+
+  // Wrap mutate để nhận callback từ bên ngoài
+  const register = (data, options = {}) => {
+    registerMutation.mutate(data, {
+      onSuccess: () => {
+        toast.success("Đăng ký thành công! Vui lòng đăng nhập.");
+        options.onSuccess?.(); // gọi callback nếu có
+      },
+      onError: (error) => {
+        toast.error(error.response?.data?.message || "Đăng ký thất bại");
+      },
+    });
+  };
 
   // ── Logout ────────────────────────────────────────────────────
   const logout = async () => {
@@ -48,7 +57,7 @@ export const useAuth = () => {
       // Dù API lỗi vẫn clear state — user phải thoát được
     } finally {
       clearAuth();
-      navigate("/login");
+      navigate("/");
       toast.success("Đã đăng xuất");
     }
   };
@@ -58,7 +67,7 @@ export const useAuth = () => {
     isAuthenticated,
     login: loginMutation.mutate,
     isLoggingIn: loginMutation.isPending,
-    register: registerMutation.mutate,
+    register,
     isRegistering: registerMutation.isPending,
     logout,
   };

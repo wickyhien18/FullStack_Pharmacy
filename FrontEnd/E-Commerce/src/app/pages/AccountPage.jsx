@@ -95,13 +95,18 @@ function AccountPage() {
       return;
     }
 
-    register({
-      fullName: regForm.fullName,
-      userName: regForm.userName,
-      email: regForm.email,
-      phone: regForm.phone,
-      password: regForm.password,
-    });
+    register(
+      {
+        fullName: regForm.fullName,
+        userName: regForm.userName,
+        email: regForm.email,
+        phone: regForm.phone,
+        password: regForm.password,
+      },
+      {
+        onSuccess: () => setTab("login"), // ← chuyển sang tab login sau khi đăng ký thành công
+      },
+    );
   };
 
   const formatPrice = (price) => {
@@ -471,7 +476,7 @@ function AccountPage() {
                   onChange={(e) =>
                     setRegForm({ ...regForm, password: e.target.value })
                   }
-                  placeholder="Tối thiểu 6 ký tự"
+                  placeholder="Mật khẩu tối thiểu 8 ký tự, ít nhất 1 chữ hoa, 1 chữ thường, 1 chữ số và 1 ký tự đặc biệt"
                   className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-400"
                 />
               </div>
