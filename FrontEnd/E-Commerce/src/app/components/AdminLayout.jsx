@@ -1,7 +1,13 @@
 import { useEffect } from "react";
 import { Outlet, NavLink, useNavigate } from "react-router";
 import { useAuthStore } from "../../stores/auth.store.js";
-import { LayoutDashboard, Package, ShoppingCart, Users, ArrowLeft } from "lucide-react";
+import {
+  LayoutDashboard,
+  Package,
+  ShoppingCart,
+  Users,
+  ArrowLeft,
+} from "lucide-react";
 import toast from "react-hot-toast";
 
 const navItems = [
@@ -16,7 +22,7 @@ export default function AdminLayout() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isAuthenticated || user?.role?.roleName !== "ROLE_ADMIN") {
+    if (!isAuthenticated || user?.role !== "ROLE_ADMIN") {
       toast.error("Bạn không có quyền truy cập trang quản trị");
       navigate("/");
     }
@@ -51,7 +57,7 @@ export default function AdminLayout() {
               {label}
             </NavLink>
           ))}
-          
+
           <div className="border-t border-gray-100 my-4 pt-4">
             <NavLink
               to="/"
