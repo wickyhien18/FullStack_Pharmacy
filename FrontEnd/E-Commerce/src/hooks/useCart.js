@@ -63,7 +63,7 @@ export const useCart = () => {
     totalPrice: cart?.totalPrice || 0,
 
     addToCart: (medicineId, quantity = 1) =>
-      addMutation.mutate({ medicineId, quantity }),
+      addMutation.mutate({ medicineId: medicineId.toString(), quantity }),
     updateItem: (cartItemId, quantity) =>
       updateMutation.mutate({ cartItemId, quantity }),
     removeItem: (cartItemId) => removeMutation.mutate(cartItemId),

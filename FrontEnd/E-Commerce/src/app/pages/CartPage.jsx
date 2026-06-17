@@ -12,8 +12,9 @@ import { useCart } from "@/hooks/useCart.js";
 import { formatPrice } from "../data/products";
 import { useState } from "react";
 function CartPage() {
-  const { items, removeFromCart, updateQuantity, totalItems, totalPrice } =
+  const { items, removeItem, updateItem, totalItems, totalPrice, isLoading } =
     useCart();
+
   const [coupon, setCoupon] = useState("");
   const [couponApplied, setCouponApplied] = useState(false);
   const [couponError, setCouponError] = useState("");
@@ -31,6 +32,19 @@ function CartPage() {
       setCouponApplied(false);
     }
   };
+  if (isLoading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-16 text-center">
+        <ShoppingCart size={64} className="mx-auto text-gray-300 mb-4" />
+        <h2
+          className="font-bold text-gray-800 mb-2"
+          style={{ fontSize: "1.25rem" }}
+        >
+          Đang tải giỏ hàng...
+        </h2>
+      </div>
+    );
+  }
   if (items.length === 0) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-16 text-center">
@@ -54,6 +68,7 @@ function CartPage() {
       </div>
     );
   }
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-5">
       {/* Breadcrumb */}
@@ -82,28 +97,28 @@ function CartPage() {
               </Link>
             </div>
             <div className="divide-y divide-gray-100">
-              {items.map(({ product, quantity }) => (
-                <div key={product.medicineId} className="p-5 flex gap-4">
+              {items.map((item) => (
+                <div key={item.cartItemId} className="p-5 flex gap-4">
                   <Link
-                    to={`/products/${product.medicineId}`}
+                    to={`/products/${item.medicineId}`}
                     className="shrink-0"
                   >
                     <img
-                      src={product.image}
-                      alt={product.name}
+                      src={item.image}
+                      alt={item.name}
                       className="w-20 h-20 object-cover rounded-xl border border-gray-100"
                     />
                   </Link>
                   <div className="flex-1 min-w-0">
                     <Link
-                      to={`/products/${product.medicineId}`}
+                      to={`/products/${item.medicineId}`}
                       className="font-medium text-sm text-gray-800 hover:text-blue-700 line-clamp-2 block mb-1"
                     >
-                      {product.name}
+                      {item.name}
                     </Link>
                     <div className="text-xs text-gray-500 mb-1">
                       {/* {product.brand} ·  */}
-                      {product.unit}
+                      {item.unit}
                     </div>
                     {/* {product.discount && (
                       <span
@@ -117,18 +132,18 @@ function CartPage() {
                       <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
                         <button
                           onClick={() =>
-                            updateQuantity(product.Id, quantity - 1)
+                            updateItem(item.cartItemId, item.quantity - 1)
                           }
                           className="px-2.5 py-1.5 hover:bg-gray-50 transition-colors"
                         >
                           <Minus size={14} />
                         </button>
                         <span className="px-3 py-1.5 text-sm font-medium border-x border-gray-200">
-                          {quantity}
+                          {item.quantity}
                         </span>
                         <button
                           onClick={() =>
-                            updateQuantity(product.Id, quantity + 1)
+                            updateItem(item.cartItemId, item.quantity + 1)
                           }
                           className="px-2.5 py-1.5 hover:bg-gray-50 transition-colors"
                         >
@@ -140,7 +155,7 @@ function CartPage() {
                           className="font-semibold text-sm"
                           // style={{ color: "#e53935" }}
                         >
-                          {formatPrice(product.price * quantity)}
+                          {formatPrice(item.price * item.quantity)}
                         </div>
                         {/* {product.originalPrice && (
                           <div className="text-xs text-gray-400 line-through">
@@ -151,7 +166,7 @@ function CartPage() {
                     </div>
                   </div>
                   <button
-                    onClick={() => removeFromCart(product.Id)}
+                    onClick={() => removeItem(item.cartItemId)}
                     className="shrink-0 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors self-start"
                   >
                     <Trash2 size={16} />
