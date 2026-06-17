@@ -226,7 +226,10 @@ function CartPage() {
               <div className="border-t border-gray-100 pt-3 flex justify-between font-bold text-base">
                 <span>Tổng cộng</span>
                 <span style={{ color: "#e53935" }}>
-                  {formatPrice(finalTotal)}
+                  {
+                    // formatPrice(finalTotal)
+                    formatPrice(totalPrice)
+                  }
                 </span>
               </div>
             </div>

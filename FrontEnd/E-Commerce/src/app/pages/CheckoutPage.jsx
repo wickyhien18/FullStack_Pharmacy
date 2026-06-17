@@ -474,7 +474,12 @@ function CheckoutPage() {
                   className="flex-1 py-3 rounded-xl text-white font-semibold text-sm hover:opacity-90"
                   style={{ backgroundColor: "#1250dc" }}
                 >
-                  Xác nhận đặt hàng ({formatPrice(total)})
+                  Xác nhận đặt hàng (
+                  {
+                    // formatPrice(total)
+                    formatPrice(totalPrice)
+                  }
+                  )
                 </button>
               </div>
             </div>
@@ -522,7 +527,12 @@ function CheckoutPage() {
               style={{ color: "#e53935" }}
             >
               <span>Tổng cộng</span>
-              <span>{formatPrice(total)}</span>
+              <span>
+                {
+                  // formatPrice(total)
+                  formatPrice(totalPrice)
+                }
+              </span>
             </div>
           </div>
         </div>
