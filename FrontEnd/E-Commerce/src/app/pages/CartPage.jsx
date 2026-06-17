@@ -83,11 +83,8 @@ function CartPage() {
             </div>
             <div className="divide-y divide-gray-100">
               {items.map(({ product, quantity }) => (
-                <div key={product.id} className="p-5 flex gap-4">
-                  <Link
-                    to={`/products/${product.medicineId}`}
-                    className="shrink-0"
-                  >
+                <div key={product.Id} className="p-5 flex gap-4">
+                  <Link to={`/products/${product.Id}`} className="shrink-0">
                     <img
                       src={product.image}
                       alt={product.name}
@@ -96,7 +93,7 @@ function CartPage() {
                   </Link>
                   <div className="flex-1 min-w-0">
                     <Link
-                      to={`/products/${product.id}`}
+                      to={`/products/${product.Id}`}
                       className="font-medium text-sm text-gray-800 hover:text-blue-700 line-clamp-2 block mb-1"
                     >
                       {product.name}
@@ -117,7 +114,7 @@ function CartPage() {
                       <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
                         <button
                           onClick={() =>
-                            updateQuantity(product.id, quantity - 1)
+                            updateQuantity(product.Id, quantity - 1)
                           }
                           className="px-2.5 py-1.5 hover:bg-gray-50 transition-colors"
                         >
@@ -128,7 +125,7 @@ function CartPage() {
                         </span>
                         <button
                           onClick={() =>
-                            updateQuantity(product.id, quantity + 1)
+                            updateQuantity(product.Id, quantity + 1)
                           }
                           className="px-2.5 py-1.5 hover:bg-gray-50 transition-colors"
                         >
@@ -151,7 +148,7 @@ function CartPage() {
                     </div>
                   </div>
                   <button
-                    onClick={() => removeFromCart(product.id)}
+                    onClick={() => removeFromCart(product.Id)}
                     className="shrink-0 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors self-start"
                   >
                     <Trash2 size={16} />
