@@ -3,39 +3,37 @@ import { Link } from "react-router";
 import {
   ChevronLeft,
   ChevronRight,
-  Zap,
   ArrowRight,
   FileText,
   MapPin,
-  Stethoscope,
-  TestTube,
+  // Stethoscope,
+  // TestTube,
 } from "lucide-react";
 import { ProductCard } from "../components/ProductCard";
-import { blogPosts, formatPrice } from "../data/products";
+import { formatPrice } from "../data/products";
 import { useMedicines, useCategories } from "../../hooks/useMedicines.js";
 const bannerSlides = [
   {
     id: 1,
-    title: "Si\xEAu Sale H\xE8 2026",
-    subtitle:
-      "Gi\u1EA3m \u0111\u1EBFn 50% vitamin & th\u1EF1c ph\u1EA9m ch\u1EE9c n\u0103ng",
-    cta: "Mua ngay",
-    href: "/promotions",
+    title: "Sản phẩm chăm sóc sức khỏe",
+    subtitle: "Tìm thuốc và sản phẩm phù hợp với nhu cầu của bạn",
+    cta: "Xem sản phẩm",
+    href: "/products",
     bg: "linear-gradient(135deg, #1250dc 0%, #0a3a9e 100%)",
     image:
       "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=600&h=300&fit=crop&auto=format",
   },
-  {
-    id: 2,
-    title: "T\u01B0 v\u1EA5n s\u1EE9c kh\u1ECFe mi\u1EC5n ph\xED",
-    subtitle:
-      "\u0110\u1ED9i ng\u0169 d\u01B0\u1EE3c s\u0129 chuy\xEAn nghi\u1EC7p s\u1EB5n s\xE0ng 24/7",
-    cta: "T\u01B0 v\u1EA5n ngay",
-    href: "/blog",
-    bg: "linear-gradient(135deg, #00897b 0%, #00695c 100%)",
-    image:
-      "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=600&h=300&fit=crop&auto=format",
-  },
+  // {
+  //   id: 2,
+  //   title: "T\u01B0 v\u1EA5n s\u1EE9c kh\u1ECFe mi\u1EC5n ph\xED",
+  //   subtitle:
+  //     "\u0110\u1ED9i ng\u0169 d\u01B0\u1EE3c s\u0129 chuy\xEAn nghi\u1EC7p s\u1EB5n s\xE0ng 24/7",
+  //   cta: "T\u01B0 v\u1EA5n ngay",
+  //   href: "/blog",
+  //   bg: "linear-gradient(135deg, #00897b 0%, #00695c 100%)",
+  //   image:
+  //     "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=600&h=300&fit=crop&auto=format",
+  // },
   {
     id: 3,
     title: "Giao h\xE0ng si\xEAu t\u1ED1c 2H",
@@ -60,18 +58,18 @@ const quickServices = [
     href: "/pharmacies",
     color: "#00897b",
   },
-  {
-    title: "T\u01B0 v\u1EA5n d\u01B0\u1EE3c s\u0129",
-    icon: <Stethoscope size={24} />,
-    href: "/blog",
-    color: "#e65100",
-  },
-  {
-    title: "Ki\u1EC3m tra s\u1EE9c kh\u1ECFe",
-    icon: <TestTube size={24} />,
-    href: "/blog",
-    color: "#7b1fa2",
-  },
+  // {
+  //   title: "T\u01B0 v\u1EA5n d\u01B0\u1EE3c s\u0129",
+  //   icon: <Stethoscope size={24} />,
+  //   href: "/blog",
+  //   color: "#e65100",
+  // },
+  // {
+  //   title: "Ki\u1EC3m tra s\u1EE9c kh\u1ECFe",
+  //   icon: <TestTube size={24} />,
+  //   href: "/blog",
+  //   color: "#7b1fa2",
+  // },
 ];
 function CountdownTimer({ targetTime }) {
   const [timeLeft, setTimeLeft] = useState({
@@ -108,8 +106,8 @@ function CountdownTimer({ targetTime }) {
 }
 function HomePage() {
   const [slide, setSlide] = useState(0);
-  const flashSaleEnd =
-    Date.now() + 2 * 60 * 60 * 1e3 + 34 * 60 * 1e3 + 15 * 1e3;
+  // const flashSaleEnd =
+  //   Date.now() + 2 * 60 * 60 * 1e3 + 34 * 60 * 1e3 + 15 * 1e3;
   useEffect(() => {
     const id = setInterval(
       () => setSlide((s) => (s + 1) % bannerSlides.length),
@@ -166,12 +164,12 @@ function HomePage() {
     ],
     description: m.description || "",
     unit: m.unit || "Hộp",
-    isFlashSale: index < 4,
+    // isFlashSale: index < 4,
     isBestSeller: index >= 4 && index < 8,
     isFeatured: index >= 8,
   }));
 
-  const flashSale = liveMedicines.slice(0, 4);
+  // const flashSale = liveMedicines.slice(0, 4);
   const bestSellers =
     liveMedicines.slice(4, 8).length > 0
       ? liveMedicines.slice(4, 8)
@@ -371,7 +369,8 @@ function HomePage() {
         </div>
       </section>
 
-      {/* Flash Sale */}
+      {/* Flash Sale - hidden until promotion feature is ready */}
+      {false && (
       <section
         className="rounded-2xl overflow-hidden"
         style={{
@@ -451,6 +450,7 @@ function HomePage() {
           </div>
         </div>
       </section>
+      )}
 
       {/* Best Sellers */}
       <section className="bg-white rounded-2xl p-6">
@@ -500,7 +500,8 @@ function HomePage() {
         </div>
       </section>
 
-      {/* Promo banner */}
+      {/* Promo banner - hidden until promotion feature is ready */}
+      {false && (
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
           {
@@ -542,8 +543,10 @@ function HomePage() {
           </div>
         ))}
       </div>
+      )}
 
-      {/* Health Blog */}
+      {/* Health Blog - hidden until blog feature is ready */}
+      {false && (
       <section className="bg-white rounded-2xl p-6">
         <div className="flex items-center justify-between mb-5">
           <h2
@@ -599,6 +602,7 @@ function HomePage() {
           ))}
         </div>
       </section>
+      )}
     </div>
   );
 }

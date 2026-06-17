@@ -354,10 +354,10 @@ function AccountPage() {
             <ul className="space-y-3">
               {[
                 "💰 Tích điểm mỗi đơn hàng, đổi quà hấp dẫn",
-                "🎁 Ưu đãi độc quyền cho thành viên",
+                "🎁 Quản lý thông tin thành viên dễ dàng",
                 "🚀 Miễn phí giao hàng toàn quốc với đơn từ 150k",
                 "📱 Tra cứu lịch sử mua hàng dễ dàng",
-                "💊 Nhận thông báo khuyến mãi thuốc sớm nhất"
+                "💊 Theo dõi trạng thái đơn thuốc nhanh chóng"
               ].map((b) => <li key={b} className="text-sm text-white/95">{b}</li>)}
             </ul>
           </div>

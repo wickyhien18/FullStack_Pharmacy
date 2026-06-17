@@ -5,9 +5,9 @@ import ProductListPage from "./pages/ProductListPage";
 import ProductDetailPage from "./pages/ProductDetailPage";
 import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
-import PromotionsPage from "./pages/PromotionsPage";
-import BlogPage from "./pages/BlogPage";
-import BlogDetailPage from "./pages/BlogDetailPage";
+// import PromotionsPage from "./pages/PromotionsPage";
+// import BlogPage from "./pages/BlogPage";
+// import BlogDetailPage from "./pages/BlogDetailPage";
 import AccountPage from "./pages/AccountPage";
 import PharmaciesPage from "./pages/PharmaciesPage";
 import SearchPage from "./pages/SearchPage";
@@ -30,9 +30,9 @@ const router = createBrowserRouter([
       { path: "products/:id", Component: ProductDetailPage },
       { path: "cart", Component: CartPage },
       { path: "checkout", Component: CheckoutPage },
-      { path: "promotions", Component: PromotionsPage },
-      { path: "blog", Component: BlogPage },
-      { path: "blog/:slug", Component: BlogDetailPage },
+      // { path: "promotions", Component: PromotionsPage },
+      // { path: "blog", Component: BlogPage },
+      // { path: "blog/:slug", Component: BlogDetailPage },
       { path: "account", Component: AccountPage },
       { path: "pharmacies", Component: PharmaciesPage },
       { path: "search", Component: SearchPage },
