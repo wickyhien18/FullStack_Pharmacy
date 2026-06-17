@@ -99,7 +99,8 @@ function CartPage() {
                       {product.name}
                     </Link>
                     <div className="text-xs text-gray-500 mb-1">
-                      {product.brand} · {product.unit}
+                      {/* {product.brand} ·  */}
+                      {product.unit}
                     </div>
                     {/* {product.discount && (
                       <span
