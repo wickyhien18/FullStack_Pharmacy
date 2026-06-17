@@ -9,7 +9,7 @@ function ProductCard({ product, showDiscount = true }) {
   // const isWishlisted = wishlist.includes(product.id);
   const handleAddToCart = (e) => {
     e.preventDefault();
-    addToCart(product);
+    addToCart(product.medicinesId, product.quantity);
     setAdded(true);
     setTimeout(() => setAdded(false), 1500);
   };

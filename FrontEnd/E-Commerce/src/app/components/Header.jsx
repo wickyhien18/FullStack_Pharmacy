@@ -21,7 +21,7 @@ import { useCategories } from "../../hooks/useMedicines.js";
 import { useAuth } from "../../hooks/useAuth.js";
 
 function Header() {
-  const { totalItems, wishlist } = useCart();
+  const { totalItems } = useCart();
   const [query, setQuery] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
