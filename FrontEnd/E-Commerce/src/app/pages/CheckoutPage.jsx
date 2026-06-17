@@ -1,6 +1,15 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
-import { ChevronRight, Check, MapPin, CreditCard, Package } from "lucide-react";
+import {
+  ChevronRight,
+  Check,
+  Clock,
+  MapPin,
+  CreditCard,
+  Package,
+  PhoneCall,
+  Truck,
+} from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { formatPrice } from "../data/products";
 import api from "../../lib/axios.js";
@@ -13,6 +22,23 @@ const paymentMethods = [
   { id: "vnpay", label: "VNPAY - QR Code", icon: "📱" },
   { id: "momo", label: "Ví MoMo", icon: "💜" },
   { id: "bank", label: "Thẻ ngân hàng / Thẻ quốc tế", icon: "💳" },
+];
+const ORDER_PROCESSING_STEPS = [
+  {
+    icon: PhoneCall,
+    title: "Nhà thuốc xác nhận đơn",
+    time: "5-10 phút",
+  },
+  {
+    icon: Package,
+    title: "Chuẩn bị thuốc",
+    time: "15-30 phút",
+  },
+  {
+    icon: Truck,
+    title: "Giao đến địa chỉ của bạn",
+    time: "30-60 phút sau xác nhận",
+  },
 ];
 
 const validateShippingForm = (values) => {
@@ -112,8 +138,8 @@ function CheckoutPage() {
       const response = await api.post("/orders", payload);
       setOrderCode(response.data.data.orderCode);
       setPlaced(true);
+      toast.success("Đơn hàng đang được xử lý. Vui lòng chờ xác nhận trong 5-10 phút.");
       clearCart();
-      setTimeout(() => navigate("/"), 5000);
     } catch (error) {
       toast.error(error.response?.data?.message || "Đặt hàng thất bại");
     }
@@ -156,12 +182,54 @@ function CheckoutPage() {
             #{orderCode || "LC2026061201"}
           </span>
         </p>
-        <p className="text-gray-500 text-sm mb-6">
-          Chúng tôi sẽ liên hệ xác nhận trong vài phút. Cảm ơn bạn đã tin dùng
-          Long Châu!
-        </p>
-        <div className="text-sm text-gray-400">
-          Tự động chuyển về trang chủ sau 5 giây...
+        <div className="rounded-2xl border border-blue-100 bg-blue-50 p-4 text-left mb-5">
+          <div className="flex items-center gap-2 text-sm font-semibold text-blue-800 mb-1">
+            <Clock size={16} />
+            Đơn hàng đang được xử lý
+          </div>
+          <p className="text-sm text-blue-700">
+            Vui lòng chờ nhà thuốc xác nhận trong khoảng 5-10 phút. Tổng thời
+            gian nhận hàng dự kiến là 45-90 phút tùy khu vực giao hàng.
+          </p>
+        </div>
+        <div className="space-y-3 text-left mb-6">
+          {ORDER_PROCESSING_STEPS.map((item) => {
+            const Icon = item.icon;
+            return (
+              <div
+                key={item.title}
+                className="flex items-center gap-3 rounded-xl bg-white border border-gray-100 p-3"
+              >
+                <div
+                  className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                  style={{ backgroundColor: "#e8efff", color: "#1250dc" }}
+                >
+                  <Icon size={18} />
+                </div>
+                <div className="flex-1">
+                  <div className="text-sm font-medium text-gray-800">
+                    {item.title}
+                  </div>
+                  <div className="text-xs text-gray-500">{item.time}</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Link
+            to="/products"
+            className="flex-1 px-5 py-3 rounded-xl border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          >
+            Tiếp tục mua sắm
+          </Link>
+          <button
+            onClick={() => navigate("/")}
+            className="flex-1 px-5 py-3 rounded-xl text-white text-sm font-semibold hover:opacity-90"
+            style={{ backgroundColor: "#1250dc" }}
+          >
+            Về trang chủ
+          </button>
         </div>
       </div>
     );
