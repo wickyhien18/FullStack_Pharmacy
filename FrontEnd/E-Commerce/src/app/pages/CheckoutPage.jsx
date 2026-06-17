@@ -62,6 +62,7 @@ function CheckoutPage() {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState("cod");
+  const [isOrdered, setOrdered] = useState(false);
   const [placed, setPlaced] = useState(false);
   const [orderCode, setOrderCode] = useState("");
   const [form, setForm] = useState({
@@ -124,6 +125,8 @@ function CheckoutPage() {
       setStep(0);
       return;
     }
+
+    setOrdered(true);
 
     try {
       const payload = {
@@ -541,18 +544,13 @@ function CheckoutPage() {
                 </button>
                 <button
                   onClick={handlePlaceOrder}
-                  className="flex-1 py-3 rounded-xl text-white font-semibold text-sm hover:opacity-90"
+                  className="flex-1 py-3 rounded-xl text-white font-semibold text-sm hover:opacity-90 flex items-center justify-center gap-2"
                   style={{ backgroundColor: "#1250dc" }}
                 >
-                  {placed === true && (
+                  Xác nhận đặt hàng ({formatPrice(totalPrice)})
+                  {isOrdered && (
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   )}
-                  (
-                  {
-                    // formatPrice(total)
-                    formatPrice(totalPrice)
-                  }
-                  )
                 </button>
               </div>
             </div>
