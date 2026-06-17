@@ -3,6 +3,7 @@
 // ================================================================
 import { prisma } from "../config/prisma.js";
 import * as orderRepo from "../repositories/order.repository.js";
+import * as cartRepo from "../repositories/cart.repository.js";
 import { buildPaginatedResponse } from "../utils/pagination.js";
 
 const generateOrderCode = () => {
@@ -31,35 +32,37 @@ const formatOrder = (order) => ({
   })),
 });
 
-export const createOrder = async (userId, { items, shippingAddress, note }) => {
-  if (!items?.length)
-    throw { status: 400, message: "Đơn hàng không có sản phẩm" };
+// ── Create Order ──────────────────────────────────────────────────
+export const createOrder = async (userId, { shippingAddress, note }) => {
   if (!shippingAddress)
     throw { status: 400, message: "Vui lòng nhập địa chỉ giao hàng" };
 
-  const medicineIds = items.map((i) => BigInt(i.medicineId));
-  const medicines = await prisma.medicine.findMany({
-    where: { medicineId: { in: medicineIds }, deletedAt: null },
-  });
+  // Lấy cart từ DB — không tin client gửi items
+  const cart = await cartRepo.findCartByUserId(BigInt(userId));
+  if (!cart) throw { status: 404, message: "Không tìm thấy giỏ hàng" };
+  if (!cart.items.length) throw { status: 400, message: "Giỏ hàng trống" };
 
-  if (medicines.length !== items.length) {
-    throw { status: 400, message: "Một số sản phẩm không tồn tại" };
-  }
-
-  const totalPrice = items.reduce((sum, item) => {
-    const med = medicines.find((m) => m.medicineId === BigInt(item.medicineId));
-    return sum + Number(med.price) * item.quantity;
-  }, 0);
+  // Tính tổng tiền từ DB — không tin client gửi giá
+  const totalPrice = cart.items.reduce(
+    (sum, item) => sum + Number(item.medicine.price) * item.quantity,
+    0,
+  );
 
   const order = await orderRepo.createOrder({
     userId: BigInt(userId),
     orderCode: generateOrderCode(),
-    items: items.map((i) => ({ ...i, medicineId: BigInt(i.medicineId) })),
+    items: cart.items.map((i) => ({
+      medicineId: i.medicineId,
+      quantity: i.quantity,
+    })),
     shippingAddress,
     note,
     totalPrice,
     // paymentMethod bỏ vì không có trong schema
   });
+
+  // Xoá cart sau khi đặt hàng thành công
+  await cartRepo.clearCart(cart.cartId);
 
   return {
     orderId: order.orderId.toString(),
