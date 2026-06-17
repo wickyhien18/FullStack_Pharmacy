@@ -9,7 +9,6 @@ import CheckoutPage from "./pages/CheckoutPage";
 // import BlogPage from "./pages/BlogPage";
 // import BlogDetailPage from "./pages/BlogDetailPage";
 import AccountPage from "./pages/AccountPage";
-import PharmaciesPage from "./pages/PharmaciesPage";
 import SearchPage from "./pages/SearchPage";
 import NotFoundPage from "./pages/NotFoundPage";
 
@@ -34,10 +33,9 @@ const router = createBrowserRouter([
       // { path: "blog", Component: BlogPage },
       // { path: "blog/:slug", Component: BlogDetailPage },
       { path: "account", Component: AccountPage },
-      { path: "pharmacies", Component: PharmaciesPage },
       { path: "search", Component: SearchPage },
-      { path: "*", Component: NotFoundPage }
-    ]
+      { path: "*", Component: NotFoundPage },
+    ],
   },
   {
     path: "/admin",
@@ -46,10 +44,8 @@ const router = createBrowserRouter([
       { index: true, Component: AdminDashboard },
       { path: "products", Component: AdminProducts },
       { path: "orders", Component: AdminOrders },
-      { path: "users", Component: AdminUsers }
-    ]
-  }
+      { path: "users", Component: AdminUsers },
+    ],
+  },
 ]);
-export {
-  router
-};
+export { router };
