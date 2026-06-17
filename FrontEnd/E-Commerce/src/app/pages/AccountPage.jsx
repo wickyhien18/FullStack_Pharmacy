@@ -143,7 +143,7 @@ function AccountPage() {
                 {user.phone || "@" + user.userName}
               </div>
               <div className="mt-3 text-xs bg-blue-50 text-blue-700 px-3 py-1.5 rounded-full inline-block font-medium">
-                🔒 Vai trò: {user.role?.roleName || "Người dùng"}
+                🔒 Vai trò: {user.role || "Người dùng"}
               </div>
             </div>
 
@@ -174,7 +174,7 @@ function AccountPage() {
                 </button>
               ))}
 
-              {user.role?.roleName === "ROLE_ADMIN" && (
+              {user.role === "ROLE_ADMIN" && (
                 <Link
                   to="/admin"
                   className="w-full flex items-center gap-3 px-4 py-3 text-sm text-amber-700 hover:bg-amber-50 font-semibold transition-colors border-b border-gray-50 text-left"
