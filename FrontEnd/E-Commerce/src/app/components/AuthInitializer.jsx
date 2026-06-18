@@ -61,10 +61,11 @@ export default function AuthInitializer({ children }) {
   // isInitialized: flag để biết đã check xong chưa
   // Trong lúc đang check → hiện loading, tránh flash màn hình login
   const [isInitialized, setIsInitialized] = useState(false);
-  const { setAuth, clearAuth } = useAuthStore();
-  const hasFetched = useRef(false);
   const [progress, setProgress] = useState(0);
   const [message, setMessage] = useState("Đang khởi động...");
+  const { setAuth, clearAuth } = useAuthStore();
+  const hasFetched = useRef(false);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (hasFetched.current) return; // already ran, skip
