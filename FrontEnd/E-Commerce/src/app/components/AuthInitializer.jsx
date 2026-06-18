@@ -26,12 +26,45 @@ const PREFETCH_TASKS = [
   },
 ];
 
+// Loading screen hiển thị trong lúc chờ
+function LoadingScreen({ progress, message }) {
+  return (
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white">
+      {/* Logo */}
+      <div className="mb-8 text-center">
+        <div className="text-4xl mb-2">💊</div>
+        <h1 className="text-xl font-bold" style={{ color: "#1250dc" }}>
+          Nhà Thuốc Online
+        </h1>
+      </div>
+
+      {/* Progress bar */}
+      <div className="w-64 mb-3">
+        <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
+          <div
+            className="h-1.5 rounded-full transition-all duration-500 ease-out"
+            style={{
+              width: `${progress}%`,
+              backgroundColor: "#1250dc",
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Message */}
+      <p className="text-sm text-gray-400">{message}</p>
+    </div>
+  );
+}
+
 export default function AuthInitializer({ children }) {
   // isInitialized: flag để biết đã check xong chưa
   // Trong lúc đang check → hiện loading, tránh flash màn hình login
   const [isInitialized, setIsInitialized] = useState(false);
   const { setAuth, clearAuth } = useAuthStore();
   const hasFetched = useRef(false);
+  const [progress, setProgress] = useState(0);
+  const [message, setMessage] = useState("Đang khởi động...");
 
   useEffect(() => {
     if (hasFetched.current) return; // already ran, skip
