@@ -9,8 +9,22 @@
 // Component này bọc toàn bộ app, chạy 1 lần duy nhất khi mount
 // ================================================================
 import { useEffect, useState, useRef } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "@/stores/auth.store.js";
 import api from "@/lib/axios.js";
+
+// Danh sách API cần prefetch trước khi render
+// Chỉ prefetch data ít thay đổi và quan trọng với UX
+const PREFETCH_TASKS = [
+  {
+    key: ["categories"],
+    fn: () => api.get("/categories").then((r) => r.data.data),
+  },
+  {
+    key: ["medicines", { page: 1, limit: 12 }],
+    fn: () => api.get("/medicines?page=1&limit=12").then((r) => r.data.data),
+  },
+];
 
 export default function AuthInitializer({ children }) {
   // isInitialized: flag để biết đã check xong chưa
