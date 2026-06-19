@@ -71,8 +71,13 @@ export default function AuthInitializer({ children }) {
     if (hasFetched.current) return; // already ran, skip
     hasFetched.current = true;
     const initAuth = async () => {
-      // Nếu chưa từng đăng nhập / đã logout → bỏ qua, không gọi API
+      // Tổng số bước = auth + prefetch tasks
+      // Nếu chưa có session thì bỏ qua auth → ít bước hơn
       const hasSession = localStorage.getItem("hasSession");
+      const authSteps = hasSession ? 2 : 0; // refresh + profile
+      const totalSteps = authSteps + PREFETCH_TASKS.length;
+      let currentStep = 0;
+
       if (!hasSession) {
         setIsInitialized(true);
         return;
