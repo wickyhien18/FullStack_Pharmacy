@@ -84,6 +84,11 @@ export const findAllMedicines = ({ skip, limit }) => {
   });
 };
 
+// Tạo medicine mới
+export const createMedicine = (data) => {
+  return prisma.medicine.create({ data });
+};
+
 export const countAllMedicines = () => {
   return prisma.medicine.count({ where: { deletedAt: null } });
 };

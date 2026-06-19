@@ -8,6 +8,10 @@ import { buildPaginatedResponse } from "../utils/pagination.js";
 // Dashboard stats
 export const getDashboardStats = () => adminRepo.getDashboardStats();
 
+// Tạo slug từ tên — cài: npm install slugify
+const generateSlug = (name) =>
+  slugify(name, { lower: true, strict: true, locale: "vi" }) + "-" + Date.now();
+
 // Danh sách đơn hàng
 export const getAllOrders = async ({ page, limit, skip }) => {
   const [orders, total] = await Promise.all([
