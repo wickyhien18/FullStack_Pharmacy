@@ -70,7 +70,9 @@ export const updateUserStatus = (userId, isActive) => {
   return prisma.user.update({ where: { userId }, data: { isActive } });
 };
 
-export const 
+export const findAllRoles = () => {
+  return prisma.role.findMany({ orderBy: { roleName: "asc" } });
+};
 
 export const existRole = (name) => {
   return prisma.role.findUnique({ where: { roleName: name } });
