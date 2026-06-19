@@ -21,6 +21,8 @@ router.patch("/orders/:orderId/status", adminController.updateOrderStatus);
 // Users
 router.get("/users", adminController.getAllUsers);
 router.patch("/users/:userId/status", adminController.updateUserStatus);
+router.patch("/users/:userId/role", updateUserRole);
+router.get("/roles", getRoles);
 
 // Medicines
 router.get("/medicines", adminController.getAllMedicines);
