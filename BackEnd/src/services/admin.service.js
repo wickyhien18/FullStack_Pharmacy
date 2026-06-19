@@ -61,6 +61,11 @@ export const updateOrderStatus = async (orderId, orderStatus) => {
   return { orderId: order.orderId.toString(), orderStatus: order.orderStatus };
 };
 
+export const getAllRoles = async () => {
+  const roles = await adminRepo.findAllRoles();
+  return { roles };
+};
+
 // Danh sách users
 export const getAllUsers = async ({ page, limit, skip }) => {
   const [users, total] = await Promise.all([
