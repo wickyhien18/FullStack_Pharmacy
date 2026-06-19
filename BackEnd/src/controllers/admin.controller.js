@@ -75,6 +75,32 @@ export const getAllMedicines = async (req, res) => {
   }
 };
 
+// POST /api/admin/medicines
+export const createMedicine = async (req, res) => {
+  try {
+    await handleUpload(req, res);
+    const data = await adminService.createMedicine(req.body, req.file);
+    return sendSuccess(res, data, "Tạo sản phẩm thành công", 201);
+  } catch (err) {
+    return sendError(res, err.message, err.status || 500);
+  }
+};
+
+// PUT /api/admin/medicines/:medicineId
+export const updateMedicine = async (req, res) => {
+  try {
+    await handleUpload(req, res);
+    const data = await adminService.updateMedicine(
+      req.params.medicineId,
+      req.body,
+      req.file,
+    );
+    return sendSuccess(res, data, "Cập nhật thành công");
+  } catch (err) {
+    return sendError(res, err.message, err.status || 500);
+  }
+};
+
 // DELETE /api/admin/medicines/:medicineId
 export const deleteMedicine = async (req, res) => {
   try {
