@@ -84,6 +84,12 @@ export const findAllMedicines = ({ skip, limit }) => {
   });
 };
 
+export const existMedicine = (id) => {
+  return prisma.medicine.findUnique({
+    where: { medicineId: BigInt(id) },
+  });
+};
+
 // Tạo inventory record cho medicine mới
 export const createInventory = (data) => {
   return prisma.inventory.create({ data });

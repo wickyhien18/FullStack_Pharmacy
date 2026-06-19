@@ -141,7 +141,23 @@ export const createMedicine = async (data, file) => {
 };
 
 // Cập nhật medicine
-export const updateMedicine = async (medicineId, data, file) => {};
+export const updateMedicine = async (medicineId, data, file) => {
+  const existing = await adminRepo.existMedicine(medicineId);
+  if (!existing) throw { status: 404, message: "Không tìm thấy sản phẩm" };
+
+  let imageUrl = existing.image;
+
+  if (file) {
+    // Upload ảnh mới
+    imageUrl = await uploadImage(
+      file.buffer,
+      data.name || existing.name,
+      file.mimetype,
+    );
+    // Xoá ảnh cũ nếu có
+    if (existing.image) await deleteImage(existing.image);
+  }
+};
 
 // Soft delete medicine
 export const deleteMedicine = async (medicineId) => {
