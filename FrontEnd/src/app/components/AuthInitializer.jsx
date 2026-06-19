@@ -142,7 +142,7 @@ export default function AuthInitializer({ children }) {
       }
     };
 
-    init();
+    initAuth();
   }, []);
 
   if (!isInitialized) {
