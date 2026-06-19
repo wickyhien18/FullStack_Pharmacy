@@ -116,7 +116,7 @@ export const createMedicine = async (data, file) => {
     imageUrl = await uploadImage(file.buffer, data.name, file.mimetype);
   }
 
-  const medicine = await adminRepo.createMedicine({
+  const medicine = await medicineRepo.createMedicine({
     data: {
       name: data.name,
       slug: generateSlug(data.name),
