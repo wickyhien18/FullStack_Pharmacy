@@ -188,5 +188,11 @@ export const updateMedicine = async (medicineId, data, file) => {
 
 // Soft delete medicine
 export const deleteMedicine = async (medicineId) => {
+  const existing = await adminRepo.existMedicine(medicineId);
+  if (!existing) throw { status: 404, message: "Không tìm thấy sản phẩm" };
+
+  // Xoá ảnh khỏi storage
+  if (medicine.image) await deleteImage(medicine.image);
+
   await medicineRepo.softDeleteMedicine(BigInt(medicineId));
 };
