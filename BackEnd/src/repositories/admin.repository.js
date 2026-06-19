@@ -70,6 +70,20 @@ export const updateUserStatus = (userId, isActive) => {
   return prisma.user.update({ where: { userId }, data: { isActive } });
 };
 
+export const 
+
+export const existRole = (name) => {
+  return prisma.role.findUnique({ where: { roleName: name } });
+};
+
+export const updateUserRole = (userId, roleId) => {
+  return prisma.user.update({
+    where: { userId: BigInt(userId) },
+    data: { roleId },
+    include: { role: true },
+  });
+};
+
 // Lấy tất cả medicines (admin thấy cả inactive)
 export const findAllMedicines = ({ skip, limit }) => {
   return prisma.medicine.findMany({
