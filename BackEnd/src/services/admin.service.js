@@ -129,7 +129,19 @@ export const createMedicine = async (data, file) => {
       image: imageUrl,
     },
   });
+
+  await adminRepo.createInventory({
+    data: {
+      medicineId: medicine.medicineId,
+      quantity: parseInt(data.stock) || 0,
+    },
+  });
+
+  return { medicineId: medicine.medicineId.toString(), slug: medicine.slug };
 };
+
+// Cập nhật medicine
+export const updateMedicine = async (medicineId, data, file) => {};
 
 // Soft delete medicine
 export const deleteMedicine = async (medicineId) => {
