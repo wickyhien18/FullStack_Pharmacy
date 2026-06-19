@@ -89,6 +89,11 @@ export const createMedicine = (data) => {
   return prisma.medicine.create({ data });
 };
 
+// Tạo inventory record cho medicine mới
+export const createInventory = (data) => {
+  return prisma.inventory.create({ data });
+};
+
 export const countAllMedicines = () => {
   return prisma.medicine.count({ where: { deletedAt: null } });
 };
