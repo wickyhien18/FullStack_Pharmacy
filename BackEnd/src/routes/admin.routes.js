@@ -17,12 +17,15 @@ router.get("/stats", adminController.getDashboardStats);
 // Orders
 router.get("/orders", adminController.getAllOrders);
 router.patch("/orders/:orderId/status", adminController.updateOrderStatus);
+router.patch(
+  "/orders/:orderId/cancel-request",
+  adminController.handleCancelRequest,
+);
 
 // Users
 router.get("/users", adminController.getAllUsers);
 router.patch("/users/:userId/status", adminController.updateUserStatus);
 router.patch("/users/:userId/role", adminController.updateUserRole);
-router.get("/roles", adminController.getRoles);
 
 // Medicines
 router.get("/medicines", adminController.getAllMedicines);

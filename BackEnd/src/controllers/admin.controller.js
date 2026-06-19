@@ -51,26 +51,12 @@ export const getAllUsers = async (req, res) => {
   }
 };
 
-// GET /api/admin/roles — lấy danh sách roles cho dropdown
-export const getRoles = async (req, res) => {
-  try {
-    const roles = adminService.getAllRoles();
-    return sendSuccess(
-      res,
-      roles.map((r) => ({
-        roleId: r.roleId.toString(),
-        roleName: r.roleName,
-      })),
-      "Lấy danh sách roles thành công",
-    );
-  } catch (err) {
-    return sendError(res, err.message, err.status || 500);
-  }
-};
-
 // PATCH /api/admin/users/:userId/status
 export const updateUserStatus = async (req, res) => {
   try {
+    if (req.user.userId === parseInt(req.params.userId))
+      return sendError(res, "Không thể khoá chính mình", 400);
+
     const data = await adminService.updateUserStatus(
       req.params.userId,
       req.body.isActive,
