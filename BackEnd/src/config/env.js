@@ -15,8 +15,12 @@ export const env = {
   JWT_ACCESS_EXPIRES: process.env.JWT_ACCESS_EXPIRES || "15m",
   JWT_REFRESH_EXPIRES: process.env.JWT_REFRESH_EXPIRES || "7d",
   CLIENT_URL: process.env.CLIENT_URL || "http://localhost:5173",
-  BCRYPT_ROUNDS: parseInt(process.env.BCRYPT_ROUNDS || "10"),
   REDIS_URL: process.env.REDIS_URL || "",
+  SUPABASE_URL: process.env.SUPABASE_URL || "",
+  SUPABASE_SERVICE_KEY: process.env.SUPABASE_SERVICE_KEY || "",
+  SUPABASE_STORAGE_BUCKET:
+    process.env.SUPABASE_STORAGE_BUCKET || "medicine-images",
+  BCRYPT_ROUNDS: parseInt(process.env.BCRYPT_ROUNDS || "10"),
   isDev: process.env.NODE_ENV !== "production",
   isProd: process.env.NODE_ENV === "production",
 };
