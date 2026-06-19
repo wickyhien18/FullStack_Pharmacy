@@ -179,8 +179,11 @@ export const updateMedicine = async (medicineId, data, file) => {
 
     // Cập nhật tồn kho nếu có
     if (data.stock !== undefined) {
+      await adminRepo.createOrUpdateInventory(medicineId, data.stock);
     }
   }
+
+  return { medicineId, message: "Cập nhật thành công" };
 };
 
 // Soft delete medicine
