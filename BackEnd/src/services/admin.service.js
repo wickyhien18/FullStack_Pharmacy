@@ -4,6 +4,8 @@
 import * as adminRepo from "../repositories/admin.repository.js";
 import * as medicineRepo from "../repositories/medicine.repository.js";
 import { buildPaginatedResponse } from "../utils/pagination.js";
+import { uploadImage, deleteImage } from "./upload.service.js";
+import slugify from "slugify";
 
 // Dashboard stats
 export const getDashboardStats = () => adminRepo.getDashboardStats();
@@ -104,6 +106,29 @@ export const getAllMedicines = async ({ page, limit, skip }) => {
   }));
 
   return buildPaginatedResponse(items, total, page, limit);
+};
+
+// Tạo medicine mới
+export const createMedicine = async (data, file) => {
+  let imageUrl = null;
+
+  if (file) {
+    imageUrl = await uploadImage(file.buffer, data.name, file.mimetype);
+  }
+
+  const medicine = await adminRepo.createMedicine({
+    data: {
+      name: data.name,
+      slug: generateSlug(data.name),
+      description: data.description || null,
+      price: parseFloat(data.price),
+      unit: data.unit || "Hộp",
+      categoryId: data.categoryId ? BigInt(data.categoryId) : null,
+      manufacturerId: data.manufacturerId ? BigInt(data.manufacturerId) : null,
+      status: data.status || "ACTIVE",
+      image: imageUrl,
+    },
+  });
 };
 
 // Soft delete medicine
