@@ -156,6 +156,30 @@ export const updateMedicine = async (medicineId, data, file) => {
     );
     // Xoá ảnh cũ nếu có
     if (existing.image) await deleteImage(existing.image);
+
+    const updateData = {};
+    if (data.name) {
+      updateData.name = data.name;
+      updateData.slug = generateSlug(data.name);
+    }
+    if (data.description !== undefined)
+      updateData.description = data.description;
+    if (data.price) updateData.price = parseFloat(data.price);
+    if (data.unit) updateData.unit = data.unit;
+    if (data.categoryId) updateData.categoryId = BigInt(data.categoryId);
+    if (data.manufacturerId)
+      updateData.manufacturerId = BigInt(data.manufacturerId);
+    if (data.status) updateData.status = data.status;
+    if (imageUrl !== existing.image) updateData.image = imageUrl;
+
+    await medicineRepo.updateMedicine({
+      where: { medicineId: BigInt(medicineId) },
+      data: updateData,
+    });
+
+    // Cập nhật tồn kho nếu có
+    if (data.stock !== undefined) {
+    }
   }
 };
 

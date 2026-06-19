@@ -95,6 +95,14 @@ export const createInventory = (data) => {
   return prisma.inventory.create({ data });
 };
 
+export const createOrUpdateInventory = (medicineId, stock) => {
+  return prisma.inventory.upsert({
+    where: { medicineId: BigInt(medicineId) },
+    update: { quantity: parseInt(stock) },
+    create: { medicineId: BigInt(medicineId), quantity: parseInt(stock) },
+  });
+};
+
 export const countAllMedicines = () => {
   return prisma.medicine.count({ where: { deletedAt: null } });
 };
