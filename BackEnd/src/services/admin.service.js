@@ -4,6 +4,7 @@
 import * as adminRepo from "../repositories/admin.repository.js";
 import * as medicineRepo from "../repositories/medicine.repository.js";
 import { buildPaginatedResponse } from "../utils/pagination.js";
+import { sendError } from "../utils/response.js";
 import { uploadImage, deleteImage } from "./upload.service.js";
 import slugify from "slugify";
 
@@ -91,6 +92,16 @@ export const getAllUsers = async ({ page, limit, skip }) => {
 export const updateUserStatus = async (userId, isActive) => {
   const user = await adminRepo.updateUserStatus(BigInt(userId), isActive);
   return { userId: user.userId.toString(), isActive: user.isActive };
+};
+
+export const updateUserRole = async (userId, roleName) => {
+  if (!roleName) throw { status: 400, message: "roleName là bắt buộc" };
+
+  const role = await adminRepo.existRole(roleId);
+  if (!role) throw { status: 404, message: "Role không tồn tại" };
+
+  const user = await adminRepo.updateUserRole(BigInt(userId), role.roleId);
+  return { userId: user.userId.toString(), role: role.roleName };
 };
 
 // Danh sách medicines (admin)

@@ -81,6 +81,26 @@ export const updateUserStatus = async (req, res) => {
   }
 };
 
+// PATCH /api/admin/users/:userId/role
+export const updateUserRole = async (req, res) => {
+  try {
+    const { roleName } = req.body;
+
+    const user = adminService.updateUserRole(req.params.userId, roleName);
+
+    return sendSuccess(
+      res,
+      {
+        userId: user.userId.toString(),
+        role: user.role?.roleName,
+      },
+      "Đổi role thành công",
+    );
+  } catch (err) {
+    return sendError(res, err.message, err.status || 500);
+  }
+};
+
 // GET /api/admin/medicines
 export const getAllMedicines = async (req, res) => {
   try {
