@@ -162,3 +162,16 @@ export const handleCancelOrderDelivedAndShipping = (orderId, status) => {
     }
   });
 };
+
+export const rejectOrder = (orderId, status, reason) => {
+  return prisma.order.update({
+    where: { orderId: BigInt(orderId) },
+    data: {
+      orderStatus: status,
+      cancelledBy: null,
+      cancelledReason: reason
+        ? `Từ chối huỷ: ${reason}`
+        : "Yêu cầu huỷ bị từ chối bởi nhà thuốc",
+    },
+  });
+};
