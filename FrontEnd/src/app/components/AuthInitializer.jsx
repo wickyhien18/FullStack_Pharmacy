@@ -57,6 +57,28 @@ function LoadingScreen({ progress, message }) {
   );
 }
 
+// Hàm dùng chung để khôi phục session (gọi cả 2 nhánh: full init và background refresh)
+const restoreSession = async (setAuth, clearAuth) => {
+  const hasSession = localStorage.getItem("hasSession");
+  if (!hasSession) return;
+
+  try {
+    const { data } = await api.post("/auth/refresh-token");
+    if (data?.data?.accessToken) {
+      const profileRes = await api.get("/auth/profile", {
+        headers: { Authorization: `Bearer ${data.data.accessToken}` },
+      });
+      setAuth(profileRes.data.data, data.data.accessToken);
+    }
+  } catch (err) {
+    if (err.response?.status !== 401) {
+      console.error("[AuthInitializer] Unexpected error:", err);
+    }
+    localStorage.removeItem("hasSession");
+    clearAuth();
+  }
+};
+
 export default function AuthInitializer({ children }) {
   // isInitialized: flag để biết đã check xong chưa
   // Trong lúc đang check → hiện loading, tránh flash màn hình login
@@ -74,26 +96,15 @@ export default function AuthInitializer({ children }) {
       // Nếu đã từng init trong session này → bỏ qua loading screen dài
       const alreadyInitialized = sessionStorage.getItem("appInitialized");
 
+      // ── Lần reload thứ 2+ trong cùng session ──────────────────────
+      // Khôi phục session NGẦM trước, rồi mới render — không hiện loading screen
+      // nhưng vẫn đợi setAuth xong để tránh flash trạng thái chưa login
       if (alreadyInitialized) {
-        // Vẫn refresh session ngầm nhưng KHÔNG hiện loading screen
-        setIsInitialized(true); // render app ngay
-        // Refresh session trong nền
-        try {
-          const hasSession = localStorage.getItem("hasSession");
-          if (hasSession) {
-            const { data } = await api.post("/auth/refresh-token");
-            if (data?.data?.accessToken) {
-              const profileRes = await api.get("/auth/profile", {
-                headers: { Authorization: `Bearer ${data.data.accessToken}` },
-              });
-              setAuth(profileRes.data.data, data.data.accessToken);
-            }
-          }
-        } catch {
-          clearAuth();
-        }
+        await restoreSession(setAuth, clearAuth);
+        setIsInitialized(true);
         return;
       }
+
       // Tổng số bước = auth + prefetch tasks
       // Nếu chưa có session thì bỏ qua auth → ít bước hơn
       const hasSession = localStorage.getItem("hasSession");
@@ -106,11 +117,6 @@ export default function AuthInitializer({ children }) {
         setProgress(Math.round((currentStep / totalSteps) * 100));
         setMessage(msg);
       };
-
-      if (!hasSession) {
-        setIsInitialized(true);
-        return;
-      }
 
       try {
         // ── Bước 1: Khôi phục session (chỉ khi đã từng đăng nhập) ──
@@ -161,6 +167,7 @@ export default function AuthInitializer({ children }) {
         setMessage("Hoàn tất!");
         await new Promise((r) => setTimeout(r, 300));
       } finally {
+        sessionStorage.setItem("appInitialized", "true");
         setIsInitialized(true);
       }
     };
@@ -172,6 +179,5 @@ export default function AuthInitializer({ children }) {
     return <LoadingScreen progress={progress} message={message} />;
   }
 
-  sessionStorage.setItem("appInitialized", "true");
   return children;
 }
