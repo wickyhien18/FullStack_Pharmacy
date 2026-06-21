@@ -1,20 +1,19 @@
-
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import api from "../../lib/axios.js";
 
 const CANCEL_MESSAGE = {
-  PENDING:   "Đơn hàng sẽ được huỷ ngay lập tức.",
+  PENDING: "Đơn hàng sẽ được huỷ ngay lập tức.",
   CONFIRMED: "Đơn hàng sẽ được huỷ ngay lập tức.",
-  SHIPPING:  "Đơn hàng đang giao. Yêu cầu huỷ sẽ gửi đến nhà thuốc để xử lý.",
+  SHIPPING: "Đơn hàng đang giao. Yêu cầu huỷ sẽ gửi đến nhà thuốc để xử lý.",
   DELIVERED: "Đơn hàng đã giao. Yêu cầu hoàn hàng sẽ gửi đến nhà thuốc.",
 };
 
 const CANCEL_LABEL = {
-  PENDING:   "Huỷ đơn hàng",
+  PENDING: "Huỷ đơn hàng",
   CONFIRMED: "Huỷ đơn hàng",
-  SHIPPING:  "Yêu cầu huỷ",
+  SHIPPING: "Yêu cầu huỷ",
   DELIVERED: "Yêu cầu hoàn hàng",
 };
 
@@ -23,15 +22,13 @@ export default function CancelOrderModal({ order, onClose }) {
   const queryClient = useQueryClient();
 
   const cancelMutation = useMutation({
-    mutationFn: () =>
-      api.post(`/orders/${order.orderId}/cancel`, { reason }),
+    mutationFn: () => api.post(`/orders/${order.orderId}/cancel`, { reason }),
     onSuccess: ({ data }) => {
       toast.success(data.data?.message || "Thành công");
       queryClient.invalidateQueries({ queryKey: ["my-orders"] });
       onClose();
     },
-    onError: (err) =>
-      toast.error(err.response?.data?.message || "Thất bại"),
+    onError: (err) => toast.error(err.response?.data?.message || "Thất bại"),
   });
 
   const label = CANCEL_LABEL[order.orderStatus] || "Huỷ đơn";
@@ -53,7 +50,7 @@ export default function CancelOrderModal({ order, onClose }) {
         {/* Lý do */}
         <div className="mb-5">
           <label className="block text-sm font-medium text-gray-700 mb-1.5">
-            Lý do *
+            Lý do (không bắt buộc)
           </label>
           <textarea
             value={reason}
@@ -74,7 +71,6 @@ export default function CancelOrderModal({ order, onClose }) {
           </button>
           <button
             onClick={() => {
-              if (!reason.trim()) { toast.error("Vui lòng nhập lý do"); return; }
               cancelMutation.mutate();
             }}
             disabled={cancelMutation.isPending}
