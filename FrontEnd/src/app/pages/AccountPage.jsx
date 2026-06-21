@@ -6,14 +6,15 @@ import {
   EyeOff,
   User,
   ShoppingBag,
-  Heart,
-  MapPin,
-  Bell,
+  // Heart,
+  // MapPin,
+  // Bell,
 } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth.js";
 import { useQuery } from "@tanstack/react-query";
 import api from "../../lib/axios.js";
 import toast from "react-hot-toast";
+import CancelOrderModal from "../components/CancelOrderModal.jsx";
 
 const statusMap = {
   PENDING: {
@@ -38,6 +39,9 @@ const statusMap = {
   },
 };
 
+// Status user có thể huỷ/yêu cầu huỷ
+const CANCELLABLE = ["PENDING", "CONFIRMED", "SHIPPING", "DELIVERED"];
+
 function AccountPage() {
   const {
     user,
@@ -51,6 +55,7 @@ function AccountPage() {
   const [tab, setTab] = useState("login");
   const [showPwd, setShowPwd] = useState(false);
   const [activeSubTab, setActiveSubTab] = useState("profile");
+  const [cancelOrder, setCancelOrder] = useState(null); // order đang muốn huỷ
 
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
   const [regForm, setRegForm] = useState({
@@ -272,6 +277,7 @@ function AccountPage() {
                         key={order.orderId}
                         className="border border-gray-100 rounded-xl p-4 hover:shadow-sm transition-shadow"
                       >
+                        {/* Header */}
                         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-50 pb-2 mb-3">
                           <div>
                             <span className="font-mono text-xs text-gray-500 font-semibold">
@@ -290,6 +296,8 @@ function AccountPage() {
                               order.orderStatus}
                           </span>
                         </div>
+
+                        {/* Items */}
                         <div className="text-sm text-gray-600 space-y-1 mb-3">
                           {order.items?.map((item, idx) => (
                             <div key={idx} className="flex justify-between">
@@ -305,6 +313,8 @@ function AccountPage() {
                             </div>
                           ))}
                         </div>
+
+                        {/* Footer */}
                         <div className="flex justify-between items-center border-t border-gray-50 pt-2 text-sm font-semibold">
                           <span className="text-gray-500">
                             Tổng thanh toán:
