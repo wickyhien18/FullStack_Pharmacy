@@ -57,6 +57,26 @@ function LoadingScreen({ progress, message }) {
   );
 }
 
+// Widget nhỏ góc màn hình — không che app, chỉ báo đang xử lý nền
+function BackgroundLoadingBadge() {
+  return (
+    <div
+      className="fixed bottom-5 right-5 z-50 flex items-center gap-2.5
+                      bg-white shadow-lg rounded-full pl-2 pr-4 py-2
+                      border border-gray-100 animate-in fade-in slide-in-from-bottom-2"
+    >
+      <div
+        className="w-7 h-7 rounded-full flex items-center justify-center text-sm"
+        style={{ backgroundColor: "#e8efff" }}
+      >
+        💊
+      </div>
+      <span className="text-xs text-gray-500">Đang tải dữ liệu...</span>
+      <div className="w-3 h-3 border-2 border-gray-200 border-t-blue-600 rounded-full animate-spin" />
+    </div>
+  );
+}
+
 // Hàm dùng chung để khôi phục session (gọi cả 2 nhánh: full init và background refresh)
 const restoreSession = async (setAuth, clearAuth) => {
   const hasSession = localStorage.getItem("hasSession");
@@ -83,6 +103,8 @@ export default function AuthInitializer({ children }) {
   // isInitialized: flag để biết đã check xong chưa
   // Trong lúc đang check → hiện loading, tránh flash màn hình login
   const [isInitialized, setIsInitialized] = useState(false);
+  // isBackgroundWorking: chỉ điều khiển widget nhỏ, KHÔNG block render app
+  const [isBackgroundWorking, setIsBackgroundWorking] = useState(true);
   const [progress, setProgress] = useState(0);
   const [message, setMessage] = useState("Đang khởi động...");
   const { setAuth, clearAuth } = useAuthStore();
