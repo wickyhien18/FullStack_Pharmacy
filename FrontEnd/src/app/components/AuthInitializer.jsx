@@ -34,7 +34,7 @@ function LoadingScreen({ progress, message }) {
       <div className="mb-8 text-center">
         <div className="text-4xl mb-2">💊</div>
         <h1 className="text-xl font-bold" style={{ color: "#1250dc" }}>
-          Nhà Thuốc Online
+          Nhà Thuốc Wicky Hien
         </h1>
       </div>
 
@@ -71,6 +71,29 @@ export default function AuthInitializer({ children }) {
     if (hasFetched.current) return; // already ran, skip
     hasFetched.current = true;
     const initAuth = async () => {
+      // Nếu đã từng init trong session này → bỏ qua loading screen dài
+      const alreadyInitialized = sessionStorage.getItem("appInitialized");
+
+      if (alreadyInitialized) {
+        // Vẫn refresh session ngầm nhưng KHÔNG hiện loading screen
+        setIsInitialized(true); // render app ngay
+        // Refresh session trong nền
+        try {
+          const hasSession = localStorage.getItem("hasSession");
+          if (hasSession) {
+            const { data } = await api.post("/auth/refresh-token");
+            if (data?.data?.accessToken) {
+              const profileRes = await api.get("/auth/profile", {
+                headers: { Authorization: `Bearer ${data.data.accessToken}` },
+              });
+              setAuth(profileRes.data.data, data.data.accessToken);
+            }
+          }
+        } catch {
+          clearAuth();
+        }
+        return;
+      }
       // Tổng số bước = auth + prefetch tasks
       // Nếu chưa có session thì bỏ qua auth → ít bước hơn
       const hasSession = localStorage.getItem("hasSession");
@@ -149,5 +172,6 @@ export default function AuthInitializer({ children }) {
     return <LoadingScreen progress={progress} message={message} />;
   }
 
+  sessionStorage.setItem("appInitialized", "true");
   return children;
 }
