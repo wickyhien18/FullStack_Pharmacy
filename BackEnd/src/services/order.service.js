@@ -98,13 +98,13 @@ export const cancelOrder = async (orderId, userId, reason = "") => {
   const { orderStatus } = order;
 
   if (orderStatus === "PENDING" || orderStatus === "CONFIRMED") {
-    await orderRepo.handleCancelOrderPending(order.orderId, reason);
+    await orderRepo.handleCancelOrderPending(BigInt(order.orderId), reason);
 
     return { message: "Đơn hàng đã được huỷ thành công", status: "CANCELLED" };
   }
 
   if (orderStatus === "SHIPPING") {
-    await orderRepo.cancelOrderShipping(order.orderId, reason);
+    await orderRepo.cancelOrderShipping(BigInt(order.orderId), reason);
 
     return {
       message: "Yêu cầu huỷ đã được gửi. Vui lòng chờ xác nhận từ nhà thuốc.",
@@ -113,7 +113,7 @@ export const cancelOrder = async (orderId, userId, reason = "") => {
   }
 
   if (orderStatus === "DELIVERED") {
-    await orderRepo.cancelOrderDelivered(order.orderId, reason);
+    await orderRepo.cancelOrderDelivered(BigInt(order.orderId), reason);
 
     return {
       message:
@@ -133,9 +133,29 @@ export const handleCancelRequest = async (
   action,
   rejectReason = "",
 ) => {
-  const order = await orderRepo.findCartByUserId(orderId);
+  const order = await orderRepo.findCartByUserId(BigInt(orderId));
 
   if (!order) throw { status: 404, message: "Không tìm thấy đơn hàng" };
 
   const { orderStatus } = order;
+
+  if (
+    orderStatus !== "CANCEL_REQUESTED" &&
+    orderStatus !== "RETURN_REQUESTED"
+  ) {
+    throw { status: 400, message: "Đơn hàng không có yêu cầu huỷ/hoàn" };
+  }
+
+  if (action === "approve") {
+    // Admin đồng ý → CANCELLED hoặc RETURNED + hoàn tồn kho
+    const newStatus =
+      orderStatus === "CANCEL_REQUESTED" ? "CANCELLED" : "RETURNED";
+
+    await orderRepo.handleCancelOrderDelivedAndShipping(
+      BigInt(order.orderId),
+      newStatus,
+    );
+
+    return { message: "Đã xác nhận huỷ/hoàn đơn hàng", status: newStatus };
+  }
 };
