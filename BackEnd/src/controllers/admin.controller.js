@@ -29,7 +29,7 @@ export const getAllOrders = async (req, res) => {
 };
 
 // PATCH /api/admin/orders/:orderId/cancel-request — Admin xử lý
-export const handleCancelRequestController = async (req, res) => {
+export const handleCancelRequest = async (req, res) => {
   try {
     const { action, rejectReason } = req.body;
     // action = 'approve' hoặc 'reject'
