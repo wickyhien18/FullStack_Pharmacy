@@ -97,5 +97,12 @@ export const cancelOrder = async (orderId, userId, reason = "") => {
     return { message: "Đơn hàng đã được huỷ thành công", status: "CANCELLED" };
   }
 
-  if ()
+  if (orderStatus === "SHIPPING") {
+    await orderRepo.cancelOrderShipping(order.orderId, reason);
+
+    return {
+      message: "Yêu cầu huỷ đã được gửi. Vui lòng chờ xác nhận từ nhà thuốc.",
+      status: "CANCEL_REQUESTED",
+    };
+  }
 };
