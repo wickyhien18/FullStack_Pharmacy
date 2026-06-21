@@ -105,6 +105,7 @@ export default function AuthInitializer({ children }) {
         return;
       }
 
+      console.log("[DEBUG] Taking LONG path - full loading screen"); // ← thêm
       // Tổng số bước = auth + prefetch tasks
       // Nếu chưa có session thì bỏ qua auth → ít bước hơn
       const hasSession = localStorage.getItem("hasSession");
