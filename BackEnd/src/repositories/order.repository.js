@@ -82,7 +82,7 @@ export const countOrdersByUser = (userId) => {
   return prisma.order.count({ where: { userId } });
 };
 
-export const findOrderById = (orderId, userId) => {
+export const findOrderByUserIdAndOrderId = (orderId, userId) => {
   return prisma.order.findFirst({
     where: { orderId, userId },
     include: {

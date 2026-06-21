@@ -80,13 +80,19 @@ export const getMyOrders = async (userId, { page, limit, skip }) => {
 };
 
 export const getOrderDetail = async (orderId, userId) => {
-  const order = await orderRepo.findOrderById(BigInt(orderId), BigInt(userId));
+  const order = await orderRepo.findOrderByUserIdAndOrderId(
+    BigInt(orderId),
+    BigInt(userId),
+  );
   if (!order) throw { status: 404, message: "Không tìm thấy đơn hàng" };
   return formatOrder(order);
 };
 
 export const cancelOrder = async (orderId, userId, reason = "") => {
-  const order = await orderRepo.findOrderById(BigInt(orderId), BigInt(userId));
+  const order = await orderRepo.findOrderByUserIdAndOrderId(
+    BigInt(orderId),
+    BigInt(userId),
+  );
   if (!order) throw { status: 404, message: "Không tìm thấy đơn hàng" };
 
   const { orderStatus } = order;
@@ -121,3 +127,9 @@ export const cancelOrder = async (orderId, userId, reason = "") => {
     message: `Không thể huỷ đơn hàng ở trạng thái "${orderStatus}"`,
   };
 };
+
+export const handleCancelRequest = async (
+  orderId,
+  action,
+  rejectReason = "",
+) => {};
