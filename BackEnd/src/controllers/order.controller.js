@@ -46,3 +46,37 @@ export const getOrderDetail = async (req, res) => {
     return sendError(res, err.message, err.status || 500);
   }
 };
+
+// POST /api/orders/:orderId/cancel — User huỷ đơn
+export const cancelOrderController = async (req, res) => {
+  try {
+    const { reason } = req.body;
+    const result = await orderService.cancelOrder(
+      req.params.orderId,
+      req.user.userId,
+      reason,
+    );
+    return sendSuccess(res, result, result.message);
+  } catch (err) {
+    return sendError(res, err.message, err.status || 500);
+  }
+};
+
+// PATCH /api/admin/orders/:orderId/cancel-request — Admin xử lý
+export const handleCancelRequestController = async (req, res) => {
+  try {
+    const { action, rejectReason } = req.body;
+    // action = 'approve' hoặc 'reject'
+    if (!["approve", "reject"].includes(action)) {
+      return sendError(res, "action phải là approve hoặc reject", 400);
+    }
+    const result = await orderService.handleCancelRequest(
+      req.params.orderId,
+      action,
+      rejectReason,
+    );
+    return sendSuccess(res, result, result.message);
+  } catch (err) {
+    return sendError(res, err.message, err.status || 500);
+  }
+};
