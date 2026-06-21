@@ -13,6 +13,6 @@ router.use(authenticate);
 router.post("/", orderController.createOrder); // Tạo đơn hàng
 router.get("/my", orderController.getMyOrders); // Lịch sử đơn của tôi
 router.get("/:orderId", orderController.getOrderDetail); // Chi tiết 1 đơn
-router.post("/:orderId/cancel", orderController.createOrder);
+router.post("/:orderId/cancel", orderController.cancelOrder);
 
 export default router;

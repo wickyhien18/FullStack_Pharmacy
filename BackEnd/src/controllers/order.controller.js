@@ -48,7 +48,7 @@ export const getOrderDetail = async (req, res) => {
 };
 
 // POST /api/orders/:orderId/cancel — User huỷ đơn
-export const cancelOrderController = async (req, res) => {
+export const cancelOrder = async (req, res) => {
   try {
     const { reason } = req.body;
     const result = await orderService.cancelOrder(
