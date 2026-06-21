@@ -56,6 +56,8 @@ export const useAuth = () => {
     } catch {
       // Dù API lỗi vẫn clear state — user phải thoát được
     } finally {
+      localStorage.removeItem("hasSession");
+      localStorage.removeItem("appInitialized"); // ← thêm dòng này
       clearAuth();
       navigate("/");
       toast.success("Đã đăng xuất");
