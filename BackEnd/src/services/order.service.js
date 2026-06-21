@@ -86,8 +86,16 @@ export const getOrderDetail = async (orderId, userId) => {
 };
 
 export const cancelOrder = async (orderId, userId, reason = "") => {
-  const order = orderRepo.findOrderById(BigInt(orderId), BigInt(userId));
+  const order = await orderRepo.findOrderById(BigInt(orderId), BigInt(userId));
   if (!order) throw { status: 404, message: "Không tìm thấy đơn hàng" };
 
   const { orderStatus } = order;
+
+  if (orderStatus === "PENDING" || orderStatus === "CONFIRMED") {
+    await orderRepo.handleCancelOrderPending(order.orderId, reason);
+
+    return { message: "Đơn hàng đã được huỷ thành công", status: "CANCELLED" };
+  }
+
+  if ()
 };
