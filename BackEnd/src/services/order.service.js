@@ -132,4 +132,10 @@ export const handleCancelRequest = async (
   orderId,
   action,
   rejectReason = "",
-) => {};
+) => {
+  const order = await orderRepo.findCartByUserId(orderId);
+
+  if (!order) throw { status: 404, message: "Không tìm thấy đơn hàng" };
+
+  const { orderStatus } = order;
+};
