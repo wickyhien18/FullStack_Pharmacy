@@ -94,7 +94,7 @@ export default function AuthInitializer({ children }) {
     hasFetched.current = true;
     const initAuth = async () => {
       // Nếu đã từng init trong session này → bỏ qua loading screen dài
-      const alreadyInitialized = sessionStorage.getItem("appInitialized");
+      const alreadyInitialized = localStorage.getItem("appInitialized");
 
       // ── Lần reload thứ 2+ trong cùng session ──────────────────────
       // Khôi phục session NGẦM trước, rồi mới render — không hiện loading screen
@@ -167,7 +167,7 @@ export default function AuthInitializer({ children }) {
         setMessage("Hoàn tất!");
         await new Promise((r) => setTimeout(r, 300));
       } finally {
-        sessionStorage.setItem("appInitialized", "true");
+        localStorage.setItem("appInitialized", "true");
         setIsInitialized(true);
       }
     };
