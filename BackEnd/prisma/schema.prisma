@@ -38,13 +38,13 @@ model User {
 }
 
 model RefreshToken {
-  id          BigInt    @id @default(autoincrement())
-  token       String    @unique @db.VarChar(500)
-  userId      BigInt    @map("user_id")
-  expireAt    DateTime? @map("expire_at") @db.Timestamp(6)
-  createdAt   DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
-  deviceInfo  String?   @map("device_info") @db.VarChar(255)  // ← thêm dòng này
-  user        User      @relation(fields: [userId], references: [userId], onDelete: Cascade, onUpdate: NoAction)
+  id         BigInt    @id @default(autoincrement())
+  token      String    @unique @db.VarChar(500)
+  userId     BigInt    @map("user_id")
+  expireAt   DateTime? @map("expire_at") @db.Timestamp(6)
+  createdAt  DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
+  deviceInfo String?   @map("device_info") @db.VarChar(255)
+  user       User      @relation(fields: [userId], references: [userId], onDelete: Cascade, onUpdate: NoAction)
 
   @@map("refresh_tokens")
 }
@@ -68,26 +68,27 @@ model Manufacturer {
 }
 
 model Medicine {
-  medicineId     BigInt         @id @default(autoincrement()) @map("medicine_id")
-  name           String         @db.VarChar(500)
-  slug           String         @unique @db.VarChar(500)
-  image          String?        @db.VarChar(500)
-  description    String?
-  price          Decimal        @db.Decimal(15, 2)
-  unit           String?        @default("Hộp") @db.VarChar(50)
-  categoryId     BigInt?        @map("category_id")
-  manufacturerId BigInt?        @map("manufacturer_id")
-  status         String?        @default("ACTIVE") @db.VarChar(255)
-  expireDate     DateTime?      @map("expire_date") @db.Date
-  createdAt      DateTime?      @default(now()) @map("created_at") @db.Timestamp(6)
-  updatedAt      DateTime?      @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
-  deletedAt      DateTime?      @map("deleted_at") @db.Timestamp(6)
-  cartItems      CartItem[]
-  inventory      Inventory?
-  inventoryLogs  InventoryLog[]
-  category       Category?      @relation(fields: [categoryId], references: [categoryId], onUpdate: NoAction)
-  manufacturer   Manufacturer?  @relation(fields: [manufacturerId], references: [manufacturerId], onUpdate: NoAction)
-  orderItems     OrderItem[]
+  medicineId      BigInt            @id @default(autoincrement()) @map("medicine_id")
+  name            String            @db.VarChar(500)
+  slug            String            @unique @db.VarChar(500)
+  image           String?           @db.VarChar(500)
+  description     String?
+  price           Decimal           @db.Decimal(15, 2)
+  unit            String?           @default("Hộp") @db.VarChar(50)
+  categoryId      BigInt?           @map("category_id")
+  manufacturerId  BigInt?           @map("manufacturer_id")
+  status          String?           @default("ACTIVE") @db.VarChar(255)
+  expireDate      DateTime?         @map("expire_date") @db.Date
+  createdAt       DateTime?         @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt       DateTime?         @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+  deletedAt       DateTime?         @map("deleted_at") @db.Timestamp(6)
+  cartItems       CartItem[]
+  inventory       Inventory?
+  inventoryLogs   InventoryLog[]
+  images          MedicineImage[]
+  category        Category?         @relation(fields: [categoryId], references: [categoryId], onUpdate: NoAction)
+  manufacturer    Manufacturer?     @relation(fields: [manufacturerId], references: [manufacturerId], onUpdate: NoAction)
+  orderItems      OrderItem[]
 
   @@index([categoryId], map: "idx_medicines_category")
   @@index([manufacturerId], map: "idx_medicines_manufacturer")
@@ -212,6 +213,19 @@ model Shipment {
   order        Order     @relation(fields: [orderId], references: [orderId], onDelete: Cascade, onUpdate: NoAction)
 
   @@map("shipments")
+}
+
+
+model MedicineImage {
+  imageId      BigInt    @id @default(autoincrement()) @map("image_id")
+  medicineId   BigInt    @map("medicine_id")
+  imageUrl     String    @map("image_url") @db.VarChar(500)
+  displayOrder Int       @default(0) @map("display_order")
+  createdAt    DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
+  medicine     Medicine  @relation(fields: [medicineId], references: [medicineId], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([medicineId], map: "idx_medicine_images_medicine_id")
+  @@map("medicine_images")
 }
 
 enum MedicineStatus {
