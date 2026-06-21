@@ -1,7 +1,13 @@
 // ================================================================
 // AuthInitializer.jsx — Khôi phục session + Prefetch
-// Overlay che TOÀN BỘ màn hình (cả Header, Footer, nội dung)
-// trong lúc đang xử lý nền — không bấm được gì cho đến khi xong
+//
+// QUAN TRỌNG: children (toàn bộ App, gồm AccountPage...) chỉ render
+// SAU KHI auth check xong. Tránh trường hợp AccountPage render login
+// form trước rồi mới "giật" sang profile khi setAuth() chạy xong.
+//
+// Header/Footer vẫn hiện ngay vì chúng nằm trong Layout — không phụ
+// thuộc vào auth state để quyết định nội dung chính. Chỉ phần Outlet
+// (nội dung trang, ví dụ AccountPage) mới cần đợi.
 // ================================================================
 import { useEffect, useState, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -11,21 +17,24 @@ import api from "@/lib/axios.js";
 const PREFETCH_TASKS = [
   {
     key: ["categories"],
-    fn:  () => api.get("/categories").then((r) => r.data.data),
+    fn: () => api.get("/categories").then((r) => r.data.data),
   },
   {
     key: ["medicines", { page: 1, limit: 12 }],
-    fn:  () => api.get("/medicines?page=1&limit=12").then((r) => r.data.data),
+    fn: () => api.get("/medicines?page=1&limit=12").then((r) => r.data.data),
   },
 ];
 
-// Overlay phủ toàn màn hình — mờ nền, chặn mọi click, kể cả Header/Footer
 function FullOverlay() {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center
-                    bg-black/10 backdrop-blur-[1px]">
-      <div className="flex flex-col items-center gap-2 bg-white rounded-2xl
-                      px-8 py-6 shadow-md">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center
+                    bg-black/10 backdrop-blur-[1px]"
+    >
+      <div
+        className="flex flex-col items-center gap-2 bg-white rounded-2xl
+                      px-8 py-6 shadow-md"
+      >
         <div className="text-3xl">💊</div>
         <span className="text-xs text-gray-400">Đang tải...</span>
       </div>
@@ -34,10 +43,13 @@ function FullOverlay() {
 }
 
 export default function AuthInitializer({ children }) {
+  // isAuthChecked: riêng cho việc auth xong chưa — quyết định render children hay không
+  const [isAuthChecked, setIsAuthChecked] = useState(false);
+  // isWorking: vẫn còn prefetch chạy nền — chỉ điều khiển overlay hiển thị
   const [isWorking, setIsWorking] = useState(true);
-  const { setAuth, clearAuth }    = useAuthStore();
+  const { setAuth, clearAuth } = useAuthStore();
   const queryClient = useQueryClient();
-  const hasFetched   = useRef(false);
+  const hasFetched = useRef(false);
 
   useEffect(() => {
     if (hasFetched.current) return;
@@ -46,35 +58,39 @@ export default function AuthInitializer({ children }) {
     const init = async () => {
       const hasSession = localStorage.getItem("hasSession");
 
-      try {
-        if (hasSession) {
-          try {
-            const { data } = await api.post("/auth/refresh-token");
-            if (data?.data?.accessToken) {
-              const profileRes = await api.get("/auth/profile", {
-                headers: { Authorization: `Bearer ${data.data.accessToken}` },
-              });
-              setAuth(profileRes.data.data, data.data.accessToken);
-            }
-          } catch (err) {
-            // CHỈ xoá session khi server xác nhận 401 thật sự
-            if (err.response?.status === 401) {
-              localStorage.removeItem("hasSession");
-              clearAuth();
-            } else if (err.response) {
-              console.error("[AuthInitializer] Unexpected error:", err);
-            }
+      // ── Bước 1: Khôi phục session — PHẢI xong trước khi render children ──
+      if (hasSession) {
+        try {
+          const { data } = await api.post("/auth/refresh-token");
+          if (data?.data?.accessToken) {
+            const profileRes = await api.get("/auth/profile", {
+              headers: { Authorization: `Bearer ${data.data.accessToken}` },
+            });
+            setAuth(profileRes.data.data, data.data.accessToken);
+          }
+        } catch (err) {
+          if (err.response?.status === 401) {
+            localStorage.removeItem("hasSession");
+            clearAuth();
+          } else if (err.response) {
+            console.error("[AuthInitializer] Unexpected error:", err);
           }
         }
+      }
 
+      // Auth đã xong (dù thành công hay thất bại) — an toàn để render children
+      setIsAuthChecked(true);
+
+      // ── Bước 2: Prefetch — không cần chặn render children nữa ──────────
+      try {
         await Promise.allSettled(
           PREFETCH_TASKS.map((task) =>
             queryClient.prefetchQuery({
               queryKey: task.key,
-              queryFn:  task.fn,
+              queryFn: task.fn,
               staleTime: 1000 * 60 * 5,
-            })
-          )
+            }),
+          ),
         );
       } finally {
         setIsWorking(false);
@@ -84,12 +100,16 @@ export default function AuthInitializer({ children }) {
     init();
   }, []);
 
+  // Chưa check auth xong → không render children (Header/Footer/AccountPage...)
+  // Chỉ hiện overlay loading đơn thuần
+  if (!isAuthChecked) {
+    return <FullOverlay />;
+  }
+
   return (
     <>
-      {/* App (Header, Footer, nội dung) luôn render trong DOM */}
       {children}
-
-      {/* Overlay phủ TOÀN MÀN HÌNH — che cả Header/Footer, chặn mọi tương tác */}
+      {/* Vẫn hiện overlay trong lúc prefetch categories/medicines chạy nền */}
       {isWorking && <FullOverlay />}
     </>
   );
