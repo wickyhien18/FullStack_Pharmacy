@@ -96,7 +96,7 @@ export const findOrderById = (orderId, userId) => {
 export const handleCancelOrderPending = (orderId, reason) => {
   return prisma.$transaction(async (tx) => {
     await tx.order.update({
-      where: { orderId: BigInt(orderId) },
+      where: { orderId },
       data: {
         orderStatus: "CANCELLED",
         cancelledBy: "USER",
@@ -106,7 +106,7 @@ export const handleCancelOrderPending = (orderId, reason) => {
     });
 
     const items = await tx.orderItem.findMany({
-      where: { orderId: BigInt(orderId) },
+      where: { orderId },
     });
 
     for (const item of items) {
@@ -120,7 +120,7 @@ export const handleCancelOrderPending = (orderId, reason) => {
 
 export const cancelOrderShipping = (orderId, reason) => {
   return prisma.order.update({
-    where: { orderId: BigInt(orderId) },
+    where: { orderId },
     data: {
       orderStatus: "CANCEL_REQUESTED",
       cancelledBy: "USER",
@@ -131,7 +131,7 @@ export const cancelOrderShipping = (orderId, reason) => {
 
 export const cancelOrderDelivered = (orderId, reason) => {
   return prisma.order.update({
-    where: { orderId: BigInt(orderId) },
+    where: { orderId },
     data: {
       orderStatus: "RETURN_REQUESTED",
       cancelledBy: "USER",
@@ -143,7 +143,7 @@ export const cancelOrderDelivered = (orderId, reason) => {
 export const handleCancelOrderDelivedAndShipping = (orderId, status) => {
   return prisma.$transaction(async (tx) => {
     await tx.order.update({
-      where: { orderId: BigInt(orderId) },
+      where: { orderId },
       data: {
         orderStatus: status,
         cancelledAt: new Date(),
@@ -152,7 +152,7 @@ export const handleCancelOrderDelivedAndShipping = (orderId, status) => {
 
     // Hoàn lại tồn kho
     const items = await tx.orderItem.findMany({
-      where: { orderId: BigInt(orderId) },
+      where: { orderId },
     });
     for (const item of items) {
       await tx.inventory.update({
@@ -165,7 +165,7 @@ export const handleCancelOrderDelivedAndShipping = (orderId, status) => {
 
 export const rejectOrder = (orderId, status, reason) => {
   return prisma.order.update({
-    where: { orderId: BigInt(orderId) },
+    where: { orderId },
     data: {
       orderStatus: status,
       cancelledBy: null,
