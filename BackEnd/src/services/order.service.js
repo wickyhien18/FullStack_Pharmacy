@@ -84,3 +84,10 @@ export const getOrderDetail = async (orderId, userId) => {
   if (!order) throw { status: 404, message: "Không tìm thấy đơn hàng" };
   return formatOrder(order);
 };
+
+export const cancelOrder = async (orderId, userId, reason = "") => {
+  const order = orderRepo.findOrderById(BigInt(orderId), BigInt(userId));
+  if (!order) throw { status: 404, message: "Không tìm thấy đơn hàng" };
+
+  const { orderStatus } = order;
+};
