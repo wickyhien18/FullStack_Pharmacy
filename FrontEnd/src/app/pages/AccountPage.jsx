@@ -315,13 +315,35 @@ function AccountPage() {
                         </div>
 
                         {/* Footer */}
-                        <div className="flex justify-between items-center border-t border-gray-50 pt-2 text-sm font-semibold">
-                          <span className="text-gray-500">
-                            Tổng thanh toán:
+                        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-gray-50 pt-2">
+                          <span
+                            className="text-sm font-semibold"
+                            style={{ color: "#1250dc" }}
+                          >
+                            Tổng: {formatPrice(order.totalPrice)}
                           </span>
-                          <span style={{ color: "#1250dc" }}>
-                            {formatPrice(order.totalPrice)}
-                          </span>
+
+                          {/* Nút huỷ — chỉ hiện khi status cho phép */}
+                          {CANCELLABLE.includes(order.orderStatus) && (
+                            <button
+                              onClick={() => setCancelOrder(order)}
+                              className="text-xs px-3 py-1.5 rounded-lg border border-red-300 text-red-600 hover:bg-red-50 transition-colors font-medium"
+                            >
+                              {order.orderStatus === "DELIVERED"
+                                ? "Yêu cầu hoàn hàng"
+                                : order.orderStatus === "SHIPPING"
+                                  ? "Yêu cầu huỷ"
+                                  : "Huỷ đơn"}
+                            </button>
+                          )}
+
+                          {/* Hiển thị lý do nếu đang chờ xử lý */}
+                          {(order.orderStatus === "CANCEL_REQUESTED" ||
+                            order.orderStatus === "RETURN_REQUESTED") && (
+                            <span className="text-xs text-orange-600 italic">
+                              Đang chờ nhà thuốc xử lý...
+                            </span>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -331,6 +353,14 @@ function AccountPage() {
             )}
           </div>
         </div>
+
+        {/* Modal huỷ đơn */}
+        {cancelOrder && (
+          <CancelOrderModal
+            order={cancelOrder}
+            onClose={() => setCancelOrder(null)}
+          />
+        )}
       </div>
     );
   }
