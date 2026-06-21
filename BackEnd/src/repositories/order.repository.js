@@ -93,7 +93,7 @@ export const findOrderById = (orderId, userId) => {
   });
 };
 
-export const cancelOrderPending = (orderId, reason) => {
+export const handleCancelOrderPending = (orderId, reason) => {
   return prisma.$transaction(async (tx) => {
     await tx.order.update({
       where: { orderId: BigInt(orderId) },
@@ -137,5 +137,28 @@ export const cancelOrderDelivered = (orderId, reason) => {
       cancelledBy: "USER",
       cancelledReason: reason || "Người dùng yêu cầu hoàn hàng",
     },
+  });
+};
+
+export const handleCancelOrderDelivedAndShipping = (orderId, status) => {
+  return prisma.$transaction(async (tx) => {
+    await tx.order.update({
+      where: { orderId: BigInt(orderId) },
+      data: {
+        orderStatus: status,
+        cancelledAt: new Date(),
+      },
+    });
+
+    // Hoàn lại tồn kho
+    const items = await tx.orderItem.findMany({
+      where: { orderId: BigInt(orderId) },
+    });
+    for (const item of items) {
+      await tx.inventory.update({
+        where: { medicineId: item.medicineId },
+        data: { quantity: { increment: item.quantity } },
+      });
+    }
   });
 };
