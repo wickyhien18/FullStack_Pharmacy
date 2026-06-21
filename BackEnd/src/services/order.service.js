@@ -105,4 +105,19 @@ export const cancelOrder = async (orderId, userId, reason = "") => {
       status: "CANCEL_REQUESTED",
     };
   }
+
+  if (orderStatus === "DELIVERED") {
+    await orderRepo.cancelOrderDelivered(order.orderId, reason);
+
+    return {
+      message:
+        "Yêu cầu hoàn hàng đã được gửi. Vui lòng chờ xác nhận từ nhà thuốc.",
+      status: "RETURN_REQUESTED",
+    };
+  }
+
+  throw {
+    status: 400,
+    message: `Không thể huỷ đơn hàng ở trạng thái "${orderStatus}"`,
+  };
 };
