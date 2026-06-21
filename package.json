@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "Pharmacy Fullstack Application root",
   "scripts": {
-    "install:all": "npm install --prefix BackEnd && npm install --prefix FrontEnd/E-Commerce",
+    "install:all": "npm install --prefix BackEnd && npm install --prefix FrontEnd",
     "dev:backend": "npm run dev --prefix BackEnd",
-    "dev:frontend": "npm run dev --prefix FrontEnd/E-Commerce",
+    "dev:frontend": "npm run dev --prefix FrontEnd",
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\""
   },
   "dependencies": {
