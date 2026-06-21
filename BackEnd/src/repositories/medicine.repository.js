@@ -1,8 +1,7 @@
-
 // ================================================================
 // medicine.repository.js — Truy vấn DB cho medicines
 // ================================================================
-import { prisma } from '../config/prisma.js';
+import { prisma } from "../config/prisma.js";
 
 // Lấy danh sách medicines có filter + phân trang
 // params = { skip, limit, search, categoryId, sort }
@@ -13,9 +12,9 @@ export const findMedicines = ({ skip, limit, where, orderBy }) => {
     take: limit,
     orderBy,
     include: {
-      category:     { select: { categoryId: true, name: true, slug: true } },
+      category: { select: { categoryId: true, name: true, slug: true } },
       manufacturer: { select: { manufacturerId: true, name: true } },
-      inventory:    { select: { quantity: true } },
+      inventory: { select: { quantity: true } },
     },
   });
 };
@@ -30,9 +29,9 @@ export const findMedicineBySlug = (slug) => {
   return prisma.medicine.findFirst({
     where: { slug, deletedAt: null },
     include: {
-      category:     true,
+      category: true,
       manufacturer: true,
-      inventory:    { select: { quantity: true } },
+      inventory: { select: { quantity: true } },
     },
   });
 };
@@ -42,8 +41,21 @@ export const findMedicineById = (medicineId) => {
   return prisma.medicine.findUnique({
     where: { medicineId },
     include: {
-      category:  true,
+      category: true,
       inventory: { select: { quantity: true } },
+    },
+  });
+};
+
+// THÊM: lấy 1 medicine kèm đủ ảnh — dùng cho admin edit form
+export const findMedicineWithImages = (medicineId) => {
+  return prisma.medicine.findUnique({
+    where: { medicineId },
+    include: {
+      category: true,
+      manufacturer: true,
+      inventory: { select: { quantity: true } },
+      images: { orderBy: { displayOrder: "asc" } },
     },
   });
 };
@@ -64,4 +76,32 @@ export const softDeleteMedicine = (medicineId) => {
     where: { medicineId },
     data: { deletedAt: new Date() },
   });
+};
+
+// ── THÊM MỚI: quản lý medicine_images ────────────────────────────
+
+export const createMedicineImages = (medicineId, imageUrls, startOrder = 0) => {
+  if (imageUrls.length === 0) return Promise.resolve();
+  return prisma.medicineImage.createMany({
+    data: imageUrls.map((url, index) => ({
+      medicineId,
+      imageUrl: url,
+      displayOrder: startOrder + index,
+    })),
+  });
+};
+
+export const findImagesByMedicineId = (medicineId) => {
+  return prisma.medicineImage.findMany({
+    where: { medicineId },
+    orderBy: { displayOrder: "asc" },
+  });
+};
+
+export const deleteMedicineImageById = (imageId) => {
+  return prisma.medicineImage.delete({ where: { imageId } });
+};
+
+export const deleteAllImagesByMedicineId = (medicineId) => {
+  return prisma.medicineImage.deleteMany({ where: { medicineId } });
 };
