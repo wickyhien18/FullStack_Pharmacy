@@ -158,4 +158,22 @@ export const handleCancelRequest = async (
 
     return { message: "Đã xác nhận huỷ/hoàn đơn hàng", status: newStatus };
   }
+
+  if (action === "reject") {
+    // Admin từ chối → trả về SHIPPING hoặc DELIVERED
+    const previousStatus =
+      orderStatus === "CANCEL_REQUESTED" ? "SHIPPING" : "DELIVERED";
+
+    await orderRepo.rejectOrder(BigInt(order.orderId), previousStatus, reason);
+
+    return {
+      message: "Đã từ chối yêu cầu huỷ, đơn hàng tiếp tục xử lý",
+      status: previousStatus,
+    };
+  }
+
+  throw {
+    status: 400,
+    message: "Action không hợp lệ. Chỉ chấp nhận approve hoặc reject",
+  };
 };
