@@ -131,8 +131,8 @@ export const getMedicineDetail = async (req, res) => {
 // POST /api/admin/medicines
 export const createMedicine = async (req, res) => {
   try {
-    await handleUpload(req, res);
-    const data = await adminService.createMedicine(req.body, req.file);
+    await handleUpload(req, res); // sẽ đổi thành handleMultiUpload bên dưới sau khi sửa middleware
+    const data = await adminService.createMedicine(req.body, req.files || []);
     return sendSuccess(res, data, "Tạo sản phẩm thành công", 201);
   } catch (err) {
     return sendError(res, err.message, err.status || 500);
@@ -142,11 +142,15 @@ export const createMedicine = async (req, res) => {
 // PUT /api/admin/medicines/:medicineId
 export const updateMedicine = async (req, res) => {
   try {
-    await handleUpload(req, res);
+    await handleUpload(req, res); // sẽ đổi thành handleMultiUpload bên dưới sau khi sửa middleware
+    const keepImageIds = req.body.keepImageIds
+      ? JSON.parse(req.body.keepImageIds)
+      : [];
     const data = await adminService.updateMedicine(
       req.params.medicineId,
       req.body,
-      req.file,
+      req.files || [],
+      keepImageIds,
     );
     return sendSuccess(res, data, "Cập nhật thành công");
   } catch (err) {
