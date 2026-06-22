@@ -151,10 +151,19 @@ export const handleCancelRequest = async (
     const newStatus =
       orderStatus === "CANCEL_REQUESTED" ? "CANCELLED" : "RETURNED";
 
-    await orderRepo.handleCancelOrderDelivedAndShipping(
-      BigInt(order.orderId),
-      newStatus,
-    );
+    if (orderStatus === "RETURN_REQUESTED") {
+      // Hoàn hàng: đổi status + hoàn tồn kho + ghi nhận hoàn tiền vào bảng payments
+      await orderRepo.approveReturnOrder(
+        BigInt(orderId),
+        Number(order.totalPrice),
+      );
+    } else {
+      // Huỷ khi đang ship: đổi status + hoàn tồn kho (không hoàn tiền vì chưa thu)
+      await orderRepo.handleCancelOrderDelivedAndShipping(
+        BigInt(orderId),
+        newStatus,
+      );
+    }
 
     return { message: "Đã xác nhận huỷ/hoàn đơn hàng", status: newStatus };
   }
@@ -164,7 +173,11 @@ export const handleCancelRequest = async (
     const previousStatus =
       orderStatus === "CANCEL_REQUESTED" ? "SHIPPING" : "DELIVERED";
 
-    await orderRepo.rejectOrder(BigInt(order.orderId), previousStatus, reason);
+    await orderRepo.rejectOrder(
+      BigInt(order.orderId),
+      previousStatus,
+      rejectReason,
+    );
 
     return {
       message: "Đã từ chối yêu cầu huỷ, đơn hàng tiếp tục xử lý",
