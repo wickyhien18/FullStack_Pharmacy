@@ -92,7 +92,7 @@ export const updateUserRole = async (req, res) => {
   try {
     const { roleName } = req.body;
 
-    const user = adminService.updateUserRole(req.params.userId, roleName);
+    const user = await adminService.updateUserRole(req.params.userId, roleName);
 
     return sendSuccess(
       res,
@@ -113,6 +113,16 @@ export const getAllMedicines = async (req, res) => {
     const { page, limit, skip } = parsePagination(req);
     const data = await adminService.getAllMedicines({ page, limit, skip });
     return sendSuccess(res, data, "Lấy danh sách sản phẩm thành công");
+  } catch (err) {
+    return sendError(res, err.message, err.status || 500);
+  }
+};
+
+// THÊM: GET /api/admin/medicines/:medicineId — chi tiết cho form edit
+export const getMedicineDetail = async (req, res) => {
+  try {
+    const data = await adminService.getMedicineDetail(req.params.medicineId);
+    return sendSuccess(res, data, "Lấy chi tiết sản phẩm thành công");
   } catch (err) {
     return sendError(res, err.message, err.status || 500);
   }
