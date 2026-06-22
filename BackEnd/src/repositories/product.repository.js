@@ -38,9 +38,9 @@ export const findProductBySlug = (slug) => {
 };
 
 // Tìm 1 Product theo id
-export const findProductById = (ProductId) => {
+export const findProductById = (productId) => {
   return prisma.product.findUnique({
-    where: { ProductId },
+    where: { productId },
     include: {
       category: true,
       inventory: { select: { quantity: true } },
@@ -49,9 +49,9 @@ export const findProductById = (ProductId) => {
 };
 
 // THÊM: lấy 1 Product kèm đủ ảnh — dùng cho admin edit form
-export const findProductWithImages = (ProductId) => {
+export const findProductWithImages = (productId) => {
   return prisma.product.findUnique({
-    where: { ProductId },
+    where: { productId },
     include: {
       category: true,
       manufacturer: true,
@@ -72,29 +72,29 @@ export const updateProduct = ({ where, data }) => {
 };
 
 // Soft delete — chỉ set deletedAt, không xoá thật
-export const softDeleteProduct = (ProductId) => {
+export const softDeleteProduct = (productId) => {
   return prisma.product.update({
-    where: { ProductId },
+    where: { productId },
     data: { deletedAt: new Date() },
   });
 };
 
 // ── THÊM MỚI: quản lý Product_images ────────────────────────────
 
-export const createProductImages = (ProductId, imageUrls, startOrder = 0) => {
+export const createProductImages = (productId, imageUrls, startOrder = 0) => {
   if (imageUrls.length === 0) return Promise.resolve();
   return prisma.productImage.createMany({
     data: imageUrls.map((url, index) => ({
-      ProductId,
+      productId,
       imageUrl: url,
       displayOrder: startOrder + index,
     })),
   });
 };
 
-export const findImagesByProductId = (ProductId) => {
+export const findImagesByProductId = (productId) => {
   return prisma.productImage.findMany({
-    where: { ProductId },
+    where: { productId },
     orderBy: { displayOrder: "asc" },
   });
 };
@@ -103,12 +103,12 @@ export const deleteProductImageById = (imageId) => {
   return prisma.productImage.delete({ where: { imageId } });
 };
 
-export const deleteAllImagesByProductId = (ProductId) => {
-  return prisma.productImage.deleteMany({ where: { ProductId } });
+export const deleteAllImagesByProductId = (productId) => {
+  return prisma.productImage.deleteMany({ where: { productId } });
 };
 
 export const syncProductImagesAndUpdateProduct = ({
-  ProductId,
+  productId,
   keptImageIds,
   newImageUrls,
   updateData,
@@ -116,14 +116,14 @@ export const syncProductImagesAndUpdateProduct = ({
   return prisma.$transaction(async (tx) => {
     const deleteWhere =
       keptImageIds.length > 0
-        ? { ProductId, imageId: { notIn: keptImageIds } }
-        : { ProductId };
+        ? { productId, imageId: { notIn: keptImageIds } }
+        : { productId };
 
-    await tx.ProductImage.deleteMany({ where: deleteWhere });
+    await tx.productImage.deleteMany({ where: deleteWhere });
 
     await Promise.all(
       keptImageIds.map((imageId, index) =>
-        tx.ProductImage.update({
+        tx.productImage.update({
           where: { imageId },
           data: { displayOrder: index },
         }),
@@ -131,17 +131,17 @@ export const syncProductImagesAndUpdateProduct = ({
     );
 
     if (newImageUrls.length > 0) {
-      await tx.ProductImage.createMany({
+      await tx.productImage.createMany({
         data: newImageUrls.map((imageUrl, index) => ({
-          ProductId,
+          productId,
           imageUrl,
           displayOrder: keptImageIds.length + index,
         })),
       });
     }
 
-    return tx.Product.update({
-      where: { ProductId },
+    return tx.product.update({
+      where: { productId },
       data: updateData,
     });
   });
