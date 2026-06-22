@@ -105,3 +105,43 @@ export const deleteMedicineImageById = (imageId) => {
 export const deleteAllImagesByMedicineId = (medicineId) => {
   return prisma.medicineImage.deleteMany({ where: { medicineId } });
 };
+
+export const syncMedicineImagesAndUpdateMedicine = ({
+  medicineId,
+  keptImageIds,
+  newImageUrls,
+  updateData,
+}) => {
+  return prisma.$transaction(async (tx) => {
+    const deleteWhere =
+      keptImageIds.length > 0
+        ? { medicineId, imageId: { notIn: keptImageIds } }
+        : { medicineId };
+
+    await tx.medicineImage.deleteMany({ where: deleteWhere });
+
+    await Promise.all(
+      keptImageIds.map((imageId, index) =>
+        tx.medicineImage.update({
+          where: { imageId },
+          data: { displayOrder: index },
+        }),
+      ),
+    );
+
+    if (newImageUrls.length > 0) {
+      await tx.medicineImage.createMany({
+        data: newImageUrls.map((imageUrl, index) => ({
+          medicineId,
+          imageUrl,
+          displayOrder: keptImageIds.length + index,
+        })),
+      });
+    }
+
+    return tx.medicine.update({
+      where: { medicineId },
+      data: updateData,
+    });
+  });
+};

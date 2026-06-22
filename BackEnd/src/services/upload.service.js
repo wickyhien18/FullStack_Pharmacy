@@ -8,19 +8,33 @@
 //   SUPABASE_STORAGE_BUCKET=medicine-images
 // ================================================================
 import { createClient } from "@supabase/supabase-js";
+import { randomUUID } from "node:crypto";
 import { env } from "../config/env.js";
 
 const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_KEY);
+const bucket = env.SUPABASE_STORAGE_BUCKET || "medicine-images";
+
+const sanitizeName = (name) =>
+  String(name || "medicine")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9-_]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80) || "medicine";
 
 // Upload file buffer lên Supabase Storage
 // Trả về public URL của ảnh
 export const uploadImage = async (buffer, filename, mimetype) => {
-  const ext        = mimetype.split("/")[1]; // image/jpeg → jpeg
-  const uniqueName = `${Date.now()}-${filename}.${ext}`;
-  const path       = `medicines/${uniqueName}`;
+  if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_KEY) {
+    throw { status: 500, message: "Thiếu cấu hình Supabase upload ảnh" };
+  }
+
+  const ext = mimetype === "image/jpeg" ? "jpg" : mimetype.split("/")[1];
+  const uniqueName = `${Date.now()}-${randomUUID()}-${sanitizeName(filename)}.${ext}`;
+  const path = `medicines/${uniqueName}`;
 
   const { error } = await supabase.storage
-    .from(env.SUPABASE_STORAGE_BUCKET || "medicine-images")
+    .from(bucket)
     .upload(path, buffer, {
       contentType: mimetype,
       upsert: false,
@@ -30,7 +44,7 @@ export const uploadImage = async (buffer, filename, mimetype) => {
 
   // Lấy public URL
   const { data } = supabase.storage
-    .from(env.SUPABASE_STORAGE_BUCKET || "medicine-images")
+    .from(bucket)
     .getPublicUrl(path);
 
   return data.publicUrl;
@@ -40,13 +54,15 @@ export const uploadImage = async (buffer, filename, mimetype) => {
 export const deleteImage = async (url) => {
   try {
     // Extract path từ URL
-    // URL dạng: https://xxx.supabase.co/storage/v1/object/public/medicine-images/medicines/xxx.jpg
-    const path = url.split("/medicine-images/")[1];
+    // URL dạng: https://xxx.supabase.co/storage/v1/object/public/{bucket}/medicines/xxx.jpg
+    const { pathname } = new URL(url);
+    const marker = `/${bucket}/`;
+    const path = pathname.includes(marker)
+      ? decodeURIComponent(pathname.split(marker)[1])
+      : null;
     if (!path) return;
 
-    await supabase.storage
-      .from(env.SUPABASE_STORAGE_BUCKET || "medicine-images")
-      .remove([path]);
+    await supabase.storage.from(bucket).remove([path]);
   } catch {
     // Không throw nếu xoá ảnh thất bại — không critical
     console.error("[Storage] Failed to delete image:", url);

@@ -206,28 +206,19 @@ export const updateMedicine = async (
     throw { status: 400, message: `Tối đa ${MAX_IMAGES} ảnh / sản phẩm` };
   }
 
-  // Xoá những ảnh KHÔNG nằm trong keepImageIds
+  const keptImages = currentImages.filter((img) =>
+    keepImageIds.includes(img.imageId.toString()),
+  );
   const imagesToDelete = currentImages.filter(
     (img) => !keepImageIds.includes(img.imageId.toString()),
   );
-  for (const img of imagesToDelete) {
-    await deleteImage(img.imageUrl);
-    await medicineRepo.deleteMedicineImageById(img.imageId);
-  }
 
-  // Upload ảnh mới, nối tiếp display_order sau ảnh giữ lại
+  // Upload ảnh mới trước. Nếu DB update fail, ảnh mới sẽ được dọn ở catch bên dưới.
   const newImageUrls = await Promise.all(
     files.map((file) =>
       uploadImage(file.buffer, data.name || existing.name, file.mimetype),
     ),
   );
-  if (newImageUrls.length > 0) {
-    await medicineRepo.createMedicineImages(
-      BigInt(medicineId),
-      newImageUrls,
-      keepImageIds.length,
-    );
-  }
 
   const updateData = {};
   if (data.name) {
@@ -241,16 +232,23 @@ export const updateMedicine = async (
   if (data.manufacturerId)
     updateData.manufacturerId = BigInt(data.manufacturerId);
   if (data.status) updateData.status = data.status;
-  // Đồng bộ lại ảnh đại diện = ảnh đầu tiên còn lại sau khi sửa
-  const remainingImages = await medicineRepo.findImagesByMedicineId(
-    BigInt(medicineId),
-  );
-  updateData.image = remainingImages[0]?.imageUrl || null;
 
-  await medicineRepo.updateMedicine({
-    where: { medicineId: BigInt(medicineId) },
-    data: updateData,
-  });
+  // Đồng bộ lại ảnh đại diện = ảnh đầu tiên còn lại sau khi sửa
+  updateData.image = keptImages[0]?.imageUrl || newImageUrls[0] || null;
+
+  try {
+    await medicineRepo.syncMedicineImagesAndUpdateMedicine({
+      medicineId: BigInt(medicineId),
+      keptImageIds: keptImages.map((img) => img.imageId),
+      newImageUrls,
+      updateData,
+    });
+  } catch (err) {
+    await Promise.all(newImageUrls.map((url) => deleteImage(url)));
+    throw err;
+  }
+
+  await Promise.all(imagesToDelete.map((img) => deleteImage(img.imageUrl)));
 
   // Cập nhật tồn kho nếu có
   if (data.stock !== undefined) {
