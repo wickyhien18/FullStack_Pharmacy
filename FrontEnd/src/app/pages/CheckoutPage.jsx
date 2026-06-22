@@ -11,7 +11,7 @@ import {
   Truck,
 } from "lucide-react";
 import { useCart } from "@/hooks/useCart.js";
-import { formatPrice } from "../data/products";
+import { formatPrice } from "../data/products.js";
 import api from "../../lib/axios.js";
 import { useAuth } from "../../hooks/useAuth.js";
 import toast from "react-hot-toast";

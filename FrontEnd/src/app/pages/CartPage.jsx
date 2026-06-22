@@ -9,7 +9,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { useCart } from "@/hooks/useCart.js";
-import { formatPrice } from "../data/products";
+import { formatPrice } from "../data/products.js";
 import { useState } from "react";
 function CartPage() {
   const { items, removeItem, updateItem, totalItems, totalPrice, isLoading } =

@@ -12,9 +12,9 @@ import {
 import { ProductCard } from "../components/ProductCard";
 import { formatPrice } from "../data/products";
 import {
-  useproducts,
+  useProducts,
   useCategoriesWithCount,
-} from "../../hooks/useproducts.js";
+} from "../../hooks/useProducts.js";
 const bannerSlides = [
   {
     id: 1,
@@ -119,7 +119,7 @@ function HomePage() {
     return () => clearInterval(id);
   }, []);
 
-  const { data: productsData, isLoading: isLoadingproducts } = useproducts({
+  const { data: productsData, isLoading: isLoadingproducts } = useProducts({
     limit: 12,
   });
   const { data: categoriesData, isLoading: isLoadingCategories } =
@@ -143,7 +143,7 @@ function HomePage() {
     })) || [];
 
   const productsList = productsData?.items || [];
-  const liveproducts = productsList.map((m, index) => ({
+  const liveProducts = productsList.map((m, index) => ({
     id: m.slug || m.productId,
     productId: m.productId,
     name: m.name,
@@ -174,17 +174,17 @@ function HomePage() {
 
   // const flashSale = liveproducts.slice(0, 4);
   const bestSellers =
-    liveproducts.slice(4, 8).length > 0
-      ? liveproducts.slice(4, 8)
-      : liveproducts.slice(0, 4);
+    liveProducts.slice(4, 8).length > 0
+      ? liveProducts.slice(4, 8)
+      : liveProducts.slice(0, 4);
   const featured =
-    liveproducts.slice(8, 12).length > 0
-      ? liveproducts.slice(8, 12)
-      : liveproducts.length > 2
-        ? liveproducts.slice(2, 6)
-        : liveproducts.slice(0, 4);
+    liveProducts.slice(8, 12).length > 0
+      ? liveProducts.slice(8, 12)
+      : liveProducts.length > 2
+        ? liveProducts.slice(2, 6)
+        : liveProducts.slice(0, 4);
 
-  if (isLoadingproducts || isLoadingCategories) {
+  if (isLoadingProducts || isLoadingCategories) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-16 text-center">
         <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
