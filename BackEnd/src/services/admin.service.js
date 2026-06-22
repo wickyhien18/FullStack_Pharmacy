@@ -134,7 +134,7 @@ export const getAllproducts = async ({ page, limit, skip }) => {
 
 // THÊM: lấy chi tiết 1 product kèm ảnh — dùng cho form edit
 export const getproductDetail = async (productId) => {
-  const product = await productRepo.findproductWithImages(BigInt(productId));
+  const product = await productRepo.findProductWithImages(BigInt(productId));
   if (!product) throw { status: 404, message: "Không tìm thấy sản phẩm" };
 
   return {
@@ -165,7 +165,7 @@ export const createproduct = async (data, files = []) => {
   );
 
   // SỬA: gọi đúng signature createproduct(data) — không bọc { data }
-  const product = await productRepo.createproduct({
+  const product = await productRepo.createProduct({
     name: data.name,
     slug: generateSlug(data.name),
     description: data.description || null,
@@ -184,7 +184,7 @@ export const createproduct = async (data, files = []) => {
 
   // THÊM: lưu tất cả ảnh vào bảng product_images
   if (imageUrls.length > 0) {
-    await productRepo.createproductImages(product.productId, imageUrls);
+    await productRepo.createProductImages(product.productId, imageUrls);
   }
 
   return { productId: product.productId.toString(), slug: product.slug };
@@ -201,7 +201,7 @@ export const updateproduct = async (
   const existing = await adminRepo.existproduct(productId);
   if (!existing) throw { status: 404, message: "Không tìm thấy sản phẩm" };
 
-  const currentImages = await productRepo.findImagesByproductId(
+  const currentImages = await productRepo.findImagesByProductId(
     BigInt(productId),
   );
 
@@ -240,7 +240,7 @@ export const updateproduct = async (
   updateData.image = keptImages[0]?.imageUrl || newImageUrls[0] || null;
 
   try {
-    await productRepo.syncproductImagesAndUpdateproduct({
+    await productRepo.syncProductImagesAndUpdateProduct({
       productId: BigInt(productId),
       keptImageIds: keptImages.map((img) => img.imageId),
       newImageUrls,
@@ -267,10 +267,9 @@ export const deleteproduct = async (productId) => {
   if (!existing) throw { status: 404, message: "Không tìm thấy sản phẩm" };
 
   // THÊM: xoá tất cả ảnh trong bảng product_images, không chỉ ảnh đại diện
-  const images = await productRepo.findImagesByproductId(BigInt(productId));
+  const images = await productRepo.findImagesByProductId(BigInt(productId));
   for (const img of images) {
     await deleteImage(img.imageUrl);
   }
-
-  await productRepo.softDeleteproduct(BigInt(productId));
+  await productRepo.softDeleteProduct(BigInt(productId));
 };
