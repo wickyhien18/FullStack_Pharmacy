@@ -17,6 +17,11 @@ export const getDashboardStats = () => adminRepo.getDashboardStats();
 const generateSlug = (name) =>
   slugify(name, { lower: true, strict: true, locale: "vi" }) + "-" + Date.now();
 
+const format = (r) => ({
+  roleId: r.roleId.toString(),
+  roleName: r.roleName,
+});
+
 // Danh sách đơn hàng
 export const getAllOrders = async ({ page, limit, skip }) => {
   const [orders, total] = await Promise.all([
@@ -64,9 +69,9 @@ export const updateOrderStatus = async (orderId, orderStatus) => {
   return { orderId: order.orderId.toString(), orderStatus: order.orderStatus };
 };
 
-export const getAllRoles = async () => {
+export const getRoles = async () => {
   const roles = await adminRepo.findAllRoles();
-  return { roles };
+  return roles.map(format);
 };
 
 // Danh sách users

@@ -75,7 +75,7 @@ export const getAllUsers = async (req, res) => {
 // GET /api/admin/roles
 export const getRoles = async (req, res) => {
   try {
-    const data = await roleService.getRoles();
+    const data = await adminService.getRoles();
     return sendSuccess(res, data, "Lấy danh sách roles thành công");
   } catch (err) {
     return sendError(res, err.message, err.status || 500);
