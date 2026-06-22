@@ -11,7 +11,7 @@ import api from "../../../lib/axios.js";
 const MAX_IMAGES = 3;
 const UNIT_SUGGESTIONS = ["Hộp", "Chai", "Tuýp", "Gói", "Viên", "Ống"];
 
-export default function productFormModal({ productId, onClose }) {
+export default function ProductFormModal({ productId, onClose }) {
   const queryClient = useQueryClient();
   const isEdit = !!productId;
 

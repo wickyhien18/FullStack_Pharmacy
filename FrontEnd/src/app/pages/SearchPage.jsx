@@ -3,13 +3,13 @@ import { useSearchParams, Link } from "react-router";
 import { Search, ChevronRight } from "lucide-react";
 // import { blogPosts } from "../data/products";
 import { ProductCard } from "../components/ProductCard";
-import { useproducts } from "../../hooks/useproducts.js";
+import { useProducts } from "../../hooks/useProducts.js";
 
 function SearchPage() {
   const [searchParams] = useSearchParams();
   const q = searchParams.get("q") || "";
 
-  const { data: productsData, isLoading } = useproducts({
+  const { data: productsData, isLoading } = useProducts({
     search: q || undefined,
     limit: 100,
   });

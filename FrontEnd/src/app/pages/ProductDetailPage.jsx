@@ -4,7 +4,7 @@ import { ShoppingCart, Minus, Plus, ChevronRight, Check } from "lucide-react";
 import { formatPrice } from "../data/products";
 import { ProductCard } from "../components/ProductCard";
 import { useCart } from "@/hooks/useCart.js";
-import { useproduct, useproducts } from "../../hooks/useproducts.js";
+import { useProduct, useProducts } from "../../hooks/useProducts.js";
 import NotFoundPage from "./NotFoundPage";
 
 const FALLBACK_IMAGE =
@@ -13,8 +13,8 @@ const tabs = ["Mô tả", "Thành phần", "Hướng dẫn sử dụng"];
 
 function ProductDetailPage() {
   const { id } = useParams();
-  const { data: m, isLoading } = useproduct(id);
-  const { data: relatedData } = useproducts({
+  const { data: m, isLoading } = useProduct(id);
+  const { data: relatedData } = useProducts({
     categoryId: m?.categoryId || undefined,
     limit: 10,
   });

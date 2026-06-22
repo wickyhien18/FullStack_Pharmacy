@@ -6,7 +6,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../../../lib/axios.js";
-import productFormModal from "./productFormModal.jsx";
+import ProductFormModal from "./ProductFormModal.jsx";
 
 const formatPrice = (p) =>
   new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(
@@ -18,7 +18,7 @@ export default function ProductsPage() {
   const [page, setPage] = useState(1);
   const [showForm, setShowForm] = useState(false);
   // null = thêm mới, số = đang sửa productId đó
-  const [editproductId, setEditproductId] = useState(null);
+  const [editProductId, setEditProductId] = useState(null);
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-products", page],
@@ -46,7 +46,7 @@ export default function ProductsPage() {
         <h1 className="text-2xl font-bold text-gray-800">Quản lý sản phẩm</h1>
         <button
           onClick={() => {
-            setEditproductId(null);
+            setEditProductId(null);
             setShowForm(true);
           }}
           className="flex items-center gap-2 px-4 py-2 rounded-lg text-white text-sm font-semibold hover:opacity-90"
@@ -137,7 +137,7 @@ export default function ProductsPage() {
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => {
-                            setEditproductId(m.productId);
+                            setEditProductId(m.productId);
                             setShowForm(true);
                           }}
                           className="text-gray-400 hover:text-blue-500 transition"
@@ -159,11 +159,11 @@ export default function ProductsPage() {
       </div>
 
       {showForm && (
-        <productFormModal
+        <ProductFormModal
           productId={editproductId}
           onClose={() => {
             setShowForm(false);
-            setEditproductId(null);
+            setEditProductId(null);
           }}
         />
       )}

@@ -9,9 +9,9 @@ import {
 } from "lucide-react";
 import { ProductCard } from "../components/ProductCard";
 import {
-  useproducts,
+  useProducts,
   useCategoriesWithCount,
-} from "../../hooks/useproducts.js";
+} from "../../hooks/useProducts.js";
 const sortOptions = [
   { value: "newest", label: "M\u1EDBi nh\u1EA5t" },
   { value: "bestseller", label: "B\xE1n ch\u1EA1y nh\u1EA5t" },
@@ -42,7 +42,7 @@ function ProductListPage() {
   const categoryId = matchedCategory ? matchedCategory.categoryId : "";
 
   // Call products API with categoryId
-  const { data: productsData, isLoading: isLoadingproducts } = useproducts({
+  const { data: productsData, isLoading: isLoadingProducts } = useProducts({
     categoryId: categoryId || undefined,
     limit: 100,
   });
@@ -66,13 +66,13 @@ function ProductListPage() {
 
   const category = categorySlug;
   const activeCategory = liveCategories.find((c) => c.id === categorySlug);
-  const totalproductCount = liveCategories.reduce(
+  const totalProductCount = liveCategories.reduce(
     (total, cat) => total + (Number(cat.count) || 0),
     0,
   );
 
   const productsList = productsData?.items || [];
-  const liveproducts = productsList.map((m, index) => ({
+  const liveProducts = productsList.map((m, index) => ({
     id: m.slug || m.productId,
     productId: m.productId,
     name: m.name,
@@ -102,7 +102,7 @@ function ProductListPage() {
   }));
 
   const filtered = useMemo(() => {
-    let list = [...liveproducts];
+    let list = [...liveProducts];
     if (categorySlug) list = list.filter((p) => p.category === categorySlug);
     if (searchParams.get("sale") === "flash")
       list = list.filter((p) => p.isFlashSale);
@@ -131,7 +131,7 @@ function ProductListPage() {
         list.sort((a, b) => b.reviewCount - a.reviewCount);
     }
     return list;
-  }, [liveproducts, categorySlug, sort, priceRange, searchParams]);
+  }, [liveProducts, categorySlug, sort, priceRange, searchParams]);
 
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const paginated = filtered.slice(
@@ -139,7 +139,7 @@ function ProductListPage() {
     page * ITEMS_PER_PAGE,
   );
 
-  if (isLoadingproducts || isLoadingCategories) {
+  if (isLoadingProducts || isLoadingCategories) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-16 text-center">
         <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
@@ -184,7 +184,7 @@ function ProductListPage() {
                 <span
                   className={`text-xs ${!category ? "text-white/70" : "text-gray-400"}`}
                 >
-                  {totalproductCount}
+                  {totalProductCount}
                 </span>
               </button>
               {liveCategories.map((cat) => (
@@ -300,7 +300,7 @@ function ProductListPage() {
                   className={`text-sm px-3 py-2 rounded-lg text-left ${!category ? "text-white" : "bg-gray-50 text-gray-700"}`}
                   style={!category ? { backgroundColor: "#1250dc" } : {}}
                 >
-                  Tất cả ({totalproductCount})
+                  Tất cả ({totalProductCount})
                 </button>
                 {liveCategories.map((cat) => (
                   <button
