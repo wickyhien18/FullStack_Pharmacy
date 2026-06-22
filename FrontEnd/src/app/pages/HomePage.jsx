@@ -119,7 +119,7 @@ function HomePage() {
     return () => clearInterval(id);
   }, []);
 
-  const { data: productsData, isLoading: isLoadingproducts } = useProducts({
+  const { data: productsData, isLoading: isLoadingProducts } = useProducts({
     limit: 12,
   });
   const { data: categoriesData, isLoading: isLoadingCategories } =

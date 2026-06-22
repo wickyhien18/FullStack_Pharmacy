@@ -160,7 +160,7 @@ export default function ProductsPage() {
 
       {showForm && (
         <ProductFormModal
-          productId={editproductId}
+          productId={editProductId}
           onClose={() => {
             setShowForm(false);
             setEditProductId(null);
