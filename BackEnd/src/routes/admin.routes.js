@@ -29,6 +29,7 @@ router.patch("/users/:userId/role", adminController.updateUserRole);
 
 // Medicines
 router.get("/medicines", adminController.getAllMedicines);
+router.get("/medicines/:medicineId", adminController.getMedicineDetail); // ← THÊM
 router.post("/medicines", adminController.createMedicine);
 router.put("/medicines/:medicineId", adminController.updateMedicine);
 router.delete("/medicines/:medicineId", adminController.deleteMedicine);
