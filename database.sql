@@ -431,3 +431,8 @@ SELECT u.user_id, NOW()
 FROM users u
 LEFT JOIN carts c ON c.user_id = u.user_id
 WHERE c.cart_id IS NULL;
+
+INSERT INTO product_images (product_id, image_url, display_order)
+SELECT product_id, image, 0
+FROM products
+WHERE image IS NOT NULL;
