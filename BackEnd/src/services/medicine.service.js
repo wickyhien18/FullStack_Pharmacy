@@ -56,6 +56,12 @@ const formatMedicine = (m) => ({
   manufacturerName: m.manufacturer?.name || null,
   stock: m.inventory?.quantity ?? 0,
   primaryImage: m.image || null,
+  images:
+    m.images?.map((img) => ({
+      // ← thêm block này
+      imageId: img.imageId.toString(),
+      imageUrl: img.imageUrl,
+    })) || [],
   expireDate: m.expireDate,
   createdAt: m.createdAt,
 });

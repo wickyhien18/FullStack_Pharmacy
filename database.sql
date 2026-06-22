@@ -338,7 +338,7 @@ INSERT INTO manufacturers (name, country) VALUES
                                               ('Janssen',          N'Bỉ'),
                                               ('Pfizer',           N'Mỹ'),
                                               ('Blackmores',       N'Úc'),
-                                              ('Dược Hậu Giang',   N'Việt Nam'),
+                                              (N'Dược Hậu Giang',   N'Việt Nam'),
                                               ('Traphaco',         N'Việt Nam'),
                                               ('Omron',            N'Nhật Bản');
 

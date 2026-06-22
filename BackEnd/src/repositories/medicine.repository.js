@@ -32,6 +32,7 @@ export const findMedicineBySlug = (slug) => {
       category: true,
       manufacturer: true,
       inventory: { select: { quantity: true } },
+      images: { orderBy: { displayOrder: "asc" } },
     },
   });
 };
