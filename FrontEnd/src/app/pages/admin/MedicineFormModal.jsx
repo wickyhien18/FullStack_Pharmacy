@@ -9,6 +9,7 @@ import toast from "react-hot-toast";
 import api from "../../../lib/axios.js";
 
 const MAX_IMAGES = 3;
+const UNIT_SUGGESTIONS = ["Hộp", "Chai", "Tuýp", "Gói", "Viên", "Ống"];
 
 export default function MedicineFormModal({ medicineId, onClose }) {
   const queryClient = useQueryClient();
@@ -206,16 +207,19 @@ export default function MedicineFormModal({ medicineId, onClose }) {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Đơn vị
               </label>
-              <select
+              <input
                 name="unit"
                 value={form.unit}
                 onChange={handleChange}
+                list="medicine-unit-suggestions"
+                placeholder="Nhập đơn vị, ví dụ: Hộp, Vỉ, Lọ..."
                 className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-400 bg-white"
-              >
-                {["Hộp", "Chai", "Tuýp", "Gói", "Viên", "Ống"].map((u) => (
-                  <option key={u}>{u}</option>
+              />
+              <datalist id="medicine-unit-suggestions">
+                {UNIT_SUGGESTIONS.map((unit) => (
+                  <option key={unit} value={unit} />
                 ))}
-              </select>
+              </datalist>
             </div>
 
             <div>
