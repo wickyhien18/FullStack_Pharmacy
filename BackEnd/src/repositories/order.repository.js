@@ -5,6 +5,32 @@
 // ================================================================
 import { prisma } from "../config/prisma.js";
 
+// Helper ghi inventory log trong transaction
+const writeInventoryLog = async (
+  tx,
+  {
+    medicineId,
+    changeType, // "IMPORT" | "EXPORT" | "ADJUST"
+    quantity, // số lượng thay đổi (luôn dương)
+    previousQuantity,
+    newQuantity,
+    referenceId, // orderId
+    note,
+  },
+) => {
+  await tx.inventoryLog.create({
+    data: {
+      medicineId,
+      changeType,
+      quantity,
+      previousQuantity,
+      newQuantity,
+      referenceId,
+      note,
+    },
+  });
+};
+
 export const findOrderById = async (orderId) => {
   return prisma.order.findUnique({
     where: { orderId },
@@ -61,6 +87,17 @@ export const createOrder = async ({
         where: { medicineId: item.medicineId },
         data: { quantity: { decrement: item.quantity } },
       });
+
+      // ← THÊM: ghi log EXPORT khi đặt hàng
+      await writeInventoryLog(tx, {
+        medicineId: item.medicineId,
+        changeType: "EXPORT",
+        quantity: item.quantity,
+        previousQuantity: currentQty,
+        newQuantity: newQty,
+        referenceId: order.orderId,
+        note: `Xuất kho cho đơn hàng ${order.orderCode}`,
+      });
     }
 
     return order;
@@ -101,7 +138,7 @@ export const findOrderByUserIdAndOrderId = async (orderId, userId) => {
 
 export const handleCancelOrderPending = async (orderId, reason) => {
   return prisma.$transaction(async (tx) => {
-    await tx.order.update({
+    const order = await tx.order.update({
       where: { orderId },
       data: {
         orderStatus: "CANCELLED",
@@ -111,14 +148,29 @@ export const handleCancelOrderPending = async (orderId, reason) => {
       },
     });
 
-    const items = await tx.orderItem.findMany({
-      where: { orderId },
-    });
+    const items = await tx.orderItem.findMany({ where: { orderId } });
 
     for (const item of items) {
+      const inventory = await tx.inventory.findUnique({
+        where: { medicineId: item.medicineId },
+      });
+      const currentQty = inventory?.quantity ?? 0;
+      const newQty = currentQty + item.quantity;
+
       await tx.inventory.update({
         where: { medicineId: item.medicineId },
         data: { quantity: { increment: item.quantity } },
+      });
+
+      // ← THÊM: ghi log IMPORT khi hoàn kho
+      await writeInventoryLog(tx, {
+        medicineId: item.medicineId,
+        changeType: "IMPORT",
+        quantity: item.quantity,
+        previousQuantity: currentQty,
+        newQuantity: newQty,
+        referenceId: orderId,
+        note: `Hoàn kho do huỷ đơn hàng`,
       });
     }
   });
@@ -150,20 +202,31 @@ export const handleCancelOrderDelivedAndShipping = async (orderId, status) => {
   return prisma.$transaction(async (tx) => {
     await tx.order.update({
       where: { orderId },
-      data: {
-        orderStatus: status,
-        cancelledAt: new Date(),
-      },
+      data: { orderStatus: status, cancelledAt: new Date() },
     });
 
-    // Hoàn lại tồn kho
-    const items = await tx.orderItem.findMany({
-      where: { orderId },
-    });
+    const items = await tx.orderItem.findMany({ where: { orderId } });
     for (const item of items) {
+      const inventory = await tx.inventory.findUnique({
+        where: { medicineId: item.medicineId },
+      });
+      const currentQty = inventory?.quantity ?? 0;
+      const newQty = currentQty + item.quantity;
+
       await tx.inventory.update({
         where: { medicineId: item.medicineId },
         data: { quantity: { increment: item.quantity } },
+      });
+
+      // ← THÊM: ghi log IMPORT khi hoàn kho
+      await writeInventoryLog(tx, {
+        medicineId: item.medicineId,
+        changeType: "IMPORT",
+        quantity: item.quantity,
+        previousQuantity: currentQty,
+        newQuantity: newQty,
+        referenceId: orderId,
+        note: `Hoàn kho do huỷ đơn hàng (${status})`,
       });
     }
   });
@@ -194,12 +257,29 @@ export const approveReturnOrder = async (orderId, totalPrice) => {
       },
     });
 
-    // 2. Hoàn lại tồn kho
+    // 2. Hoàn tồn kho + ghi log
     const items = await tx.orderItem.findMany({ where: { orderId } });
     for (const item of items) {
+      const inventory = await tx.inventory.findUnique({
+        where: { medicineId: item.medicineId },
+      });
+      const currentQty = inventory?.quantity ?? 0;
+      const newQty = currentQty + item.quantity;
+
       await tx.inventory.update({
         where: { medicineId: item.medicineId },
         data: { quantity: { increment: item.quantity } },
+      });
+
+      // ← THÊM: ghi log IMPORT khi hoàn kho
+      await writeInventoryLog(tx, {
+        medicineId: item.medicineId,
+        changeType: "IMPORT",
+        quantity: item.quantity,
+        previousQuantity: currentQty,
+        newQuantity: newQty,
+        referenceId: orderId,
+        note: `Hoàn kho do hoàn hàng`,
       });
     }
 
