@@ -258,9 +258,9 @@ export const updateMedicine = async (
   if (data.stock !== undefined) {
     await adminRepo.createOrUpdateInventory(medicineId, data.stock);
   }
-};
 
-return { medicineId, message: "Cập nhật thành công" };
+  return { medicineId, message: "Cập nhật thành công" };
+};
 
 // Soft delete medicine
 export const deleteMedicine = async (medicineId) => {
