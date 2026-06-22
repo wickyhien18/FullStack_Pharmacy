@@ -15,7 +15,7 @@ SET standard_conforming_strings = on;
 -- ----------------------------------------------------------------
 -- Custom ENUM types (PostgreSQL không inline ENUM trong CREATE TABLE)
 -- ----------------------------------------------------------------
-CREATE TYPE medicine_status   AS ENUM ('ACTIVE', 'INACTIVE', 'OUT_OF_STOCK');
+CREATE TYPE product_status   AS ENUM ('ACTIVE', 'INACTIVE', 'OUT_OF_STOCK');
 CREATE TYPE change_type_enum  AS ENUM ('IMPORT', 'EXPORT', 'ADJUST');
 CREATE TYPE order_status_enum AS ENUM (
     'PENDING',           -- Vừa đặt, chờ xác nhận
@@ -127,10 +127,10 @@ CREATE TABLE manufacturers (
 );
 
 -- ----------------------------------------------------------------
--- 6. MEDICINES
+-- 6. productS
 -- ----------------------------------------------------------------
-CREATE TABLE medicines (
-    medicine_id     BIGSERIAL        NOT NULL,
+CREATE TABLE products (
+    product_id     BIGSERIAL        NOT NULL,
     name            VARCHAR(500)     NOT NULL,
     slug            VARCHAR(520)     NOT NULL UNIQUE,
     image           VARCHAR(500)     NULL,
@@ -139,21 +139,21 @@ CREATE TABLE medicines (
     unit            VARCHAR(50)      DEFAULT N'Hộp',
     category_id     BIGINT           NULL,
     manufacturer_id BIGINT           NULL,
-    status          medicine_status  DEFAULT 'ACTIVE',
+    status          product_status  DEFAULT 'ACTIVE',
     expire_date     DATE             NULL,
     created_at      TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
     deleted_at      TIMESTAMP        NULL,
-    PRIMARY KEY (medicine_id),
+    PRIMARY KEY (product_id),
     FOREIGN KEY (category_id)     REFERENCES categories(category_id)       ON DELETE SET NULL,
     FOREIGN KEY (manufacturer_id) REFERENCES manufacturers(manufacturer_id) ON DELETE SET NULL
 );
 
-CREATE INDEX idx_medicines_category     ON medicines(category_id);
-CREATE INDEX idx_medicines_manufacturer ON medicines(manufacturer_id);
+CREATE INDEX idx_products_category     ON products(category_id);
+CREATE INDEX idx_products_manufacturer ON products(manufacturer_id);
 
-CREATE TRIGGER trg_medicines_updated_at
-    BEFORE UPDATE ON medicines
+CREATE TRIGGER trg_products_updated_at
+    BEFORE UPDATE ON products
     FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
 -- ----------------------------------------------------------------
@@ -161,12 +161,12 @@ CREATE TRIGGER trg_medicines_updated_at
 -- ----------------------------------------------------------------
 CREATE TABLE inventory (
     inventory_id BIGSERIAL NOT NULL,
-    medicine_id  BIGINT    NOT NULL,
+    product_id  BIGINT    NOT NULL,
     quantity     INT       NOT NULL DEFAULT 0,
     last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (inventory_id),
-    CONSTRAINT uk_inventory_medicine UNIQUE (medicine_id),
-    FOREIGN KEY (medicine_id) REFERENCES medicines(medicine_id) ON DELETE CASCADE
+    CONSTRAINT uk_inventory_product UNIQUE (product_id),
+    FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE
 );
 
 CREATE OR REPLACE TRIGGER trg_inventory_last_updated
@@ -178,7 +178,7 @@ CREATE OR REPLACE TRIGGER trg_inventory_last_updated
 -- ----------------------------------------------------------------
 CREATE TABLE inventory_logs (
     log_id            BIGSERIAL        NOT NULL,
-    medicine_id       BIGINT           NOT NULL,
+    product_id       BIGINT           NOT NULL,
     change_type       change_type_enum NOT NULL,
     quantity          INT              NOT NULL,
     previous_quantity INT              NOT NULL,
@@ -187,10 +187,10 @@ CREATE TABLE inventory_logs (
     note              VARCHAR(500)     NULL,
     created_at        TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (log_id),
-    FOREIGN KEY (medicine_id) REFERENCES medicines(medicine_id) ON DELETE CASCADE
+    FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE
 );
 
-CREATE INDEX idx_inventory_logs_medicine ON inventory_logs(medicine_id);
+CREATE INDEX idx_inventory_logs_product ON inventory_logs(product_id);
 CREATE INDEX idx_inventory_logs_type     ON inventory_logs(change_type);
 
 -- ----------------------------------------------------------------
@@ -210,12 +210,12 @@ CREATE TABLE carts (
 CREATE TABLE cart_items (
     cart_item_id BIGSERIAL NOT NULL,
     cart_id      BIGINT    NOT NULL,
-    medicine_id  BIGINT    NOT NULL,
+    product_id  BIGINT    NOT NULL,
     quantity     INT       NOT NULL DEFAULT 1,
     PRIMARY KEY (cart_item_id),
-    CONSTRAINT uk_cart_medicine UNIQUE (cart_id, medicine_id),
+    CONSTRAINT uk_cart_product UNIQUE (cart_id, product_id),
     FOREIGN KEY (cart_id)     REFERENCES carts(cart_id)         ON DELETE CASCADE,
-    FOREIGN KEY (medicine_id) REFERENCES medicines(medicine_id) ON DELETE CASCADE
+    FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE
 );
 
 -- ----------------------------------------------------------------
@@ -252,13 +252,13 @@ CREATE TRIGGER trg_orders_updated_at
 CREATE TABLE order_items (
     order_item_id BIGSERIAL     NOT NULL,
     order_id      BIGINT        NOT NULL,
-    medicine_id   BIGINT        NULL,
+    product_id   BIGINT        NULL,
     quantity      INT           NOT NULL,
     unit_price    NUMERIC(15,2) NOT NULL,
     total_price   NUMERIC(15,2) NOT NULL,
     PRIMARY KEY (order_item_id),
     FOREIGN KEY (order_id)    REFERENCES orders(order_id)         ON DELETE CASCADE,
-    FOREIGN KEY (medicine_id) REFERENCES medicines(medicine_id)   ON DELETE SET NULL
+    FOREIGN KEY (product_id) REFERENCES products(product_id)   ON DELETE SET NULL
 );
 
 CREATE INDEX idx_order_items_order ON order_items(order_id);
@@ -304,6 +304,20 @@ CREATE TABLE shipments (
     PRIMARY KEY (shipment_id),
     FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE
 );
+
+
+-- ----------------------------------------------------------------
+-- 15. PRODUCT_IMAGES
+-- ----------------------------------------------------------------
+CREATE TABLE product_images (
+  image_id      BIGSERIAL PRIMARY KEY,
+  product_id   BIGINT NOT NULL REFERENCES products(product_id) ON DELETE CASCADE,
+  image_url     VARCHAR(500) NOT NULL,
+  display_order INT NOT NULL DEFAULT 0,
+  created_at    TIMESTAMP DEFAULT NOW()
+);
+ 
+CREATE INDEX idx_product_images_product_id ON product_images(product_id);
 
 -- ================================================================
 -- SEED DATA
@@ -351,8 +365,8 @@ INSERT INTO categories (name, slug) VALUES
                                         (N'Dược mỹ phẩm',          'duoc-my-pham'),
                                         (N'Thiết bị y tế',         'thiet-bi-y-te');
 
--- Medicines
-INSERT INTO medicines (name, slug, description, price, unit, category_id, manufacturer_id, status)
+-- products
+INSERT INTO products (name, slug, description, price, unit, category_id, manufacturer_id, status)
 VALUES
     ('Smecta 3g', 'smecta-3g',
      N'Điều trị tiêu chảy cấp và mãn tính', 85000, N'Hộp 30 gói',
@@ -395,22 +409,22 @@ VALUES
      (SELECT manufacturer_id FROM manufacturers WHERE name = 'Omron'), 'ACTIVE');
 
 -- Inventory (tồn kho ban đầu)
-INSERT INTO inventory (medicine_id, quantity)
-SELECT medicine_id, 150 FROM medicines WHERE slug = 'smecta-3g';
-INSERT INTO inventory (medicine_id, quantity)
-SELECT medicine_id, 80  FROM medicines WHERE slug = 'motilium-m-10mg';
-INSERT INTO inventory (medicine_id, quantity)
-SELECT medicine_id, 200 FROM medicines WHERE slug = 'vitamin-c-1000mg-redoxon';
-INSERT INTO inventory (medicine_id, quantity)
-SELECT medicine_id, 60  FROM medicines WHERE slug = 'centrum-silver';
-INSERT INTO inventory (medicine_id, quantity)
-SELECT medicine_id, 90  FROM medicines WHERE slug = 'blackmores-fish-oil-1000mg';
-INSERT INTO inventory (medicine_id, quantity)
-SELECT medicine_id, 300 FROM medicines WHERE slug = 'tiffy-forte';
-INSERT INTO inventory (medicine_id, quantity)
-SELECT medicine_id, 180 FROM medicines WHERE slug = 'broncol-5mg';
-INSERT INTO inventory (medicine_id, quantity)
-SELECT medicine_id, 25  FROM medicines WHERE slug = 'may-do-huyet-ap-omron-7120';
+INSERT INTO inventory (product_id, quantity)
+SELECT product_id, 150 FROM products WHERE slug = 'smecta-3g';
+INSERT INTO inventory (product_id, quantity)
+SELECT product_id, 80  FROM products WHERE slug = 'motilium-m-10mg';
+INSERT INTO inventory (product_id, quantity)
+SELECT product_id, 200 FROM products WHERE slug = 'vitamin-c-1000mg-redoxon';
+INSERT INTO inventory (product_id, quantity)
+SELECT product_id, 60  FROM products WHERE slug = 'centrum-silver';
+INSERT INTO inventory (product_id, quantity)
+SELECT product_id, 90  FROM products WHERE slug = 'blackmores-fish-oil-1000mg';
+INSERT INTO inventory (product_id, quantity)
+SELECT product_id, 300 FROM products WHERE slug = 'tiffy-forte';
+INSERT INTO inventory (product_id, quantity)
+SELECT product_id, 180 FROM products WHERE slug = 'broncol-5mg';
+INSERT INTO inventory (product_id, quantity)
+SELECT product_id, 25  FROM products WHERE slug = 'may-do-huyet-ap-omron-7120';
 
 INSERT INTO carts (user_id, created_at)
 SELECT u.user_id, NOW()
