@@ -17,7 +17,7 @@ import {
   Stethoscope,
 } from "lucide-react";
 import { useCart } from "@/hooks/useCart.js";
-import { useCategories } from "../../hooks/useMedicines.js";
+import { useCategories } from "../../hooks/useproducts.js";
 import { useAuth } from "../../hooks/useAuth.js";
 
 function Header() {

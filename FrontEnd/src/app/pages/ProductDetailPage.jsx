@@ -4,7 +4,7 @@ import { ShoppingCart, Minus, Plus, ChevronRight, Check } from "lucide-react";
 import { formatPrice } from "../data/products";
 import { ProductCard } from "../components/ProductCard";
 import { useCart } from "@/hooks/useCart.js";
-import { useMedicine, useMedicines } from "../../hooks/useMedicines.js";
+import { useproduct, useproducts } from "../../hooks/useproducts.js";
 import NotFoundPage from "./NotFoundPage";
 
 const FALLBACK_IMAGE =
@@ -13,8 +13,8 @@ const tabs = ["Mô tả", "Thành phần", "Hướng dẫn sử dụng"];
 
 function ProductDetailPage() {
   const { id } = useParams();
-  const { data: m, isLoading } = useMedicine(id);
-  const { data: relatedData } = useMedicines({
+  const { data: m, isLoading } = useproduct(id);
+  const { data: relatedData } = useproducts({
     categoryId: m?.categoryId || undefined,
     limit: 10,
   });
@@ -37,7 +37,7 @@ function ProductDetailPage() {
   if (!m) return <NotFoundPage />;
 
   // ── Xây dựng mảng images đầy đủ ──────────────────────────────────
-  // Ưu tiên: m.images (từ bảng medicine_images, đã sort theo display_order)
+  // Ưu tiên: m.images (từ bảng product_images, đã sort theo display_order)
   // Fallback: m.primaryImage (cột image cũ) hoặc ảnh placeholder
   const imageList = (() => {
     if (m.images && m.images.length > 0) {
@@ -49,7 +49,7 @@ function ProductDetailPage() {
 
   const product = {
     id: m.slug,
-    medicineId: m.medicineId,
+    productId: m.productId,
     name: m.name,
     brand: m.manufacturerName || "Dược phẩm",
     price: m.price,
@@ -67,7 +67,7 @@ function ProductDetailPage() {
       ?.slice(0, 4)
       ?.map((item) => ({
         id: item.slug,
-        medicineId: item.medicineId,
+        productId: item.productId,
         name: item.name,
         brand: item.manufacturerName || "Dược phẩm",
         price: item.price,

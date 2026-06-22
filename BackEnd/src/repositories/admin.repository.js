@@ -10,7 +10,7 @@ export const getDashboardStats = async () => {
     await Promise.all([
       prisma.order.count(),
       prisma.user.count({ where: { deletedAt: null } }),
-      prisma.medicine.count({ where: { deletedAt: null } }),
+      prisma.product.count({ where: { deletedAt: null } }),
       // Tính tổng doanh thu từ đơn hàng đã giao thành công
       prisma.order.aggregate({
         _sum: { totalPrice: true },
@@ -35,7 +35,7 @@ export const findAllOrders = ({ skip, limit }) => {
     include: {
       user: { select: { userId: true, fullName: true, email: true } },
       items: {
-        select: { quantity: true, medicine: { select: { name: true } } },
+        select: { quantity: true, product: { select: { name: true } } },
       },
     },
   });
@@ -86,9 +86,9 @@ export const updateUserRole = (userId, roleId) => {
   });
 };
 
-// Lấy tất cả medicines (admin thấy cả inactive)
-export const findAllMedicines = ({ skip, limit }) => {
-  return prisma.medicine.findMany({
+// Lấy tất cả products (admin thấy cả inactive)
+export const findAllproducts = ({ skip, limit }) => {
+  return prisma.product.findMany({
     skip,
     take: limit,
     orderBy: { createdAt: "desc" },
@@ -100,25 +100,25 @@ export const findAllMedicines = ({ skip, limit }) => {
   });
 };
 
-export const existMedicine = (id) => {
-  return prisma.medicine.findUnique({
-    where: { medicineId: BigInt(id) },
+export const existproduct = (id) => {
+  return prisma.product.findUnique({
+    where: { productId: BigInt(id) },
   });
 };
 
-// Tạo inventory record cho medicine mới
+// Tạo inventory record cho product mới
 export const createInventory = (data) => {
   return prisma.inventory.create({ data });
 };
 
-export const createOrUpdateInventory = (medicineId, stock) => {
+export const createOrUpdateInventory = (productId, stock) => {
   return prisma.inventory.upsert({
-    where: { medicineId: BigInt(medicineId) },
+    where: { productId: BigInt(productId) },
     update: { quantity: parseInt(stock) },
-    create: { medicineId: BigInt(medicineId), quantity: parseInt(stock) },
+    create: { productId: BigInt(productId), quantity: parseInt(stock) },
   });
 };
 
-export const countAllMedicines = () => {
-  return prisma.medicine.count({ where: { deletedAt: null } });
+export const countAllproducts = () => {
+  return prisma.product.count({ where: { deletedAt: null } });
 };

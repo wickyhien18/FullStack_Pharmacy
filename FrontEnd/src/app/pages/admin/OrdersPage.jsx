@@ -133,7 +133,7 @@ function OrderDetailModal({ order, onClose }) {
               {order.items?.map((item, i) => (
                 <div key={i} className="flex justify-between text-sm">
                   <span className="text-gray-600">
-                    {item.medicineName}{" "}
+                    {item.productName}{" "}
                     <span className="text-gray-400">x{item.quantity}</span>
                   </span>
                 </div>

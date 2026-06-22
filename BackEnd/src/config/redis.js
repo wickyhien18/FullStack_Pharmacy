@@ -1,9 +1,8 @@
-
 // ================================================================
 // redis.js — Kết nối Redis / Redis connection
 //
 // Redis dùng để cache / Redis is used for caching:
-//   - Danh sách thuốc / Medicine list
+//   - Danh sách thuốc / product list
 //   - Categories
 //   - Bất kỳ data nào ít thay đổi / Any rarely-changing data
 //
@@ -12,14 +11,14 @@
 //     ├── Cache hit  → Trả về ngay (~1ms) / Return immediately
 //     └── Cache miss → Query DB → Lưu vào cache → Trả về / Save to cache then return
 // ================================================================
-import Redis from 'ioredis';
-import { env } from './env.js';
+import Redis from "ioredis";
+import { env } from "./env.js";
 
 // Không kết nối nếu không có REDIS_URL
 // Skip connection if no REDIS_URL — app still works, just without cache
 const createRedisClient = () => {
   if (!env.REDIS_URL) {
-    console.warn('[Redis] REDIS_URL not set — caching disabled');
+    console.warn("[Redis] REDIS_URL not set — caching disabled");
     return null;
   }
 
@@ -32,8 +31,8 @@ const createRedisClient = () => {
     lazyConnect: true, // Không crash app nếu Redis down / Don't crash if Redis is down
   });
 
-  client.on('connect', () => console.log('[Redis] Connected'));
-  client.on('error',   (err) => console.error('[Redis] Error:', err.message));
+  client.on("connect", () => console.log("[Redis] Connected"));
+  client.on("error", (err) => console.error("[Redis] Error:", err.message));
 
   return client;
 };
@@ -50,7 +49,7 @@ export const setCache = async (key, value, ttl = 300) => {
     await redis.setex(key, ttl, JSON.stringify(value));
   } catch (err) {
     // Không throw — Redis lỗi không làm crash app / Don't throw — Redis error won't crash app
-    console.error('[Redis] setCache error:', err.message);
+    console.error("[Redis] setCache error:", err.message);
   }
 };
 
@@ -62,7 +61,7 @@ export const getCache = async (key) => {
     const data = await redis.get(key);
     return data ? JSON.parse(data) : null;
   } catch (err) {
-    console.error('[Redis] getCache error:', err.message);
+    console.error("[Redis] getCache error:", err.message);
     return null;
   }
 };
@@ -73,12 +72,12 @@ export const deleteCache = async (key) => {
   try {
     await redis.del(key);
   } catch (err) {
-    console.error('[Redis] deleteCache error:', err.message);
+    console.error("[Redis] deleteCache error:", err.message);
   }
 };
 
 // ── Helper: Xoá cache theo pattern ───────────────────────────────
-// VD / Example: deletePattern('medicines:*') xoá tất cả cache medicines
+// VD / Example: deletePattern('products:*') xoá tất cả cache products
 // Dùng khi admin sửa/xoá sản phẩm / Use when admin updates/deletes products
 export const deletePattern = async (pattern) => {
   if (!redis) return;
@@ -87,6 +86,6 @@ export const deletePattern = async (pattern) => {
     if (keys.length > 0) await redis.del(...keys);
     console.log(`[Redis] Deleted ${keys.length} keys matching: ${pattern}`);
   } catch (err) {
-    console.error('[Redis] deletePattern error:', err.message);
+    console.error("[Redis] deletePattern error:", err.message);
   }
 };

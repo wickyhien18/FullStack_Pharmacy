@@ -1,7 +1,7 @@
 // ================================================================
 // order.repository.js — v2, khớp 100% với schema hiện tại
 // Bỏ: originalPrice, paymentMethod (Order không có)
-// Bỏ: medicineName, medicineUnit (OrderItem không có)
+// Bỏ: productName, productUnit (OrderItem không có)
 // ================================================================
 import { prisma } from "../config/prisma.js";
 
@@ -9,7 +9,7 @@ import { prisma } from "../config/prisma.js";
 const writeInventoryLog = async (
   tx,
   {
-    medicineId,
+    productId,
     changeType, // "IMPORT" | "EXPORT" | "ADJUST"
     quantity, // số lượng thay đổi (luôn dương)
     previousQuantity,
@@ -20,7 +20,7 @@ const writeInventoryLog = async (
 ) => {
   await tx.inventoryLog.create({
     data: {
-      medicineId,
+      productId,
       changeType,
       quantity,
       previousQuantity,
@@ -61,36 +61,36 @@ export const createOrder = async ({
     });
 
     for (const item of items) {
-      const medicine = await tx.medicine.findUnique({
-        where: { medicineId: item.medicineId },
+      const product = await tx.product.findUnique({
+        where: { productId: item.productId },
         include: { inventory: true },
       });
 
-      if (!medicine) throw new Error("Sản phẩm không tồn tại");
-      if ((medicine.inventory?.quantity ?? 0) < item.quantity) {
-        throw new Error(`Sản phẩm "${medicine.name}" không đủ hàng`);
+      if (!product) throw new Error("Sản phẩm không tồn tại");
+      if ((product.inventory?.quantity ?? 0) < item.quantity) {
+        throw new Error(`Sản phẩm "${product.name}" không đủ hàng`);
       }
 
       await tx.orderItem.create({
         data: {
           order: { connect: { orderId: order.orderId } },
-          medicine: { connect: { medicineId: item.medicineId } },
+          product: { connect: { productId: item.productId } },
           quantity: item.quantity,
-          unitPrice: medicine.price,
-          totalPrice: Number(medicine.price) * item.quantity,
-          // medicineName ← KHÔNG có trong schema → bỏ
-          // medicineUnit ← KHÔNG có trong schema → bỏ
+          unitPrice: product.price,
+          totalPrice: Number(product.price) * item.quantity,
+          // productName ← KHÔNG có trong schema → bỏ
+          // productUnit ← KHÔNG có trong schema → bỏ
         },
       });
 
       await tx.inventory.update({
-        where: { medicineId: item.medicineId },
+        where: { productId: item.productId },
         data: { quantity: { decrement: item.quantity } },
       });
 
       // ← THÊM: ghi log EXPORT khi đặt hàng
       await writeInventoryLog(tx, {
-        medicineId: item.medicineId,
+        productId: item.productId,
         changeType: "EXPORT",
         quantity: item.quantity,
         previousQuantity: currentQty,
@@ -113,8 +113,8 @@ export const findOrdersByUser = async (userId, { skip, limit }) => {
     include: {
       items: {
         include: {
-          // Lấy tên + đơn vị qua relation medicine vì không có snapshot column
-          medicine: { select: { name: true, unit: true } },
+          // Lấy tên + đơn vị qua relation product vì không có snapshot column
+          product: { select: { name: true, unit: true } },
         },
       },
     },
@@ -129,7 +129,7 @@ export const findOrderByUserIdAndOrderId = async (orderId, userId) => {
   return prisma.order.findFirst({
     where: { orderId, userId },
     include: {
-      items: { include: { medicine: { select: { name: true, unit: true } } } },
+      items: { include: { product: { select: { name: true, unit: true } } } },
       payments: true,
       shipment: true,
     },
@@ -152,19 +152,19 @@ export const handleCancelOrderPending = async (orderId, reason) => {
 
     for (const item of items) {
       const inventory = await tx.inventory.findUnique({
-        where: { medicineId: item.medicineId },
+        where: { productId: item.productId },
       });
       const currentQty = inventory?.quantity ?? 0;
       const newQty = currentQty + item.quantity;
 
       await tx.inventory.update({
-        where: { medicineId: item.medicineId },
+        where: { productId: item.productId },
         data: { quantity: { increment: item.quantity } },
       });
 
       // ← THÊM: ghi log IMPORT khi hoàn kho
       await writeInventoryLog(tx, {
-        medicineId: item.medicineId,
+        productId: item.productId,
         changeType: "IMPORT",
         quantity: item.quantity,
         previousQuantity: currentQty,
@@ -208,19 +208,19 @@ export const handleCancelOrderDelivedAndShipping = async (orderId, status) => {
     const items = await tx.orderItem.findMany({ where: { orderId } });
     for (const item of items) {
       const inventory = await tx.inventory.findUnique({
-        where: { medicineId: item.medicineId },
+        where: { productId: item.productId },
       });
       const currentQty = inventory?.quantity ?? 0;
       const newQty = currentQty + item.quantity;
 
       await tx.inventory.update({
-        where: { medicineId: item.medicineId },
+        where: { productId: item.productId },
         data: { quantity: { increment: item.quantity } },
       });
 
       // ← THÊM: ghi log IMPORT khi hoàn kho
       await writeInventoryLog(tx, {
-        medicineId: item.medicineId,
+        productId: item.productId,
         changeType: "IMPORT",
         quantity: item.quantity,
         previousQuantity: currentQty,
@@ -261,19 +261,19 @@ export const approveReturnOrder = async (orderId, totalPrice) => {
     const items = await tx.orderItem.findMany({ where: { orderId } });
     for (const item of items) {
       const inventory = await tx.inventory.findUnique({
-        where: { medicineId: item.medicineId },
+        where: { productId: item.productId },
       });
       const currentQty = inventory?.quantity ?? 0;
       const newQty = currentQty + item.quantity;
 
       await tx.inventory.update({
-        where: { medicineId: item.medicineId },
+        where: { productId: item.productId },
         data: { quantity: { increment: item.quantity } },
       });
 
       // ← THÊM: ghi log IMPORT khi hoàn kho
       await writeInventoryLog(tx, {
-        medicineId: item.medicineId,
+        productId: item.productId,
         changeType: "IMPORT",
         quantity: item.quantity,
         previousQuantity: currentQty,

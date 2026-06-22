@@ -20,8 +20,8 @@ const PREFETCH_TASKS = [
     fn: () => api.get("/categories").then((r) => r.data.data),
   },
   {
-    key: ["medicines", { page: 1, limit: 12 }],
-    fn: () => api.get("/medicines?page=1&limit=12").then((r) => r.data.data),
+    key: ["products", { page: 1, limit: 12 }],
+    fn: () => api.get("/products?page=1&limit=12").then((r) => r.data.data),
   },
 ];
 
@@ -109,7 +109,7 @@ export default function AuthInitializer({ children }) {
   return (
     <>
       {children}
-      {/* Vẫn hiện overlay trong lúc prefetch categories/medicines chạy nền */}
+      {/* Vẫn hiện overlay trong lúc prefetch categories/products chạy nền */}
       {isWorking && <FullOverlay />}
     </>
   );

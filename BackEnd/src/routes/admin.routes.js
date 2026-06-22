@@ -28,11 +28,11 @@ router.patch("/users/:userId/status", adminController.updateUserStatus);
 router.patch("/users/:userId/role", adminController.updateUserRole);
 router.get("/roles", adminController.getRoles);
 
-// Medicines
-router.get("/medicines", adminController.getAllMedicines);
-router.get("/medicines/:medicineId", adminController.getMedicineDetail); // ← THÊM
-router.post("/medicines", adminController.createMedicine);
-router.put("/medicines/:medicineId", adminController.updateMedicine);
-router.delete("/medicines/:medicineId", adminController.deleteMedicine);
+// products
+router.get("/products", adminController.getAllproducts);
+router.get("/products/:productId", adminController.getproductDetail); // ← THÊM
+router.post("/products", adminController.createproduct);
+router.put("/products/:productId", adminController.updateproduct);
+router.delete("/products/:productId", adminController.deleteproduct);
 
 export default router;

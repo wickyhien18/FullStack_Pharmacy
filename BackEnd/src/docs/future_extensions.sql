@@ -23,18 +23,18 @@ CREATE TABLE addresses (
 CREATE INDEX idx_addresses_user ON addresses(user_id);
 
 -- ================================================================
--- 2. MEDICINE_IMAGES — Nhiều ảnh cho 1 sản phẩm
+-- 2. product_IMAGES — Nhiều ảnh cho 1 sản phẩm
 -- ================================================================
-CREATE TABLE medicine_images (
+CREATE TABLE product_images (
     image_id    BIGSERIAL    NOT NULL,
-    medicine_id BIGINT       NOT NULL,
+    product_id BIGINT       NOT NULL,
     url         VARCHAR(500) NOT NULL,
     is_primary  BOOLEAN      DEFAULT FALSE,
     sort_order  INT          DEFAULT 0,
     PRIMARY KEY (image_id),
-    FOREIGN KEY (medicine_id) REFERENCES medicines(medicine_id) ON DELETE CASCADE
+    FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE
 );
-CREATE INDEX idx_medicine_images_medicine ON medicine_images(medicine_id);
+CREATE INDEX idx_product_images_product ON product_images(product_id);
 
 -- ================================================================
 -- 3. REVIEWS — Đánh giá sản phẩm
@@ -42,7 +42,7 @@ CREATE INDEX idx_medicine_images_medicine ON medicine_images(medicine_id);
 CREATE TABLE reviews (
     review_id   BIGSERIAL NOT NULL,
     user_id     BIGINT    NOT NULL,
-    medicine_id BIGINT    NOT NULL,
+    product_id BIGINT    NOT NULL,
     order_id    BIGINT    NULL,
     rating      SMALLINT  NOT NULL CHECK (rating BETWEEN 1 AND 5),
     title       VARCHAR(255) NULL,
@@ -52,12 +52,12 @@ CREATE TABLE reviews (
     created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (review_id),
-    CONSTRAINT uk_user_medicine_review UNIQUE (user_id, medicine_id),
+    CONSTRAINT uk_user_product_review UNIQUE (user_id, product_id),
     FOREIGN KEY (user_id)     REFERENCES users(user_id)         ON DELETE CASCADE,
-    FOREIGN KEY (medicine_id) REFERENCES medicines(medicine_id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE,
     FOREIGN KEY (order_id)    REFERENCES orders(order_id)       ON DELETE SET NULL
 );
-CREATE INDEX idx_reviews_medicine ON reviews(medicine_id);
+CREATE INDEX idx_reviews_product ON reviews(product_id);
 CREATE INDEX idx_reviews_user     ON reviews(user_id);
 
 -- ================================================================
@@ -124,12 +124,12 @@ CREATE INDEX idx_otps_email ON otps(email);
 CREATE TABLE wishlists (
     wishlist_id BIGSERIAL NOT NULL,
     user_id     BIGINT    NOT NULL,
-    medicine_id BIGINT    NOT NULL,
+    product_id BIGINT    NOT NULL,
     created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (wishlist_id),
-    CONSTRAINT uk_wishlist UNIQUE (user_id, medicine_id),
+    CONSTRAINT uk_wishlist UNIQUE (user_id, product_id),
     FOREIGN KEY (user_id)     REFERENCES users(user_id)         ON DELETE CASCADE,
-    FOREIGN KEY (medicine_id) REFERENCES medicines(medicine_id) ON DELETE CASCADE
+    FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE
 );
 CREATE INDEX idx_wishlists_user ON wishlists(user_id);
 
@@ -157,14 +157,14 @@ ALTER TABLE orders ADD COLUMN cancelled_reason VARCHAR(500)  NULL;
 ALTER TABLE orders ADD COLUMN cancelled_at     TIMESTAMP     NULL;
 
 -- ================================================================
--- 9. MEDICINES — Bổ sung thông tin chi tiết
+-- 9. productS — Bổ sung thông tin chi tiết
 -- ================================================================
-ALTER TABLE medicines ADD COLUMN original_price        NUMERIC(15,2) NULL;
-ALTER TABLE medicines ADD COLUMN requires_prescription BOOLEAN       DEFAULT FALSE;
-ALTER TABLE medicines ADD COLUMN ingredients           TEXT          NULL;
-ALTER TABLE medicines ADD COLUMN usage                 TEXT          NULL;
-ALTER TABLE medicines ADD COLUMN dosage                TEXT          NULL;
-ALTER TABLE medicines ADD COLUMN contraindication      TEXT          NULL;
+ALTER TABLE products ADD COLUMN original_price        NUMERIC(15,2) NULL;
+ALTER TABLE products ADD COLUMN requires_prescription BOOLEAN       DEFAULT FALSE;
+ALTER TABLE products ADD COLUMN ingredients           TEXT          NULL;
+ALTER TABLE products ADD COLUMN usage                 TEXT          NULL;
+ALTER TABLE products ADD COLUMN dosage                TEXT          NULL;
+ALTER TABLE products ADD COLUMN contraindication      TEXT          NULL;
 
 -- ================================================================
 -- 10. EXTENSIONS PostgreSQL
@@ -173,15 +173,15 @@ CREATE EXTENSION IF NOT EXISTS pg_trgm;   -- Full-text search tiếng Việt
 CREATE EXTENSION IF NOT EXISTS pgcrypto;  -- Gen UUID cho order_code
 
 -- Index full-text search trên tên thuốc
-CREATE INDEX idx_medicines_name_trgm ON medicines USING GIN (name gin_trgm_ops);
+CREATE INDEX idx_products_name_trgm ON products USING GIN (name gin_trgm_ops);
 
 -- ================================================================
--- 11. VIEW vw_medicines_summary
+-- 11. VIEW vw_products_summary
 -- Dùng cho trang danh sách sản phẩm — tổng hợp tồn kho + rating
 -- ================================================================
-CREATE OR REPLACE VIEW vw_medicines_summary AS
+CREATE OR REPLACE VIEW vw_products_summary AS
 SELECT
-    m.medicine_id,
+    m.product_id,
     m.name,
     m.slug,
     m.price,
@@ -195,16 +195,16 @@ SELECT
     COALESCE(inv.quantity, 0)                                   AS stock,
     COALESCE(ROUND(AVG(r.rating)::NUMERIC, 1), 0)              AS avg_rating,
     COUNT(r.review_id)                                          AS review_count,
-    (SELECT url FROM medicine_images mi
-     WHERE mi.medicine_id = m.medicine_id AND mi.is_primary = TRUE
+    (SELECT url FROM product_images mi
+     WHERE mi.product_id = m.product_id AND mi.is_primary = TRUE
      LIMIT 1)                                                   AS primary_image
-FROM medicines m
+FROM products m
 LEFT JOIN categories    c   ON c.category_id      = m.category_id
 LEFT JOIN manufacturers mf  ON mf.manufacturer_id = m.manufacturer_id
-LEFT JOIN inventory     inv ON inv.medicine_id     = m.medicine_id
-LEFT JOIN reviews       r   ON r.medicine_id       = m.medicine_id AND r.is_visible = TRUE
+LEFT JOIN inventory     inv ON inv.product_id     = m.product_id
+LEFT JOIN reviews       r   ON r.product_id       = m.product_id AND r.is_visible = TRUE
 WHERE m.deleted_at IS NULL
-GROUP BY m.medicine_id, c.name, c.slug, mf.name, inv.quantity;
+GROUP BY m.product_id, c.name, c.slug, mf.name, inv.quantity;
 
 -- ================================================================
 -- 12. NOTIFICATIONS — Thông báo realtime (kết hợp Socket.io Phase 4)

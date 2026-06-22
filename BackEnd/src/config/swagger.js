@@ -1,6 +1,6 @@
 import swaggerJsdoc from "swagger-jsdoc";
 import { authDocs } from "../docs/auth.docs.js";
-import { medicineDocs } from "../docs/medicine.docs.js";
+import { productDocs } from "../docs/product.docs.js";
 import { orderDocs } from "../docs/order.docs.js";
 import { adminDocs } from "../docs/admin.docs.js";
 import { categoryDocs } from "../docs/category.docs.js";
@@ -8,7 +8,7 @@ import { categoryDocs } from "../docs/category.docs.js";
 // Gộp tất cả docs lại
 const paths = {
   ...authDocs,
-  ...medicineDocs,
+  ...productDocs,
   ...orderDocs,
   ...adminDocs,
   ...categoryDocs,

@@ -1,5 +1,5 @@
 // ================================================================
-// MedicineFormModal.jsx — Modal thêm/sửa thuốc, hỗ trợ TỐI ĐA 3 ảnh
+// productFormModal.jsx — Modal thêm/sửa thuốc, hỗ trợ TỐI ĐA 3 ảnh
 // Dùng FormData: field "images" (multiple), "keepImageIds" (JSON string)
 // ================================================================
 import { useState, useEffect } from "react";
@@ -11,9 +11,9 @@ import api from "../../../lib/axios.js";
 const MAX_IMAGES = 3;
 const UNIT_SUGGESTIONS = ["Hộp", "Chai", "Tuýp", "Gói", "Viên", "Ống"];
 
-export default function MedicineFormModal({ medicineId, onClose }) {
+export default function productFormModal({ productId, onClose }) {
   const queryClient = useQueryClient();
-  const isEdit = !!medicineId;
+  const isEdit = !!productId;
 
   const [form, setForm] = useState({
     name: "",
@@ -33,11 +33,11 @@ export default function MedicineFormModal({ medicineId, onClose }) {
 
   const totalImageCount = existingImages.length + newImages.length;
 
-  // ── Lấy chi tiết medicine khi edit ──────────────────────────────
+  // ── Lấy chi tiết product khi edit ──────────────────────────────
   const { data: detail, isLoading: isLoadingDetail } = useQuery({
-    queryKey: ["admin-medicine-detail", medicineId],
+    queryKey: ["admin-product-detail", productId],
     queryFn: () =>
-      api.get(`/admin/medicines/${medicineId}`).then((r) => r.data.data),
+      api.get(`/admin/products/${productId}`).then((r) => r.data.data),
     enabled: isEdit,
   });
 
@@ -101,11 +101,11 @@ export default function MedicineFormModal({ medicineId, onClose }) {
   const mutation = useMutation({
     mutationFn: (formData) => {
       if (isEdit) {
-        return api.put(`/admin/medicines/${medicineId}`, formData, {
+        return api.put(`/admin/products/${productId}`, formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
       }
-      return api.post("/admin/medicines", formData, {
+      return api.post("/admin/products", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
     },
@@ -113,8 +113,8 @@ export default function MedicineFormModal({ medicineId, onClose }) {
       toast.success(
         isEdit ? "Cập nhật thành công" : "Thêm sản phẩm thành công",
       );
-      queryClient.invalidateQueries({ queryKey: ["admin-medicines"] });
-      queryClient.invalidateQueries({ queryKey: ["medicines"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
       onClose();
     },
     onError: (err) =>
@@ -211,11 +211,11 @@ export default function MedicineFormModal({ medicineId, onClose }) {
                 name="unit"
                 value={form.unit}
                 onChange={handleChange}
-                list="medicine-unit-suggestions"
+                list="product-unit-suggestions"
                 placeholder="Nhập đơn vị, ví dụ: Hộp, Vỉ, Lọ..."
                 className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-400 bg-white"
               />
-              <datalist id="medicine-unit-suggestions">
+              <datalist id="product-unit-suggestions">
                 {UNIT_SUGGESTIONS.map((unit) => (
                   <option key={unit} value={unit} />
                 ))}

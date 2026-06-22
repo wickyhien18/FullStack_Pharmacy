@@ -302,7 +302,7 @@ function AccountPage() {
                           {order.items?.map((item, idx) => (
                             <div key={idx} className="flex justify-between">
                               <span>
-                                {item.medicineName}{" "}
+                                {item.productName}{" "}
                                 <span className="text-gray-400">
                                   x{item.quantity}
                                 </span>

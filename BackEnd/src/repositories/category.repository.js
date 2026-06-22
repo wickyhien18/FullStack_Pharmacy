@@ -1,14 +1,13 @@
-
-import { prisma } from '../config/prisma.js';
+import { prisma } from "../config/prisma.js";
 
 export const findAllCategories = () => {
-  return prisma.category.findMany({ orderBy: { name: 'asc' } });
+  return prisma.category.findMany({ orderBy: { name: "asc" } });
 };
 
 export const findAllCategoriesWithCount = () => {
   return prisma.category.findMany({
-    include: { _count: { select: { medicines: true } } },
-    orderBy: { name: 'asc' },
+    include: { _count: { select: { products: true } } },
+    orderBy: { name: "asc" },
   });
 };
 

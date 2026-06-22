@@ -117,47 +117,47 @@ export const updateUserRole = async (req, res) => {
   }
 };
 
-// GET /api/admin/medicines
-export const getAllMedicines = async (req, res) => {
+// GET /api/admin/products
+export const getAllproducts = async (req, res) => {
   try {
     const { page, limit, skip } = parsePagination(req);
-    const data = await adminService.getAllMedicines({ page, limit, skip });
+    const data = await adminService.getAllproducts({ page, limit, skip });
     return sendSuccess(res, data, "Lấy danh sách sản phẩm thành công");
   } catch (err) {
     return sendError(res, err.message, err.status || 500);
   }
 };
 
-// THÊM: GET /api/admin/medicines/:medicineId — chi tiết cho form edit
-export const getMedicineDetail = async (req, res) => {
+// THÊM: GET /api/admin/products/:productId — chi tiết cho form edit
+export const getproductDetail = async (req, res) => {
   try {
-    const data = await adminService.getMedicineDetail(req.params.medicineId);
+    const data = await adminService.getproductDetail(req.params.productId);
     return sendSuccess(res, data, "Lấy chi tiết sản phẩm thành công");
   } catch (err) {
     return sendError(res, err.message, err.status || 500);
   }
 };
 
-// POST /api/admin/medicines
-export const createMedicine = async (req, res) => {
+// POST /api/admin/products
+export const createproduct = async (req, res) => {
   try {
     await handleUpload(req, res); // sẽ đổi thành handleMultiUpload bên dưới sau khi sửa middleware
-    const data = await adminService.createMedicine(req.body, req.files || []);
+    const data = await adminService.createproduct(req.body, req.files || []);
     return sendSuccess(res, data, "Tạo sản phẩm thành công", 201);
   } catch (err) {
     return sendError(res, err.message, err.status || 500);
   }
 };
 
-// PUT /api/admin/medicines/:medicineId
-export const updateMedicine = async (req, res) => {
+// PUT /api/admin/products/:productId
+export const updateproduct = async (req, res) => {
   try {
     await handleUpload(req, res); // sẽ đổi thành handleMultiUpload bên dưới sau khi sửa middleware
     const keepImageIds = req.body.keepImageIds
       ? JSON.parse(req.body.keepImageIds)
       : [];
-    const data = await adminService.updateMedicine(
-      req.params.medicineId,
+    const data = await adminService.updateproduct(
+      req.params.productId,
       req.body,
       req.files || [],
       keepImageIds,
@@ -168,10 +168,10 @@ export const updateMedicine = async (req, res) => {
   }
 };
 
-// DELETE /api/admin/medicines/:medicineId
-export const deleteMedicine = async (req, res) => {
+// DELETE /api/admin/products/:productId
+export const deleteproduct = async (req, res) => {
   try {
-    await adminService.deleteMedicine(req.params.medicineId);
+    await adminService.deleteproduct(req.params.productId);
     return sendSuccess(res, null, "Xoá sản phẩm thành công");
   } catch (err) {
     return sendError(res, err.message, err.status || 500);

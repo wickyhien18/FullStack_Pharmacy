@@ -1,7 +1,7 @@
 // ================================================================
-// medicine.service.js — Business logic cho medicines
+// product.service.js — Business logic cho products
 // ================================================================
-import * as medicineRepo from "../repositories/medicine.repository.js";
+import * as productRepo from "../repositories/product.repository.js";
 import { getCache, setCache, deletePattern } from "../config/redis.js";
 import { buildPaginatedResponse } from "../utils/pagination.js";
 
@@ -39,9 +39,9 @@ const buildOrderBy = (sort) => {
   }
 };
 
-// Format medicine trả về client
-const formatMedicine = (m) => ({
-  medicineId: m.medicineId.toString(),
+// Format product trả về client
+const formatproduct = (m) => ({
+  productId: m.productId.toString(),
   name: m.name,
   slug: m.slug,
   price: Number(m.price),
@@ -66,8 +66,8 @@ const formatMedicine = (m) => ({
   createdAt: m.createdAt,
 });
 
-// Lấy danh sách medicines
-export const getMedicines = async ({
+// Lấy danh sách products
+export const getproducts = async ({
   page,
   limit,
   skip,
@@ -77,7 +77,7 @@ export const getMedicines = async ({
 }) => {
   // Cache key bao gồm tất cả params — params khác = cache khác
   // Cache key includes all params — different params = different cache
-  const cacheKey = `medicines:list:${page}:${limit}:${search || ""}:${categoryId || ""}:${sort || ""}`;
+  const cacheKey = `products:list:${page}:${limit}:${search || ""}:${categoryId || ""}:${sort || ""}`;
 
   // Check cache trước / Check cache first
   const cached = await getCache(cacheKey);
@@ -91,13 +91,13 @@ export const getMedicines = async ({
   const where = buildWhere({ search, categoryId });
   const orderBy = buildOrderBy(sort);
 
-  const [medicines, total] = await Promise.all([
-    medicineRepo.findMedicines({ skip, limit, where, orderBy }),
-    medicineRepo.countMedicines(where),
+  const [products, total] = await Promise.all([
+    productRepo.findproducts({ skip, limit, where, orderBy }),
+    productRepo.countproducts(where),
   ]);
 
   const result = buildPaginatedResponse(
-    medicines.map(formatMedicine),
+    products.map(formatproduct),
     total,
     page,
     limit,
@@ -109,16 +109,16 @@ export const getMedicines = async ({
   return result;
 };
 
-// Lấy chi tiết 1 medicine
-export const getMedicineBySlug = async (slug) => {
-  const cacheKey = `medicines:detail:${slug}`;
+// Lấy chi tiết 1 product
+export const getproductBySlug = async (slug) => {
+  const cacheKey = `products:detail:${slug}`;
 
   const cached = await getCache(cacheKey);
   if (cached) return cached;
-  const medicine = await medicineRepo.findMedicineBySlug(slug);
-  if (!medicine) throw { status: 404, message: "Không tìm thấy sản phẩm" };
+  const product = await productRepo.findproductBySlug(slug);
+  if (!product) throw { status: 404, message: "Không tìm thấy sản phẩm" };
 
-  const result = formatMedicine(medicine);
+  const result = formatproduct(product);
 
   // Cache 10 phút / Cache for 10 minutes
   await setCache(cacheKey, result, 600);
@@ -129,8 +129,8 @@ export const getMedicineBySlug = async (slug) => {
 // ── Invalidate Cache ──────────────────────────────────────────────
 // Gọi khi admin sửa/xoá sản phẩm để xoá cache cũ
 // Call when admin updates/deletes products to clear stale cache
-export const invalidateMedicineCache = async (slug = null) => {
-  await deletePattern("medicines:list:*");
-  if (slug) await deletePattern(`medicines:detail:${slug}`);
-  console.log("[Cache] Invalidated medicine cache");
+export const invalidateproductCache = async (slug = null) => {
+  await deletePattern("products:list:*");
+  if (slug) await deletePattern(`products:detail:${slug}`);
+  console.log("[Cache] Invalidated product cache");
 };

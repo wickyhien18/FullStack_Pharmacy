@@ -19,7 +19,7 @@ export const env = {
   SUPABASE_URL: process.env.SUPABASE_URL || "",
   SUPABASE_SERVICE_KEY: process.env.SUPABASE_SERVICE_KEY || "",
   SUPABASE_STORAGE_BUCKET:
-    process.env.SUPABASE_STORAGE_BUCKET || "medicine-images",
+    process.env.SUPABASE_STORAGE_BUCKET || "product-images",
   BCRYPT_ROUNDS: parseInt(process.env.BCRYPT_ROUNDS || "10"),
   isDev: process.env.NODE_ENV !== "production",
   isProd: process.env.NODE_ENV === "production",

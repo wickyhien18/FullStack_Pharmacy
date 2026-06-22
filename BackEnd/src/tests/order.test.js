@@ -1,6 +1,6 @@
 // ================================================================
 // order.test.js — Integration tests cho Order API
-// Lưu ý / Note: cần có user test + medicines trong DB
+// Lưu ý / Note: cần có user test + products trong DB
 // ================================================================
 import request from "supertest";
 import app from "../app.js";
@@ -59,21 +59,21 @@ describe("POST /api/orders", () => {
     const res = await request(app)
       .post("/api/orders")
       .set("Authorization", `Bearer ${accessToken}`)
-      .send({ items: [{ medicineId: 1, quantity: 1 }], shippingAddress: "" });
+      .send({ items: [{ productId: 1, quantity: 1 }], shippingAddress: "" });
 
     expect(res.status).toBe(400);
   });
 
   it("should create order successfully with valid data", async () => {
-    // Lấy medicine đầu tiên trong DB để test / Get first medicine to test
-    const medicine = await prisma.medicine.findFirst({
+    // Lấy product đầu tiên trong DB để test / Get first product to test
+    const product = await prisma.product.findFirst({
       where: { deletedAt: null, status: "ACTIVE" },
       include: { inventory: true },
     });
 
-    // Bỏ qua nếu không có medicine / Skip if no medicine available
-    if (!medicine || (medicine.inventory?.quantity ?? 0) < 1) {
-      console.warn("[Test] No available medicine to test order creation");
+    // Bỏ qua nếu không có product / Skip if no product available
+    if (!product || (product.inventory?.quantity ?? 0) < 1) {
+      console.warn("[Test] No available product to test order creation");
       return;
     }
 
@@ -81,7 +81,7 @@ describe("POST /api/orders", () => {
       .post("/api/orders")
       .set("Authorization", `Bearer ${accessToken}`)
       .send({
-        items: [{ medicineId: medicine.medicineId.toString(), quantity: 1 }],
+        items: [{ productId: product.productId.toString(), quantity: 1 }],
         shippingAddress: "99 Nguyen Chi Thanh, Q1, TP.HCM",
         note: "Test order from Jest",
       });

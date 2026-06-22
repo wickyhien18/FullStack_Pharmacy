@@ -1,84 +1,116 @@
-
 // ================================================================
 // admin.docs.js — Swagger docs cho admin
 // ================================================================
 export const adminDocs = {
-  '/api/admin/stats': {
+  "/api/admin/stats": {
     get: {
-      summary: 'Thống kê dashboard',
-      tags: ['Admin'],
+      summary: "Thống kê dashboard",
+      tags: ["Admin"],
       security: [{ bearerAuth: [] }],
-      responses: { 200: { description: 'Số liệu tổng quan' } },
+      responses: { 200: { description: "Số liệu tổng quan" } },
     },
   },
-  '/api/admin/orders': {
+  "/api/admin/orders": {
     get: {
-      summary: 'Lấy tất cả đơn hàng',
-      tags: ['Admin'],
+      summary: "Lấy tất cả đơn hàng",
+      tags: ["Admin"],
       security: [{ bearerAuth: [] }],
-      responses: { 200: { description: 'Danh sách đơn hàng' } },
+      responses: { 200: { description: "Danh sách đơn hàng" } },
     },
   },
-  '/api/admin/orders/{orderId}/status': {
+  "/api/admin/orders/{orderId}/status": {
     patch: {
-      summary: 'Cập nhật trạng thái đơn hàng',
-      tags: ['Admin'],
+      summary: "Cập nhật trạng thái đơn hàng",
+      tags: ["Admin"],
       security: [{ bearerAuth: [] }],
-      parameters: [{ name: 'orderId', in: 'path', required: true, schema: { type: 'integer' } }],
+      parameters: [
+        {
+          name: "orderId",
+          in: "path",
+          required: true,
+          schema: { type: "integer" },
+        },
+      ],
       requestBody: {
         content: {
-          'application/json': {
+          "application/json": {
             schema: {
-              type: 'object',
+              type: "object",
               properties: {
-                orderStatus: { type: 'string', enum: ['PENDING','CONFIRMED','SHIPPING','DELIVERED','CANCELLED'] },
+                orderStatus: {
+                  type: "string",
+                  enum: [
+                    "PENDING",
+                    "CONFIRMED",
+                    "SHIPPING",
+                    "DELIVERED",
+                    "CANCELLED",
+                  ],
+                },
               },
             },
           },
         },
       },
-      responses: { 200: { description: 'Cập nhật thành công' } },
+      responses: { 200: { description: "Cập nhật thành công" } },
     },
   },
-  '/api/admin/users': {
+  "/api/admin/users": {
     get: {
-      summary: 'Lấy tất cả người dùng',
-      tags: ['Admin'],
+      summary: "Lấy tất cả người dùng",
+      tags: ["Admin"],
       security: [{ bearerAuth: [] }],
-      responses: { 200: { description: 'Danh sách users' } },
+      responses: { 200: { description: "Danh sách users" } },
     },
   },
-  '/api/admin/users/{userId}/status': {
+  "/api/admin/users/{userId}/status": {
     patch: {
-      summary: 'Khoá / mở khoá tài khoản',
-      tags: ['Admin'],
+      summary: "Khoá / mở khoá tài khoản",
+      tags: ["Admin"],
       security: [{ bearerAuth: [] }],
-      parameters: [{ name: 'userId', in: 'path', required: true, schema: { type: 'integer' } }],
+      parameters: [
+        {
+          name: "userId",
+          in: "path",
+          required: true,
+          schema: { type: "integer" },
+        },
+      ],
       requestBody: {
         content: {
-          'application/json': {
-            schema: { type: 'object', properties: { isActive: { type: 'boolean' } } },
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: { isActive: { type: "boolean" } },
+            },
           },
         },
       },
-      responses: { 200: { description: 'Cập nhật thành công' } },
+      responses: { 200: { description: "Cập nhật thành công" } },
     },
   },
-  '/api/admin/medicines': {
+  "/api/admin/products": {
     get: {
-      summary: 'Lấy tất cả sản phẩm (admin)',
-      tags: ['Admin'],
+      summary: "Lấy tất cả sản phẩm (admin)",
+      tags: ["Admin"],
       security: [{ bearerAuth: [] }],
-      responses: { 200: { description: 'Danh sách sản phẩm' } },
+      responses: { 200: { description: "Danh sách sản phẩm" } },
     },
   },
-  '/api/admin/medicines/{medicineId}': {
+  "/api/admin/products/{productId}": {
     delete: {
-      summary: 'Xoá mềm sản phẩm',
-      tags: ['Admin'],
+      summary: "Xoá mềm sản phẩm",
+      tags: ["Admin"],
       security: [{ bearerAuth: [] }],
-      parameters: [{ name: 'medicineId', in: 'path', required: true, schema: { type: 'integer' } }],
-      responses: { 200: { description: 'Xoá thành công' } },
+      parameters: [
+        {
+          name: "productId",
+          in: "path",
+          required: true,
+          schema: { type: "integer" },
+        },
+      ],
+      responses: { 200: { description: "Xoá thành công" } },
     },
   },
 };

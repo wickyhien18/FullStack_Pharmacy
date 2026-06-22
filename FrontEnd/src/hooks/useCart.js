@@ -25,8 +25,8 @@ export const useCart = () => {
 
   // Thêm vào cart
   const addMutation = useMutation({
-    mutationFn: ({ medicineId, quantity }) =>
-      api.post("/cart/items", { medicineId, quantity }),
+    mutationFn: ({ productId, quantity }) =>
+      api.post("/cart/items", { productId, quantity }),
     onSuccess: () => {
       invalidateCart();
       toast.success("Đã thêm vào giỏ hàng");
@@ -62,8 +62,8 @@ export const useCart = () => {
     totalItems: cart?.totalItems || 0,
     totalPrice: cart?.totalPrice || 0,
 
-    addToCart: (medicineId, quantity = 1) =>
-      addMutation.mutate({ medicineId: medicineId.toString(), quantity }),
+    addToCart: (productId, quantity = 1) =>
+      addMutation.mutate({ productId: productId.toString(), quantity }),
     updateItem: (cartItemId, quantity) =>
       updateMutation.mutate({ cartItemId, quantity }),
     removeItem: (cartItemId) => removeMutation.mutate(cartItemId),

@@ -6,7 +6,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../../../lib/axios.js";
-import MedicineFormModal from "./MedicineFormModal.jsx";
+import productFormModal from "./productFormModal.jsx";
 
 const formatPrice = (p) =>
   new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(
@@ -17,21 +17,19 @@ export default function ProductsPage() {
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [showForm, setShowForm] = useState(false);
-  // null = thêm mới, số = đang sửa medicineId đó
-  const [editMedicineId, setEditMedicineId] = useState(null);
+  // null = thêm mới, số = đang sửa productId đó
+  const [editproductId, setEditproductId] = useState(null);
 
   const { data, isLoading } = useQuery({
-    queryKey: ["admin-medicines", page],
+    queryKey: ["admin-products", page],
     queryFn: () =>
-      api
-        .get(`/admin/medicines?page=${page}&limit=20`)
-        .then((r) => r.data.data),
+      api.get(`/admin/products?page=${page}&limit=20`).then((r) => r.data.data),
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => api.delete(`/admin/medicines/${id}`),
+    mutationFn: (id) => api.delete(`/admin/products/${id}`),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-medicines"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-products"] });
       toast.success("Đã xoá sản phẩm");
     },
     onError: (err) =>
@@ -48,7 +46,7 @@ export default function ProductsPage() {
         <h1 className="text-2xl font-bold text-gray-800">Quản lý sản phẩm</h1>
         <button
           onClick={() => {
-            setEditMedicineId(null);
+            setEditproductId(null);
             setShowForm(true);
           }}
           className="flex items-center gap-2 px-4 py-2 rounded-lg text-white text-sm font-semibold hover:opacity-90"
@@ -96,7 +94,7 @@ export default function ProductsPage() {
                     </tr>
                   ))
               : data?.items?.map((m) => (
-                  <tr key={m.medicineId} className="hover:bg-gray-50">
+                  <tr key={m.productId} className="hover:bg-gray-50">
                     <td className="px-4 py-3">
                       <img
                         src={m.primaryImage || "/placeholder.png"}
@@ -139,7 +137,7 @@ export default function ProductsPage() {
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => {
-                            setEditMedicineId(m.medicineId);
+                            setEditproductId(m.productId);
                             setShowForm(true);
                           }}
                           className="text-gray-400 hover:text-blue-500 transition"
@@ -147,7 +145,7 @@ export default function ProductsPage() {
                           <Pencil size={15} />
                         </button>
                         <button
-                          onClick={() => handleDelete(m.medicineId, m.name)}
+                          onClick={() => handleDelete(m.productId, m.name)}
                           className="text-gray-400 hover:text-red-500 transition"
                         >
                           <Trash2 size={15} />
@@ -161,11 +159,11 @@ export default function ProductsPage() {
       </div>
 
       {showForm && (
-        <MedicineFormModal
-          medicineId={editMedicineId}
+        <productFormModal
+          productId={editproductId}
           onClose={() => {
             setShowForm(false);
-            setEditMedicineId(null);
+            setEditproductId(null);
           }}
         />
       )}

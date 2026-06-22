@@ -2,7 +2,7 @@
 // admin.service.js — Business logic cho admin
 // ================================================================
 import * as adminRepo from "../repositories/admin.repository.js";
-import * as medicineRepo from "../repositories/medicine.repository.js";
+import * as productRepo from "../repositories/product.repository.js";
 import { buildPaginatedResponse } from "../utils/pagination.js";
 import { sendError } from "../utils/response.js";
 import { uploadImage, deleteImage } from "./upload.service.js";
@@ -45,7 +45,7 @@ export const getAllOrders = async ({ page, limit, skip }) => {
         }
       : null,
     items: o.items?.map((i) => ({
-      medicineName: i.medicine?.name || "N/A",
+      productName: i.product?.name || "N/A",
       quantity: i.quantity,
     })),
   }));
@@ -111,15 +111,15 @@ export const updateUserRole = async (userId, roleName) => {
   return { userId: user.userId.toString(), role: role.roleName };
 };
 
-// Danh sách medicines (admin)
-export const getAllMedicines = async ({ page, limit, skip }) => {
-  const [medicines, total] = await Promise.all([
-    adminRepo.findAllMedicines({ skip, limit }),
-    adminRepo.countAllMedicines(),
+// Danh sách products (admin)
+export const getAllproducts = async ({ page, limit, skip }) => {
+  const [products, total] = await Promise.all([
+    adminRepo.findAllproducts({ skip, limit }),
+    adminRepo.countAllproducts(),
   ]);
 
-  const items = medicines.map((m) => ({
-    medicineId: m.medicineId.toString(),
+  const items = products.map((m) => ({
+    productId: m.productId.toString(),
     name: m.name,
     slug: m.slug,
     price: Number(m.price),
@@ -132,32 +132,30 @@ export const getAllMedicines = async ({ page, limit, skip }) => {
   return buildPaginatedResponse(items, total, page, limit);
 };
 
-// THÊM: lấy chi tiết 1 medicine kèm ảnh — dùng cho form edit
-export const getMedicineDetail = async (medicineId) => {
-  const medicine = await medicineRepo.findMedicineWithImages(
-    BigInt(medicineId),
-  );
-  if (!medicine) throw { status: 404, message: "Không tìm thấy sản phẩm" };
+// THÊM: lấy chi tiết 1 product kèm ảnh — dùng cho form edit
+export const getproductDetail = async (productId) => {
+  const product = await productRepo.findproductWithImages(BigInt(productId));
+  if (!product) throw { status: 404, message: "Không tìm thấy sản phẩm" };
 
   return {
-    medicineId: medicine.medicineId.toString(),
-    name: medicine.name,
-    description: medicine.description,
-    price: Number(medicine.price),
-    unit: medicine.unit,
-    status: medicine.status,
-    categoryId: medicine.categoryId?.toString() || "",
-    manufacturerId: medicine.manufacturerId?.toString() || "",
-    stock: medicine.inventory?.quantity ?? 0,
-    images: medicine.images.map((img) => ({
+    productId: product.productId.toString(),
+    name: product.name,
+    description: product.description,
+    price: Number(product.price),
+    unit: product.unit,
+    status: product.status,
+    categoryId: product.categoryId?.toString() || "",
+    manufacturerId: product.manufacturerId?.toString() || "",
+    stock: product.inventory?.quantity ?? 0,
+    images: product.images.map((img) => ({
       imageId: img.imageId.toString(),
       imageUrl: img.imageUrl,
     })),
   };
 };
 
-// Tạo medicine mới
-export const createMedicine = async (data, files = []) => {
+// Tạo product mới
+export const createproduct = async (data, files = []) => {
   if (files.length > MAX_IMAGES) {
     throw { status: 400, message: `Tối đa ${MAX_IMAGES} ảnh / sản phẩm` };
   }
@@ -166,8 +164,8 @@ export const createMedicine = async (data, files = []) => {
     files.map((file) => uploadImage(file.buffer, data.name, file.mimetype)),
   );
 
-  // SỬA: gọi đúng signature createMedicine(data) — không bọc { data }
-  const medicine = await medicineRepo.createMedicine({
+  // SỬA: gọi đúng signature createproduct(data) — không bọc { data }
+  const product = await productRepo.createproduct({
     name: data.name,
     slug: generateSlug(data.name),
     description: data.description || null,
@@ -180,31 +178,31 @@ export const createMedicine = async (data, files = []) => {
   });
 
   await adminRepo.createInventory({
-    medicineId: medicine.medicineId,
+    productId: product.productId,
     quantity: parseInt(data.stock) || 0,
   });
 
-  // THÊM: lưu tất cả ảnh vào bảng medicine_images
+  // THÊM: lưu tất cả ảnh vào bảng product_images
   if (imageUrls.length > 0) {
-    await medicineRepo.createMedicineImages(medicine.medicineId, imageUrls);
+    await productRepo.createproductImages(product.productId, imageUrls);
   }
 
-  return { medicineId: medicine.medicineId.toString(), slug: medicine.slug };
+  return { productId: product.productId.toString(), slug: product.slug };
 };
 
 // SỬA TOÀN BỘ: hỗ trợ nhiều ảnh + sửa bug "chỉ update khi có file mới"
 // keepImageIds: mảng imageId (string[]) muốn GIỮ LẠI — ảnh không có trong list này sẽ bị xoá
-export const updateMedicine = async (
-  medicineId,
+export const updateproduct = async (
+  productId,
   data,
   files = [],
   keepImageIds = [],
 ) => {
-  const existing = await adminRepo.existMedicine(medicineId);
+  const existing = await adminRepo.existproduct(productId);
   if (!existing) throw { status: 404, message: "Không tìm thấy sản phẩm" };
 
-  const currentImages = await medicineRepo.findImagesByMedicineId(
-    BigInt(medicineId),
+  const currentImages = await productRepo.findImagesByproductId(
+    BigInt(productId),
   );
 
   if (keepImageIds.length + files.length > MAX_IMAGES) {
@@ -242,8 +240,8 @@ export const updateMedicine = async (
   updateData.image = keptImages[0]?.imageUrl || newImageUrls[0] || null;
 
   try {
-    await medicineRepo.syncMedicineImagesAndUpdateMedicine({
-      medicineId: BigInt(medicineId),
+    await productRepo.syncproductImagesAndUpdateproduct({
+      productId: BigInt(productId),
       keptImageIds: keptImages.map((img) => img.imageId),
       newImageUrls,
       updateData,
@@ -257,22 +255,22 @@ export const updateMedicine = async (
 
   // Cập nhật tồn kho nếu có
   if (data.stock !== undefined) {
-    await adminRepo.createOrUpdateInventory(medicineId, data.stock);
+    await adminRepo.createOrUpdateInventory(productId, data.stock);
   }
 
-  return { medicineId, message: "Cập nhật thành công" };
+  return { productId, message: "Cập nhật thành công" };
 };
 
-// Soft delete medicine
-export const deleteMedicine = async (medicineId) => {
-  const existing = await adminRepo.existMedicine(medicineId);
+// Soft delete product
+export const deleteproduct = async (productId) => {
+  const existing = await adminRepo.existproduct(productId);
   if (!existing) throw { status: 404, message: "Không tìm thấy sản phẩm" };
 
-  // THÊM: xoá tất cả ảnh trong bảng medicine_images, không chỉ ảnh đại diện
-  const images = await medicineRepo.findImagesByMedicineId(BigInt(medicineId));
+  // THÊM: xoá tất cả ảnh trong bảng product_images, không chỉ ảnh đại diện
+  const images = await productRepo.findImagesByproductId(BigInt(productId));
   for (const img of images) {
     await deleteImage(img.imageUrl);
   }
 
-  await medicineRepo.softDeleteMedicine(BigInt(medicineId));
+  await productRepo.softDeleteproduct(BigInt(productId));
 };

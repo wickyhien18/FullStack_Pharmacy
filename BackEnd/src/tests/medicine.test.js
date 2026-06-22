@@ -1,19 +1,21 @@
-
 // ================================================================
-// medicine.test.js — Integration tests cho Medicine API
-// Integration tests for Medicine API
+// product.test.js — Integration tests cho product API
+// Integration tests for product API
 // ================================================================
-import request from 'supertest';
-import app from '../app.js';
-import { prisma } from '../config/prisma.js';
+import request from "supertest";
+import app from "../app.js";
+import { prisma } from "../config/prisma.js";
 
-beforeAll(async () => { await prisma.$connect(); });
-afterAll(async () => { await prisma.$disconnect(); });
+beforeAll(async () => {
+  await prisma.$connect();
+});
+afterAll(async () => {
+  await prisma.$disconnect();
+});
 
-describe('GET /api/medicines', () => {
-
-  it('should return paginated list', async () => {
-    const res = await request(app).get('/api/medicines');
+describe("GET /api/products", () => {
+  it("should return paginated list", async () => {
+    const res = await request(app).get("/api/products");
 
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
@@ -24,10 +26,8 @@ describe('GET /api/medicines', () => {
     expect(res.body.data.totalPages).toBeDefined();
   });
 
-  it('should respect limit param', async () => {
-    const res = await request(app)
-      .get('/api/medicines')
-      .query({ limit: 5 });
+  it("should respect limit param", async () => {
+    const res = await request(app).get("/api/products").query({ limit: 5 });
 
     expect(res.status).toBe(200);
     // Số items trả về không vượt quá limit / Items returned must not exceed limit
@@ -35,18 +35,16 @@ describe('GET /api/medicines', () => {
     expect(res.body.data.limit).toBe(5);
   });
 
-  it('should filter by search keyword', async () => {
-    const res = await request(app)
-      .get('/api/medicines')
-      .query({ search: 'a' }); // search chữ 'a' chắc chắn có kết quả / 'a' will have results
+  it("should filter by search keyword", async () => {
+    const res = await request(app).get("/api/products").query({ search: "a" }); // search chữ 'a' chắc chắn có kết quả / 'a' will have results
 
     expect(res.status).toBe(200);
     expect(Array.isArray(res.body.data.items)).toBe(true);
   });
 
-  it('should return correct pagination metadata', async () => {
+  it("should return correct pagination metadata", async () => {
     const res = await request(app)
-      .get('/api/medicines')
+      .get("/api/products")
       .query({ page: 1, limit: 3 });
 
     expect(res.body.data.page).toBe(1);
@@ -57,21 +55,20 @@ describe('GET /api/medicines', () => {
   });
 });
 
-describe('GET /api/medicines/:slug', () => {
-
-  it('should return 404 for non-existent slug', async () => {
-    const res = await request(app)
-      .get('/api/medicines/slug-nay-khong-ton-tai-abcxyz');
+describe("GET /api/products/:slug", () => {
+  it("should return 404 for non-existent slug", async () => {
+    const res = await request(app).get(
+      "/api/products/slug-nay-khong-ton-tai-abcxyz",
+    );
 
     expect(res.status).toBe(404);
     expect(res.body.success).toBe(false);
   });
 });
 
-describe('GET /api/categories', () => {
-
-  it('should return categories list', async () => {
-    const res = await request(app).get('/api/categories');
+describe("GET /api/categories", () => {
+  it("should return categories list", async () => {
+    const res = await request(app).get("/api/categories");
 
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);

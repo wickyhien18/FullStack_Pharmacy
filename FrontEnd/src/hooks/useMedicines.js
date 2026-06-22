@@ -1,5 +1,5 @@
 // ================================================================
-// useMedicines.js — Custom hooks cho medicine APIs
+// useproducts.js — Custom hooks cho product APIs
 // useQuery: dùng cho GET data, tự động cache, refetch, loading state
 // ================================================================
 import { useQuery } from "@tanstack/react-query";
@@ -7,21 +7,21 @@ import api from "@/lib/axios.js";
 
 // Lấy danh sách thuốc có lọc + phân trang
 // params = { page, limit, search, categoryId, sort }
-export const useMedicines = (params = {}) => {
+export const useproducts = (params = {}) => {
   return useQuery({
     // queryKey: React Query dùng key này để cache và identify query
     // Khi params thay đổi → key thay đổi → tự fetch lại
-    queryKey: ["medicines", params],
-    queryFn: () => api.get("/medicines", { params }).then((r) => r.data.data),
+    queryKey: ["products", params],
+    queryFn: () => api.get("/products", { params }).then((r) => r.data.data),
   });
 };
 
 // Lấy chi tiết 1 thuốc theo slug
 // enabled: false khi chưa có slug → không fetch
-export const useMedicine = (slug) => {
+export const useproduct = (slug) => {
   return useQuery({
-    queryKey: ["medicine", slug],
-    queryFn: () => api.get(`/medicines/${slug}`).then((r) => r.data.data),
+    queryKey: ["product", slug],
+    queryFn: () => api.get(`/products/${slug}`).then((r) => r.data.data),
     enabled: !!slug, // chỉ fetch khi slug có giá trị
   });
 };

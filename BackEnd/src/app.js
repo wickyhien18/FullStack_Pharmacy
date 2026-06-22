@@ -13,7 +13,7 @@ import { errorHandler, notFound } from "./middlewares/error.middleware.js";
 import { sanitizeInput } from "./middlewares/security.middleware.js";
 
 import authRoutes from "./routes/auth.routes.js";
-import medicineRoutes from "./routes/medicine.routes.js";
+import productRoutes from "./routes/product.routes.js";
 import orderRoutes from "./routes/order.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import categoryRoutes from "./routes/category.routes.js";
@@ -59,7 +59,7 @@ app.get("/health", (_req, res) => {
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // ── Routes ────────────────────────────────────────────────────────
 app.use("/api/auth", authRoutes);
-app.use("/api/medicines", medicineRoutes);
+app.use("/api/products", productRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/admin", adminRoutes);

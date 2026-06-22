@@ -1,8 +1,7 @@
-
 // ================================================================
 // cart.repository.js
 // ================================================================
-import { prisma } from '../config/prisma.js';
+import { prisma } from "../config/prisma.js";
 
 // Lấy cart của user — mỗi user chỉ có 1 cart
 export const findCartByUserId = (userId) => {
@@ -11,27 +10,27 @@ export const findCartByUserId = (userId) => {
     include: {
       items: {
         include: {
-          medicine: {
+          product: {
             include: { inventory: { select: { quantity: true } } },
           },
         },
-        orderBy: { cartItemId: 'asc' },
+        orderBy: { cartItemId: "asc" },
       },
     },
   });
 };
 
-// Tìm cart item theo cartId + medicineId
-export const findCartItem = (cartId, medicineId) => {
+// Tìm cart item theo cartId + productId
+export const findCartItem = (cartId, productId) => {
   return prisma.cartItem.findUnique({
-    where: { uk_cart_medicine: { cartId, medicineId } },
+    where: { uk_cart_product: { cartId, productId } },
   });
 };
 
 // Thêm item vào cart
-export const createCartItem = (cartId, medicineId, quantity) => {
+export const createCartItem = (cartId, productId, quantity) => {
   return prisma.cartItem.create({
-    data: { cartId, medicineId, quantity },
+    data: { cartId, productId, quantity },
   });
 };
 

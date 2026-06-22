@@ -3,25 +3,25 @@ import { useSearchParams, Link } from "react-router";
 import { Search, ChevronRight } from "lucide-react";
 // import { blogPosts } from "../data/products";
 import { ProductCard } from "../components/ProductCard";
-import { useMedicines } from "../../hooks/useMedicines.js";
+import { useproducts } from "../../hooks/useproducts.js";
 
 function SearchPage() {
   const [searchParams] = useSearchParams();
   const q = searchParams.get("q") || "";
 
-  const { data: medicinesData, isLoading } = useMedicines({
+  const { data: productsData, isLoading } = useproducts({
     search: q || undefined,
     limit: 100,
   });
 
   const matchedProducts = useMemo(() => {
-    if (!q || !medicinesData?.items) return [];
-    return medicinesData.items.map((m, index) => ({
+    if (!q || !productsData?.items) return [];
+    return productsData.items.map((m, index) => ({
       id: m.slug,
-      medicineId: m.medicineId,
+      productId: m.productId,
       name: m.name,
       brand: m.manufacturerName || "Dược phẩm",
-      category: m.categorySlug || "medicines",
+      category: m.categorySlug || "products",
       price: m.price,
       originalPrice: m.originalPrice || m.price * 1.15,
       discount: m.originalPrice
@@ -41,7 +41,7 @@ function SearchPage() {
       description: m.description || "",
       unit: m.unit || "Hộp",
     }));
-  }, [q, medicinesData]);
+  }, [q, productsData]);
 
   // const matchedPosts = useMemo(() => {
   //   if (!q) return [];

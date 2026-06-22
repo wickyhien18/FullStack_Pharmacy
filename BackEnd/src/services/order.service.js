@@ -24,8 +24,8 @@ const formatOrder = (order) => ({
   items: order.items?.map((i) => ({
     orderItemId: i.orderItemId.toString(),
     // Lấy từ relation thay vì column snapshot (không có trong schema)
-    medicineName: i.medicine?.name || "Sản phẩm không còn tồn tại",
-    medicineUnit: i.medicine?.unit || "Hộp",
+    productName: i.product?.name || "Sản phẩm không còn tồn tại",
+    productUnit: i.product?.unit || "Hộp",
     quantity: i.quantity,
     unitPrice: Number(i.unitPrice),
     totalPrice: Number(i.totalPrice),
@@ -44,7 +44,7 @@ export const createOrder = async (userId, { shippingAddress, note }) => {
 
   // Tính tổng tiền từ DB — không tin client gửi giá
   const totalPrice = cart.items.reduce(
-    (sum, item) => sum + Number(item.medicine.price) * item.quantity,
+    (sum, item) => sum + Number(item.product.price) * item.quantity,
     0,
   );
 
@@ -52,7 +52,7 @@ export const createOrder = async (userId, { shippingAddress, note }) => {
     userId: BigInt(userId),
     orderCode: generateOrderCode(),
     items: cart.items.map((i) => ({
-      medicineId: i.medicineId,
+      productId: i.productId,
       quantity: i.quantity,
     })),
     shippingAddress,

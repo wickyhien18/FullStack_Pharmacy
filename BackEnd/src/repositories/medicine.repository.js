@@ -1,12 +1,12 @@
 // ================================================================
-// medicine.repository.js — Truy vấn DB cho medicines
+// product.repository.js — Truy vấn DB cho products
 // ================================================================
 import { prisma } from "../config/prisma.js";
 
-// Lấy danh sách medicines có filter + phân trang
+// Lấy danh sách products có filter + phân trang
 // params = { skip, limit, search, categoryId, sort }
-export const findMedicines = ({ skip, limit, where, orderBy }) => {
-  return prisma.medicine.findMany({
+export const findproducts = ({ skip, limit, where, orderBy }) => {
+  return prisma.product.findMany({
     where,
     skip,
     take: limit,
@@ -19,14 +19,14 @@ export const findMedicines = ({ skip, limit, where, orderBy }) => {
   });
 };
 
-// Đếm tổng số medicines (dùng cho phân trang)
-export const countMedicines = (where) => {
-  return prisma.medicine.count({ where });
+// Đếm tổng số products (dùng cho phân trang)
+export const countproducts = (where) => {
+  return prisma.product.count({ where });
 };
 
-// Tìm 1 medicine theo slug
-export const findMedicineBySlug = (slug) => {
-  return prisma.medicine.findFirst({
+// Tìm 1 product theo slug
+export const findproductBySlug = (slug) => {
+  return prisma.product.findFirst({
     where: { slug, deletedAt: null },
     include: {
       category: true,
@@ -37,10 +37,10 @@ export const findMedicineBySlug = (slug) => {
   });
 };
 
-// Tìm 1 medicine theo id
-export const findMedicineById = (medicineId) => {
-  return prisma.medicine.findUnique({
-    where: { medicineId },
+// Tìm 1 product theo id
+export const findproductById = (productId) => {
+  return prisma.product.findUnique({
+    where: { productId },
     include: {
       category: true,
       inventory: { select: { quantity: true } },
@@ -48,10 +48,10 @@ export const findMedicineById = (medicineId) => {
   });
 };
 
-// THÊM: lấy 1 medicine kèm đủ ảnh — dùng cho admin edit form
-export const findMedicineWithImages = (medicineId) => {
-  return prisma.medicine.findUnique({
-    where: { medicineId },
+// THÊM: lấy 1 product kèm đủ ảnh — dùng cho admin edit form
+export const findproductWithImages = (productId) => {
+  return prisma.product.findUnique({
+    where: { productId },
     include: {
       category: true,
       manufacturer: true,
@@ -61,54 +61,54 @@ export const findMedicineWithImages = (medicineId) => {
   });
 };
 
-// Tạo medicine mới
-export const createMedicine = (data) => {
-  return prisma.medicine.create({ data });
+// Tạo product mới
+export const createproduct = (data) => {
+  return prisma.product.create({ data });
 };
 
-// Cập nhật medicine
-export const updateMedicine = ({ where, data }) => {
-  return prisma.medicine.update({ where, data });
+// Cập nhật product
+export const updateproduct = ({ where, data }) => {
+  return prisma.product.update({ where, data });
 };
 
 // Soft delete — chỉ set deletedAt, không xoá thật
-export const softDeleteMedicine = (medicineId) => {
-  return prisma.medicine.update({
-    where: { medicineId },
+export const softDeleteproduct = (productId) => {
+  return prisma.product.update({
+    where: { productId },
     data: { deletedAt: new Date() },
   });
 };
 
-// ── THÊM MỚI: quản lý medicine_images ────────────────────────────
+// ── THÊM MỚI: quản lý product_images ────────────────────────────
 
-export const createMedicineImages = (medicineId, imageUrls, startOrder = 0) => {
+export const createproductImages = (productId, imageUrls, startOrder = 0) => {
   if (imageUrls.length === 0) return Promise.resolve();
-  return prisma.medicineImage.createMany({
+  return prisma.productImage.createMany({
     data: imageUrls.map((url, index) => ({
-      medicineId,
+      productId,
       imageUrl: url,
       displayOrder: startOrder + index,
     })),
   });
 };
 
-export const findImagesByMedicineId = (medicineId) => {
-  return prisma.medicineImage.findMany({
-    where: { medicineId },
+export const findImagesByproductId = (productId) => {
+  return prisma.productImage.findMany({
+    where: { productId },
     orderBy: { displayOrder: "asc" },
   });
 };
 
-export const deleteMedicineImageById = (imageId) => {
-  return prisma.medicineImage.delete({ where: { imageId } });
+export const deleteproductImageById = (imageId) => {
+  return prisma.productImage.delete({ where: { imageId } });
 };
 
-export const deleteAllImagesByMedicineId = (medicineId) => {
-  return prisma.medicineImage.deleteMany({ where: { medicineId } });
+export const deleteAllImagesByproductId = (productId) => {
+  return prisma.productImage.deleteMany({ where: { productId } });
 };
 
-export const syncMedicineImagesAndUpdateMedicine = ({
-  medicineId,
+export const syncproductImagesAndUpdateproduct = ({
+  productId,
   keptImageIds,
   newImageUrls,
   updateData,
@@ -116,14 +116,14 @@ export const syncMedicineImagesAndUpdateMedicine = ({
   return prisma.$transaction(async (tx) => {
     const deleteWhere =
       keptImageIds.length > 0
-        ? { medicineId, imageId: { notIn: keptImageIds } }
-        : { medicineId };
+        ? { productId, imageId: { notIn: keptImageIds } }
+        : { productId };
 
-    await tx.medicineImage.deleteMany({ where: deleteWhere });
+    await tx.productImage.deleteMany({ where: deleteWhere });
 
     await Promise.all(
       keptImageIds.map((imageId, index) =>
-        tx.medicineImage.update({
+        tx.productImage.update({
           where: { imageId },
           data: { displayOrder: index },
         }),
@@ -131,17 +131,17 @@ export const syncMedicineImagesAndUpdateMedicine = ({
     );
 
     if (newImageUrls.length > 0) {
-      await tx.medicineImage.createMany({
+      await tx.productImage.createMany({
         data: newImageUrls.map((imageUrl, index) => ({
-          medicineId,
+          productId,
           imageUrl,
           displayOrder: keptImageIds.length + index,
         })),
       });
     }
 
-    return tx.medicine.update({
-      where: { medicineId },
+    return tx.product.update({
+      where: { productId },
       data: updateData,
     });
   });

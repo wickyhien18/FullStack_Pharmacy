@@ -149,13 +149,13 @@ describe("GET /api/admin/users", () => {
   });
 });
 
-// ── ADMIN MEDICINES ───────────────────────────────────────────────
-describe("GET /api/admin/medicines", () => {
-  it("should return medicine list for admin", async () => {
+// ── ADMIN productS ───────────────────────────────────────────────
+describe("GET /api/admin/products", () => {
+  it("should return product list for admin", async () => {
     if (!adminToken) return;
 
     const res = await request(app)
-      .get("/api/admin/medicines")
+      .get("/api/admin/products")
       .set("Authorization", `Bearer ${adminToken}`);
 
     expect(res.status).toBe(200);
