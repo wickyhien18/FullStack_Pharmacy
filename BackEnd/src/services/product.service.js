@@ -40,7 +40,7 @@ const buildOrderBy = (sort) => {
 };
 
 // Format product trả về client
-const formatproduct = (m) => ({
+const formatProduct = (m) => ({
   productId: m.productId.toString(),
   name: m.name,
   slug: m.slug,
@@ -67,7 +67,7 @@ const formatproduct = (m) => ({
 });
 
 // Lấy danh sách products
-export const getproducts = async ({
+export const getProducts = async ({
   page,
   limit,
   skip,
@@ -92,12 +92,12 @@ export const getproducts = async ({
   const orderBy = buildOrderBy(sort);
 
   const [products, total] = await Promise.all([
-    productRepo.findproducts({ skip, limit, where, orderBy }),
-    productRepo.countproducts(where),
+    productRepo.findProducts({ skip, limit, where, orderBy }),
+    productRepo.countProducts(where),
   ]);
 
   const result = buildPaginatedResponse(
-    products.map(formatproduct),
+    products.map(formatProduct),
     total,
     page,
     limit,
@@ -110,15 +110,15 @@ export const getproducts = async ({
 };
 
 // Lấy chi tiết 1 product
-export const getproductBySlug = async (slug) => {
+export const getProductBySlug = async (slug) => {
   const cacheKey = `products:detail:${slug}`;
 
   const cached = await getCache(cacheKey);
   if (cached) return cached;
-  const product = await productRepo.findproductBySlug(slug);
+  const product = await productRepo.findProductBySlug(slug);
   if (!product) throw { status: 404, message: "Không tìm thấy sản phẩm" };
 
-  const result = formatproduct(product);
+  const result = formatProduct(product);
 
   // Cache 10 phút / Cache for 10 minutes
   await setCache(cacheKey, result, 600);
@@ -129,7 +129,7 @@ export const getproductBySlug = async (slug) => {
 // ── Invalidate Cache ──────────────────────────────────────────────
 // Gọi khi admin sửa/xoá sản phẩm để xoá cache cũ
 // Call when admin updates/deletes products to clear stale cache
-export const invalidateproductCache = async (slug = null) => {
+export const invalidateProductCache = async (slug = null) => {
   await deletePattern("products:list:*");
   if (slug) await deletePattern(`products:detail:${slug}`);
   console.log("[Cache] Invalidated product cache");
