@@ -129,7 +129,7 @@ function Header() {
                 WICKY HIEN
               </div>
               <div className="text-xs text-gray-500 leading-tight">
-                Dự án Nhà thuốc
+                Dự án Sản phẩm
               </div>
             </div>
           </Link>
@@ -141,7 +141,7 @@ function Header() {
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Tìm kiếm thuốc, thực phẩm chức năng, sản phẩm..."
+                placeholder="Tìm kiếm sản phẩm, thực phẩm chức năng..."
                 className="w-full pl-4 pr-12 py-2.5 border-2 rounded-xl text-sm focus:outline-none transition-colors"
                 style={{ borderColor: "#1250dc" }}
               />

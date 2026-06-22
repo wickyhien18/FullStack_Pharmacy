@@ -49,12 +49,12 @@ function Footer() {
                 <div style={{ color: "#1250dc" }} className="font-bold text-lg">
                   WICKY HIEN
                 </div>
-                <div className="text-xs text-gray-500">Dự án Nhà thuốc</div>
+                <div className="text-xs text-gray-500">Dự án Sản phẩm</div>
               </div>
             </Link>
             <p className="text-sm text-gray-600 mb-4 leading-relaxed">
               Dự án Website CLONE từ trang website Nhà thuốc Long Châu. Vui lòng
-              không đặt mua thuốc nếu có hay không có ý định mua thuốc
+              không đặt mua sản phẩm nếu không có ý định mua sản phẩm
             </p>
             <div className="space-y-2 text-sm text-gray-600">
               <div className="flex items-center gap-2">

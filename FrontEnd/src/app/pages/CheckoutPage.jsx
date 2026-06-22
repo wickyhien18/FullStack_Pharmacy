@@ -31,7 +31,7 @@ const ORDER_PROCESSING_STEPS = [
   },
   {
     icon: Package,
-    title: "Chuẩn bị thuốc",
+    title: "Chuẩn bị sản phẩm",
     time: "15-30 phút",
   },
   {
