@@ -133,7 +133,7 @@ export const handleCancelRequest = async (
   action,
   rejectReason = "",
 ) => {
-  const order = await orderRepo.findCartByUserId(BigInt(orderId));
+  const order = await orderRepo.findOrderById(BigInt(orderId));
 
   if (!order) throw { status: 404, message: "Không tìm thấy đơn hàng" };
 
