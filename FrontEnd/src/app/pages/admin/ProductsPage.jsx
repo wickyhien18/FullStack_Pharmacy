@@ -9,7 +9,9 @@ import api from "../../../lib/axios.js";
 import MedicineFormModal from "./MedicineFormModal.jsx";
 
 const formatPrice = (p) =>
-  new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(p);
+  new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(
+    p,
+  );
 
 export default function ProductsPage() {
   const queryClient = useQueryClient();
@@ -20,16 +22,20 @@ export default function ProductsPage() {
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-medicines", page],
-    queryFn:  () => api.get(`/admin/medicines?page=${page}&limit=20`).then((r) => r.data.data),
+    queryFn: () =>
+      api
+        .get(`/admin/medicines?page=${page}&limit=20`)
+        .then((r) => r.data.data),
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id) => api.delete(`/admin/medicines/${id}`),
-    onSuccess:  () => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-medicines"] });
       toast.success("Đã xoá sản phẩm");
     },
-    onError: (err) => toast.error(err.response?.data?.message || "Xoá thất bại"),
+    onError: (err) =>
+      toast.error(err.response?.data?.message || "Xoá thất bại"),
   });
 
   const handleDelete = (id, name) => {
@@ -41,7 +47,10 @@ export default function ProductsPage() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Quản lý sản phẩm</h1>
         <button
-          onClick={() => { setEditMedicineId(null); setShowForm(true); }}
+          onClick={() => {
+            setEditMedicineId(null);
+            setShowForm(true);
+          }}
           className="flex items-center gap-2 px-4 py-2 rounded-lg text-white text-sm font-semibold hover:opacity-90"
           style={{ backgroundColor: "#1250dc" }}
         >
@@ -53,8 +62,19 @@ export default function ProductsPage() {
         <table className="w-full text-sm">
           <thead className="bg-gray-50 border-b border-gray-100">
             <tr>
-              {["Ảnh", "Sản phẩm", "Danh mục", "Giá", "Tồn kho", "Trạng thái", ""].map((h) => (
-                <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">
+              {[
+                "Ảnh",
+                "Sản phẩm",
+                "Danh mục",
+                "Giá",
+                "Tồn kho",
+                "Trạng thái",
+                "",
+              ].map((h) => (
+                <th
+                  key={h}
+                  className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase"
+                >
                   {h}
                 </th>
               ))}
@@ -62,15 +82,19 @@ export default function ProductsPage() {
           </thead>
           <tbody className="divide-y divide-gray-50">
             {isLoading
-              ? Array(5).fill(0).map((_, i) => (
-                  <tr key={i}>
-                    {Array(7).fill(0).map((_, j) => (
-                      <td key={j} className="px-4 py-3">
-                        <div className="h-4 bg-gray-100 rounded animate-pulse" />
-                      </td>
-                    ))}
-                  </tr>
-                ))
+              ? Array(5)
+                  .fill(0)
+                  .map((_, i) => (
+                    <tr key={i}>
+                      {Array(7)
+                        .fill(0)
+                        .map((_, j) => (
+                          <td key={j} className="px-4 py-3">
+                            <div className="h-4 bg-gray-100 rounded animate-pulse" />
+                          </td>
+                        ))}
+                    </tr>
+                  ))
               : data?.items?.map((m) => (
                   <tr key={m.medicineId} className="hover:bg-gray-50">
                     <td className="px-4 py-3">
@@ -81,26 +105,43 @@ export default function ProductsPage() {
                       />
                     </td>
                     <td className="px-4 py-3">
-                      <p className="font-medium text-gray-700 line-clamp-1 max-w-[200px]">{m.name}</p>
+                      <p className="font-medium text-gray-700 line-clamp-1 max-w-[200px]">
+                        {m.name}
+                      </p>
                     </td>
-                    <td className="px-4 py-3 text-gray-500">{m.categoryName || "—"}</td>
-                    <td className="px-4 py-3 font-medium text-blue-700">{formatPrice(m.price)}</td>
+                    <td className="px-4 py-3 text-gray-500">
+                      {m.categoryName || "—"}
+                    </td>
+                    <td className="px-4 py-3 font-medium text-blue-700">
+                      {formatPrice(m.price)}
+                    </td>
                     <td className="px-4 py-3">
-                      <span className={m.stock > 0 ? "text-green-600" : "text-red-500"}>
+                      <span
+                        className={
+                          m.stock > 0 ? "text-green-600" : "text-red-500"
+                        }
+                      >
                         {m.stock}
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                        m.status === "ACTIVE" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"
-                      }`}>
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                          m.status === "ACTIVE"
+                            ? "bg-green-100 text-green-700"
+                            : "bg-gray-100 text-gray-500"
+                        }`}
+                      >
                         {m.status}
                       </span>
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         <button
-                          onClick={() => { setEditMedicineId(m.medicineId); setShowForm(true); }}
+                          onClick={() => {
+                            setEditMedicineId(m.medicineId);
+                            setShowForm(true);
+                          }}
                           className="text-gray-400 hover:text-blue-500 transition"
                         >
                           <Pencil size={15} />
@@ -122,7 +163,10 @@ export default function ProductsPage() {
       {showForm && (
         <MedicineFormModal
           medicineId={editMedicineId}
-          onClose={() => { setShowForm(false); setEditMedicineId(null); }}
+          onClose={() => {
+            setShowForm(false);
+            setEditMedicineId(null);
+          }}
         />
       )}
     </div>

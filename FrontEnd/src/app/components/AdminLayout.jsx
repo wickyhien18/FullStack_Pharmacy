@@ -2,17 +2,21 @@ import { useEffect } from "react";
 import { Outlet, NavLink, useNavigate } from "react-router";
 import { useAuthStore } from "../../stores/auth.store.js";
 import {
-  LayoutDashboard, Package, ShoppingCart,
-  Users, ArrowLeft, AlertCircle,
+  LayoutDashboard,
+  Package,
+  ShoppingCart,
+  Users,
+  ArrowLeft,
+  AlertCircle,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
 const navItems = [
-  { to: "/admin",                label: "Dashboard",      icon: LayoutDashboard, end: true },
-  { to: "/admin/products",       label: "Sản phẩm",       icon: Package },
-  { to: "/admin/orders",         label: "Đơn hàng",       icon: ShoppingCart },
-  { to: "/admin/users",          label: "Người dùng",     icon: Users },
-  { to: "/admin/cancel-requests",label: "Yêu cầu huỷ",   icon: AlertCircle },
+  { to: "/admin", label: "Dashboard", icon: LayoutDashboard, end: true },
+  { to: "/admin/products", label: "Sản phẩm", icon: Package },
+  { to: "/admin/orders", label: "Đơn hàng", icon: ShoppingCart },
+  { to: "/admin/users", label: "Người dùng", icon: Users },
+  { to: "/admin/cancel-requests", label: "Yêu cầu huỷ", icon: AlertCircle },
 ];
 
 export default function AdminLayout() {
@@ -37,10 +41,14 @@ export default function AdminLayout() {
         <nav className="flex-1 p-4 space-y-1">
           {navItems.map(({ to, label, icon: Icon, end }) => (
             <NavLink
-              key={to} to={to} end={end}
+              key={to}
+              to={to}
+              end={end}
               className={({ isActive }) =>
                 `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-                  isActive ? "bg-blue-50 text-blue-700 font-semibold" : "text-gray-600 hover:bg-gray-50"
+                  isActive
+                    ? "bg-blue-50 text-blue-700 font-semibold"
+                    : "text-gray-600 hover:bg-gray-50"
                 }`
               }
             >

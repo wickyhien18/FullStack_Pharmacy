@@ -6,7 +6,6 @@ import * as adminService from "../services/admin.service.js";
 import * as orderService from "../services/order.service.js";
 import { sendSuccess, sendError } from "../utils/response.js";
 import { parsePagination } from "../utils/pagination.js";
-import * as roleService from "../services/role.service.js";
 
 // GET /api/admin/stats
 export const getDashboardStats = async (req, res) => {
