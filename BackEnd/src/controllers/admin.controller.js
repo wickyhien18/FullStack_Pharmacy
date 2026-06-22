@@ -6,6 +6,7 @@ import * as adminService from "../services/admin.service.js";
 import * as orderService from "../services/order.service.js";
 import { sendSuccess, sendError } from "../utils/response.js";
 import { parsePagination } from "../utils/pagination.js";
+import * as roleService from "../services/role.service.js";
 
 // GET /api/admin/stats
 export const getDashboardStats = async (req, res) => {
@@ -66,6 +67,16 @@ export const getAllUsers = async (req, res) => {
     const { page, limit, skip } = parsePagination(req);
     const data = await adminService.getAllUsers({ page, limit, skip });
     return sendSuccess(res, data, "Lấy danh sách người dùng thành công");
+  } catch (err) {
+    return sendError(res, err.message, err.status || 500);
+  }
+};
+
+// GET /api/admin/roles
+export const getRoles = async (req, res) => {
+  try {
+    const data = await roleService.getRoles();
+    return sendSuccess(res, data, "Lấy danh sách roles thành công");
   } catch (err) {
     return sendError(res, err.message, err.status || 500);
   }
