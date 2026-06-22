@@ -243,7 +243,11 @@ export const updateMedicine = async (
   if (data.manufacturerId)
     updateData.manufacturerId = BigInt(data.manufacturerId);
   if (data.status) updateData.status = data.status;
-  if (imageUrl !== existing.image) updateData.image = imageUrl;
+  // Đồng bộ lại ảnh đại diện = ảnh đầu tiên còn lại sau khi sửa
+  const remainingImages = await medicineRepo.findImagesByMedicineId(
+    BigInt(medicineId),
+  );
+  updateData.image = remainingImages[0]?.imageUrl || null;
 
   await medicineRepo.updateMedicine({
     where: { medicineId: BigInt(medicineId) },
@@ -263,8 +267,11 @@ export const deleteMedicine = async (medicineId) => {
   const existing = await adminRepo.existMedicine(medicineId);
   if (!existing) throw { status: 404, message: "Không tìm thấy sản phẩm" };
 
-  // Xoá ảnh khỏi storage
-  if (medicine.image) await deleteImage(medicine.image);
+  // THÊM: xoá tất cả ảnh trong bảng medicine_images, không chỉ ảnh đại diện
+  const images = await medicineRepo.findImagesByMedicineId(BigInt(medicineId));
+  for (const img of images) {
+    await deleteImage(img.imageUrl);
+  }
 
   await medicineRepo.softDeleteMedicine(BigInt(medicineId));
 };
