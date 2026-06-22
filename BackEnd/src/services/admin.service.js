@@ -152,7 +152,7 @@ export const getMedicineDetail = async (medicineId) => {
 };
 
 // Tạo medicine mới
-export const createMedicine = async (data, file = []) => {
+export const createMedicine = async (data, files = []) => {
   if (files.length > MAX_IMAGES) {
     throw { status: 400, message: `Tối đa ${MAX_IMAGES} ảnh / sản phẩm` };
   }
@@ -175,10 +175,8 @@ export const createMedicine = async (data, file = []) => {
   });
 
   await adminRepo.createInventory({
-    data: {
-      medicineId: medicine.medicineId,
-      quantity: parseInt(data.stock) || 0,
-    },
+    medicineId: medicine.medicineId,
+    quantity: parseInt(data.stock) || 0,
   });
 
   // THÊM: lưu tất cả ảnh vào bảng medicine_images
@@ -194,7 +192,7 @@ export const createMedicine = async (data, file = []) => {
 export const updateMedicine = async (
   medicineId,
   data,
-  file = [],
+  files = [],
   keepImageIds = [],
 ) => {
   const existing = await adminRepo.existMedicine(medicineId);

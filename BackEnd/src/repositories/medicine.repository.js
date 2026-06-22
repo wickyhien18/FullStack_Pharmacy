@@ -66,8 +66,8 @@ export const createMedicine = (data) => {
 };
 
 // Cập nhật medicine
-export const updateMedicine = (medicineId, data) => {
-  return prisma.medicine.update({ where: { medicineId }, data });
+export const updateMedicine = ({ where, data }) => {
+  return prisma.medicine.update({ where, data });
 };
 
 // Soft delete — chỉ set deletedAt, không xoá thật

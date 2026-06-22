@@ -57,7 +57,7 @@ export default function MedicineFormModal({ medicineId, onClose }) {
   }, [detail]);
 
   const { data: categories } = useQuery({
-    qqueryKey: ["categories"],
+    queryKey: ["categories"],
     queryFn: () => api.get("/categories").then((r) => r.data.data),
     // SỬA: AuthInitializer đã prefetch key "categories" với data dạng {items, total}
     // select giúp luôn lấy đúng mảng items dù cache trả về object hay đã là mảng
