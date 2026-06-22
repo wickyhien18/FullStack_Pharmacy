@@ -6,11 +6,11 @@ import { sendSuccess, sendError } from "../utils/response.js";
 import { parsePagination } from "../utils/pagination.js";
 
 // GET /api/products
-export const getproducts = async (req, res) => {
+export const getProducts = async (req, res) => {
   try {
     const { page, limit, skip } = parsePagination(req);
     const { search, categoryId, sort } = req.query;
-    const data = await productService.getproducts({
+    const data = await productService.getProducts({
       page,
       limit,
       skip,
@@ -25,9 +25,9 @@ export const getproducts = async (req, res) => {
 };
 
 // GET /api/products/:slug
-export const getproductBySlug = async (req, res) => {
+export const getProductBySlug = async (req, res) => {
   try {
-    const data = await productService.getproductBySlug(req.params.slug);
+    const data = await productService.getProductBySlug(req.params.slug);
     return sendSuccess(res, data, "Lấy thông tin thuốc thành công");
   } catch (err) {
     return sendError(res, err.message, err.status || 500);
