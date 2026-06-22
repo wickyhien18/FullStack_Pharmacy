@@ -181,3 +181,43 @@ export const rejectOrder = async (orderId, status, reason) => {
     },
   });
 };
+
+// Xử lý hoàn hàng: đổi status RETURNED + hoàn tồn kho + ghi nhận hoàn tiền
+export const approveReturnOrder = async (orderId, totalPrice) => {
+  return prisma.$transaction(async (tx) => {
+    // 1. Đổi status đơn hàng → RETURNED
+    await tx.order.update({
+      where: { orderId },
+      data: {
+        orderStatus: "RETURNED",
+        cancelledAt: new Date(),
+      },
+    });
+
+    // 2. Hoàn lại tồn kho
+    const items = await tx.orderItem.findMany({ where: { orderId } });
+    for (const item of items) {
+      await tx.inventory.update({
+        where: { medicineId: item.medicineId },
+        data: { quantity: { increment: item.quantity } },
+      });
+    }
+
+    // 3. Ghi nhận hoàn tiền vào bảng payments
+    // Tìm payment gốc (nếu có) để lấy paymentMethod
+    const existingPayment = await tx.payment.findFirst({
+      where: { orderId },
+      orderBy: { createdAt: "desc" },
+    });
+
+    await tx.payment.create({
+      data: {
+        orderId,
+        paymentMethod: existingPayment?.paymentMethod || "COD",
+        amount: totalPrice,
+        status: "REFUNDED",
+        paidAt: new Date(),
+      },
+    });
+  });
+};
