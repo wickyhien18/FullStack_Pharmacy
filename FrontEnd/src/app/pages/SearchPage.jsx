@@ -21,7 +21,11 @@ function SearchPage() {
   // Debounce query — chờ 400ms sau khi gõ xong mới gọi API
   const debouncedQ = useDebounce(q, 400);
 
-  const { data: productsData, isLoading } = useProducts({
+  const {
+    data: productsData,
+    isLoading,
+    isFetching,
+  } = useProducts({
     search: debouncedQ || undefined,
     limit: 20, // ← giảm từ 100 xuống 20, đủ hiển thị, tải nhanh hơn
   });
@@ -116,10 +120,31 @@ function SearchPage() {
                   </Link>
                 )}
               </h2>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {matchedProducts.map((p) => (
-                  <ProductCard key={p.id} product={p} />
-                ))}
+
+              {/* ← wrap thêm relative div này */}
+              <div className="relative">
+                {isFetching && (
+                  <div
+                    className="absolute inset-0 bg-white/60 backdrop-blur-[1px] z-10
+                        flex items-center justify-center rounded-xl"
+                  >
+                    <div
+                      className="flex items-center gap-2 bg-white shadow-md
+                          px-4 py-2 rounded-full text-sm text-gray-600"
+                    >
+                      <div
+                        className="w-4 h-4 border-2 border-blue-600
+                            border-t-transparent rounded-full animate-spin"
+                      />
+                      Đang tìm kiếm...
+                    </div>
+                  </div>
+                )}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {matchedProducts.map((p) => (
+                    <ProductCard key={p.id} product={p} />
+                  ))}
+                </div>
               </div>
             </section>
           )}
