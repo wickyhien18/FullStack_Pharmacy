@@ -51,12 +51,13 @@ app.use(compression()); //Compress response bodies for all requests to improve p
 // ── Logging ───────────────────────────────────────────────────────
 if (env.isDev) app.use(morgan("dev")); //Log HTTP requests in development mode
 
-// ── Health check ──────────────────────────────────────────────────
-app.get("/health", (_req, res) => {
-  res.json({ success: true, message: "API is running", env: env.NODE_ENV });
-});
 // ── Swagger UI ───────────────────────────────────────────────────
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+// Health check — dùng cho UptimeRobot ping để tránh Render sleep + giữ DB connection
+app.get("/health", (req, res) =>
+  res.json({ status: "ok", timestamp: new Date().toISOString() }),
+);
 // ── Routes ────────────────────────────────────────────────────────
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
