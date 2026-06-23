@@ -13,6 +13,8 @@ export const useProducts = (params = {}) => {
     // Khi params thay đổi → key thay đổi → tự fetch lại
     queryKey: ["products", params],
     queryFn: () => api.get("/products", { params }).then((r) => r.data.data),
+    placeholderData: (previousData) => previousData, // ← React Query v5 syntax
+    staleTime: 1000 * 60 * 2, // giữ cache 2 phút, không refetch liên tục
   });
 };
 
