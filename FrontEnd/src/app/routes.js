@@ -46,7 +46,7 @@ const router = createBrowserRouter([
       { path: "products", Component: AdminProducts },
       { path: "orders", Component: AdminOrders },
       { path: "users", Component: AdminUsers },
-      { path: "cancel-requests", element: <CancelRequestsPage /> },
+      { path: "cancel-requests", Component: CancelRequestsPage },
     ],
   },
 ]);
