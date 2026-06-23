@@ -57,7 +57,7 @@ function Footer() {
             </p>
             <p className="text-sm text-red-600 mb-4 leading-relaxed font-semibold">
               Vui lòng không đặt mua sản phẩm nếu không có ý định mua sản phẩm
-              hay có ý định mua sản phẩm
+              hay có ý định mua sản phẩm.
             </p>
             <div className="space-y-2 text-sm text-gray-600">
               <div className="flex items-center gap-2">
