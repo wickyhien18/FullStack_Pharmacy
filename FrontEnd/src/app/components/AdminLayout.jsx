@@ -36,7 +36,9 @@ export default function AdminLayout() {
     <div className="flex h-screen bg-gray-100">
       <aside className="w-64 bg-white shadow-sm flex flex-col shrink-0">
         <div className="p-6 border-b">
-          <h1 className="text-lg font-bold text-blue-700">Long Châu Admin</h1>
+          <h1 className="text-lg font-bold text-blue-700">
+            Quản trị Nhà thuốc
+          </h1>
         </div>
         <nav className="flex-1 p-4 space-y-1">
           {navItems.map(({ to, label, icon: Icon, end }) => (
