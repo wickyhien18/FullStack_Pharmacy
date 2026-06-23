@@ -27,8 +27,12 @@ export const getDashboardStats = async () => {
 };
 
 // Lấy tất cả đơn hàng (admin thấy hết)
-export const findAllOrders = ({ skip, limit }) => {
+export const findAllOrders = ({ skip, limit, status }) => {
+  const where = status
+    ? { orderStatus: { in: status.split(",").map((s) => s.trim()) } }
+    : {};
   return prisma.order.findMany({
+    where,
     skip,
     take: limit,
     orderBy: { createdAt: "desc" },
@@ -41,7 +45,12 @@ export const findAllOrders = ({ skip, limit }) => {
   });
 };
 
-export const countAllOrders = () => prisma.order.count();
+export const countAllOrders = (status) => {
+  const where = status
+    ? { orderStatus: { in: status.split(",").map((s) => s.trim()) } }
+    : {};
+  return prisma.order.count({ where });
+};
 
 // Cập nhật status đơn hàng
 export const updateOrderStatus = (orderId, orderStatus) => {
