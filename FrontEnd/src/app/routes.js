@@ -18,6 +18,7 @@ import AdminDashboard from "./pages/admin/DashboardPage";
 import AdminProducts from "./pages/admin/ProductsPage";
 import AdminOrders from "./pages/admin/OrdersPage";
 import AdminUsers from "./pages/admin/UsersPage";
+import CancelRequestsPage from "./pages/admin/CancelRequestsPage.jsx";
 
 const router = createBrowserRouter([
   {
@@ -45,6 +46,7 @@ const router = createBrowserRouter([
       { path: "products", Component: AdminProducts },
       { path: "orders", Component: AdminOrders },
       { path: "users", Component: AdminUsers },
+      { path: "cancel-requests", element: <CancelRequestsPage /> },
     ],
   },
 ]);
