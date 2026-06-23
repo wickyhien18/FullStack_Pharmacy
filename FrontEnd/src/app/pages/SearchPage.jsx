@@ -1,21 +1,33 @@
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useSearchParams, Link } from "react-router";
 import { Search, ChevronRight } from "lucide-react";
-// import { blogPosts } from "../data/products";
 import { ProductCard } from "../components/ProductCard";
 import { useProducts } from "../../hooks/useProducts.js";
+
+// Debounce hook — chờ user gõ xong mới fetch, tránh gọi API liên tục
+function useDebounce(value, delay = 400) {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const timer = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+  return debounced;
+}
 
 function SearchPage() {
   const [searchParams] = useSearchParams();
   const q = searchParams.get("q") || "";
 
+  // Debounce query — chờ 400ms sau khi gõ xong mới gọi API
+  const debouncedQ = useDebounce(q, 400);
+
   const { data: productsData, isLoading } = useProducts({
-    search: q || undefined,
-    limit: 100,
+    search: debouncedQ || undefined,
+    limit: 20, // ← giảm từ 100 xuống 20, đủ hiển thị, tải nhanh hơn
   });
 
   const matchedProducts = useMemo(() => {
-    if (!q || !productsData?.items) return [];
+    if (!debouncedQ || !productsData?.items) return [];
     return productsData.items.map((m, index) => ({
       id: m.slug,
       productId: m.productId,
@@ -27,9 +39,6 @@ function SearchPage() {
       discount: m.originalPrice
         ? Math.round((1 - m.price / m.originalPrice) * 100)
         : 15,
-      rating: 4.8,
-      reviewCount: 42 + index,
-      sold: 120 + index * 5,
       stock: m.stock || 50,
       image:
         m.primaryImage ||
@@ -41,18 +50,10 @@ function SearchPage() {
       description: m.description || "",
       unit: m.unit || "Hộp",
     }));
-  }, [q, productsData]);
+  }, [debouncedQ, productsData]);
 
-  // const matchedPosts = useMemo(() => {
-  //   if (!q) return [];
-  //   const lower = q.toLowerCase();
-  //   return blogPosts.filter(
-  //     (p) =>
-  //       p.title.toLowerCase().includes(lower) ||
-  //       p.excerpt.toLowerCase().includes(lower) ||
-  //       p.tags.some((t) => t.toLowerCase().includes(lower)),
-  //   );
-  // }, [q]);
+  const total = productsData?.total || 0;
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-5">
       <nav className="flex items-center gap-2 text-sm text-gray-500 mb-5">
@@ -66,31 +67,46 @@ function SearchPage() {
       {q ? (
         <>
           <div className="mb-6">
-            <p className="text-gray-600 text-sm">
-              Tìm thấy{" "}
-              <span className="font-semibold text-gray-800">
-                {
-                  matchedProducts.length
-                  // +
-                  // matchedPosts.length
-                }
-              </span>{" "}
-              kết quả cho "
-              <span className="font-semibold" style={{ color: "#1250dc" }}>
-                {q}
-              </span>
-              "
-            </p>
+            {isLoading ? (
+              <p className="text-gray-400 text-sm">Đang tìm kiếm...</p>
+            ) : (
+              <p className="text-gray-600 text-sm">
+                Tìm thấy{" "}
+                <span className="font-semibold text-gray-800">{total}</span> kết
+                quả cho "
+                <span className="font-semibold" style={{ color: "#1250dc" }}>
+                  {q}
+                </span>
+                "
+              </p>
+            )}
           </div>
 
-          {matchedProducts.length > 0 && (
+          {/* Skeleton khi đang load */}
+          {isLoading && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {Array(8)
+                .fill(0)
+                .map((_, i) => (
+                  <div key={i} className="bg-white rounded-2xl overflow-hidden">
+                    <div className="h-40 bg-gray-100 animate-pulse" />
+                    <div className="p-3 space-y-2">
+                      <div className="h-3 bg-gray-100 rounded animate-pulse" />
+                      <div className="h-3 bg-gray-100 rounded animate-pulse w-2/3" />
+                    </div>
+                  </div>
+                ))}
+            </div>
+          )}
+
+          {!isLoading && matchedProducts.length > 0 && (
             <section className="mb-8">
               <h2
                 className="font-semibold text-gray-800 mb-4 flex items-center justify-between"
                 style={{ fontSize: "1rem" }}
               >
-                <span>Sản phẩm ({matchedProducts.length})</span>
-                {matchedProducts.length > 8 && (
+                <span>Sản phẩm ({total})</span>
+                {total > 20 && (
                   <Link
                     to={`/products?q=${q}`}
                     className="text-sm font-medium"
@@ -101,57 +117,14 @@ function SearchPage() {
                 )}
               </h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {matchedProducts.slice(0, 8).map((p) => (
+                {matchedProducts.map((p) => (
                   <ProductCard key={p.id} product={p} />
                 ))}
               </div>
             </section>
           )}
 
-          {/* {matchedPosts.length > 0 && (
-            <section>
-              <h2
-                className="font-semibold text-gray-800 mb-4"
-                style={{ fontSize: "1rem" }}
-              >
-                Bài viết ({matchedPosts.length})
-              </h2>
-              <div className="space-y-4">
-                {matchedPosts.map((post) => (
-                  <Link
-                    key={post.id}
-                    to={`/blog/${post.slug}`}
-                    className="group bg-white rounded-xl p-4 flex gap-4 hover:shadow-md transition-shadow border border-gray-100"
-                  >
-                    <img
-                      src={post.image}
-                      alt={post.title}
-                      className="w-24 h-20 object-cover rounded-lg shrink-0"
-                    />
-                    <div>
-                      <div
-                        className="text-xs font-medium mb-1"
-                        style={{ color: "#1250dc" }}
-                      >
-                        {post.category}
-                      </div>
-                      <div
-                        className="font-semibold text-gray-800 group-hover:text-blue-700 transition-colors mb-1"
-                        style={{ fontSize: "0.9rem" }}
-                      >
-                        {post.title}
-                      </div>
-                      <div className="text-xs text-gray-500 line-clamp-2">
-                        {post.excerpt}
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {matchedProducts.length === 0 && matchedPosts.length === 0 && (
+          {!isLoading && matchedProducts.length === 0 && (
             <div className="text-center py-16 bg-white rounded-2xl">
               <Search size={48} className="mx-auto text-gray-300 mb-4" />
               <h3 className="font-semibold text-gray-700 mb-2">
@@ -168,7 +141,7 @@ function SearchPage() {
                 Xem tất cả sản phẩm
               </Link>
             </div>
-          )} */}
+          )}
         </>
       ) : (
         <div className="text-center py-16 bg-white rounded-2xl">
@@ -184,4 +157,5 @@ function SearchPage() {
     </div>
   );
 }
+
 export { SearchPage as default };
