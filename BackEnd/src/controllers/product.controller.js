@@ -9,7 +9,7 @@ import { parsePagination } from "../utils/pagination.js";
 export const getProducts = async (req, res) => {
   try {
     const { page, limit, skip } = parsePagination(req);
-    const { search, categoryId, sort } = req.query;
+    const { search, categoryId, sort, minPrice, maxPrice } = req.query;
     const data = await productService.getProducts({
       page,
       limit,
@@ -17,6 +17,8 @@ export const getProducts = async (req, res) => {
       search,
       categoryId,
       sort,
+      minPrice: minPrice ? Number(minPrice) : undefined,
+      maxPrice: maxPrice ? Number(maxPrice) : undefined,
     });
     return sendSuccess(res, data, "Lấy danh sách thuốc thành công");
   } catch (err) {

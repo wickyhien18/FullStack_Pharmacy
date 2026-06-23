@@ -6,7 +6,13 @@ import { getCache, setCache, deletePattern } from "../config/redis.js";
 import { buildPaginatedResponse } from "../utils/pagination.js";
 
 // Xây dựng where clause từ query params
-const buildWhere = ({ search, categoryId, status = "ACTIVE" }) => {
+const buildWhere = ({
+  search,
+  categoryId,
+  minPrice,
+  maxPrice,
+  status = "ACTIVE",
+}) => {
   const where = {
     deletedAt: null, // không lấy đã xoá
     status,
@@ -19,7 +25,11 @@ const buildWhere = ({ search, categoryId, status = "ACTIVE" }) => {
   }
 
   if (categoryId) {
-    where.categoryId = BigInt(categoryId);
+    if (minPrice !== undefined || maxPrice !== undefined) {
+      where.price = {};
+      if (minPrice !== undefined) where.price.gte = minPrice;
+      if (maxPrice !== undefined) where.price.lte = maxPrice;
+    }
   }
 
   return where;
@@ -28,9 +38,9 @@ const buildWhere = ({ search, categoryId, status = "ACTIVE" }) => {
 // Xây dựng orderBy từ sort param
 const buildOrderBy = (sort) => {
   switch (sort) {
-    case "price_asc":
+    case "price-asc":
       return { price: "asc" };
-    case "price_desc":
+    case "price-desc":
       return { price: "desc" };
     case "newest":
       return { createdAt: "desc" };
@@ -74,10 +84,12 @@ export const getProducts = async ({
   search,
   categoryId,
   sort,
+  minPrice,
+  maxPrice,
 }) => {
   // Cache key bao gồm tất cả params — params khác = cache khác
   // Cache key includes all params — different params = different cache
-  const cacheKey = `products:list:${page}:${limit}:${search || ""}:${categoryId || ""}:${sort || ""}`;
+  const cacheKey = `products:list:${page}:${limit}:${search || ""}:${categoryId || ""}:${sort || ""}:${minPrice || ""}:${maxPrice || ""}`;
 
   // Check cache trước / Check cache first
   const cached = await getCache(cacheKey);
@@ -88,7 +100,7 @@ export const getProducts = async ({
 
   console.log("[Cache] MISS:", cacheKey);
 
-  const where = buildWhere({ search, categoryId });
+  const where = buildWhere({ search, categoryId, minPrice, maxPrice });
   const orderBy = buildOrderBy(sort);
 
   const [products, total] = await Promise.all([
