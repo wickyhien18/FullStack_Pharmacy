@@ -21,7 +21,8 @@ export const getDashboardStats = async (req, res) => {
 export const getAllOrders = async (req, res) => {
   try {
     const { page, limit, skip } = parsePagination(req);
-    const data = await adminService.getAllOrders({ page, limit, skip });
+    const { status } = req.query;
+    const data = await adminService.getAllOrders({ page, limit, skip, status });
     return sendSuccess(res, data, "Lấy danh sách đơn hàng thành công");
   } catch (err) {
     return sendError(res, err.message, err.status || 500);

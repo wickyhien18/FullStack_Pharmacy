@@ -23,10 +23,10 @@ const format = (r) => ({
 });
 
 // Danh sách đơn hàng
-export const getAllOrders = async ({ page, limit, skip }) => {
+export const getAllOrders = async ({ page, limit, skip, status }) => {
   const [orders, total] = await Promise.all([
-    adminRepo.findAllOrders({ skip, limit }),
-    adminRepo.countAllOrders(),
+    adminRepo.findAllOrders({ skip, limit, status }),
+    adminRepo.countAllOrders(status),
   ]);
 
   const items = orders.map((o) => ({
