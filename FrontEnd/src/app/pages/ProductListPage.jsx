@@ -245,6 +245,7 @@ function ProductListPage() {
                       setSort(e.target.value);
                       setPage(1);
                     }}
+                    disabled={isFetching}
                     className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 pr-8 appearance-none bg-white cursor-pointer hover:border-blue-400 focus:outline-none"
                   >
                     {sortOptions.map((o) => (
@@ -304,21 +305,42 @@ function ProductListPage() {
           )}
 
           {/* Products grid */}
-          {liveMedicines.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {liveMedicines.map((p) => (
-                <ProductCard key={p.id} product={p} />
-              ))}
-            </div>
-          ) : (
-            <div className="bg-white rounded-xl p-16 text-center text-gray-500">
-              <div className="text-4xl mb-3">🔍</div>
-              <div className="font-medium text-gray-700 mb-1">
-                Không tìm thấy sản phẩm
+          <div className="relative">
+            {/* Overlay khi sort/filter đang fetch — không ẩn data cũ */}
+            {isFetching && !isLoadingProducts && (
+              <div
+                className="absolute inset-0 bg-white/60 backdrop-blur-[1px] z-10 
+                    flex items-center justify-center rounded-xl"
+              >
+                <div
+                  className="flex items-center gap-2 bg-white shadow-md 
+                      px-4 py-2 rounded-full text-sm text-gray-600"
+                >
+                  <div
+                    className="w-4 h-4 border-2 border-blue-600 
+                        border-t-transparent rounded-full animate-spin"
+                  />
+                  Đang tải...
+                </div>
               </div>
-              <div className="text-sm">Thử thay đổi bộ lọc hoặc danh mục</div>
-            </div>
-          )}
+            )}
+
+            {liveMedicines.length > 0 ? (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {liveMedicines.map((p) => (
+                  <ProductCard key={p.id} product={p} />
+                ))}
+              </div>
+            ) : (
+              <div className="bg-white rounded-xl p-16 text-center text-gray-500">
+                <div className="text-4xl mb-3">🔍</div>
+                <div className="font-medium text-gray-700 mb-1">
+                  Không tìm thấy sản phẩm
+                </div>
+                <div className="text-sm">Thử thay đổi bộ lọc hoặc danh mục</div>
+              </div>
+            )}
+          </div>
 
           {/* Pagination */}
           {totalPages > 1 && (
