@@ -15,6 +15,7 @@ export const findProducts = ({ skip, limit, where, orderBy }) => {
       category: { select: { categoryId: true, name: true, slug: true } },
       manufacturer: { select: { manufacturerId: true, name: true } },
       inventory: { select: { quantity: true } },
+      _count: { select: { orderItems: true } },
     },
   });
 };

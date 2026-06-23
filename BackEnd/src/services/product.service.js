@@ -42,6 +42,8 @@ const buildOrderBy = (sort) => {
       return { price: "asc" };
     case "price-desc":
       return { price: "desc" };
+    case "bestseller":
+      return { orderItems: { _count: "desc" } };
     case "newest":
       return { createdAt: "desc" };
     default:
