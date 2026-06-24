@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 function Footer() {
   return (
-    <footer className="bg-white border-t border-gray-200 mt-12">
+    <footer className="bg-white border-t border-gray-200">
       {/* Trust badges */}
       {/* <div className="border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 py-6">

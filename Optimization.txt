@@ -35,11 +35,23 @@ Vercel Build: 47s
 - Web run 3: 
 Add Loading lazy and style= aspectRatio: "400/176" in img to ProductCard
 
-First Contentful Paint: 3.1s
-Largest Contentful Paint: 4.2s
-Total Blocking Time: 20ms
-Cumulative Layout Shift: 0.239
-Speed Index: 4.2s
+First Contentful Paint: 3.0s
+Largest Contentful Paint: 3.2s
+Total Blocking Time: 10ms
+Cumulative Layout Shift: 0.187
+Speed Index: 4.5s
 
-Render Build: 60s
-Vercel Build: 47s
+Render Build: 50s
+Vercel Build: 46s
+
+- Web run 4: 
+Remove mt-12 in Footer
+
+First Contentful Paint: 3.0s
+Largest Contentful Paint: 3.2s
+Total Blocking Time: 10ms
+Cumulative Layout Shift: 0.187
+Speed Index: 4.5s
+
+Render Build: 50s
+Vercel Build: 46s
