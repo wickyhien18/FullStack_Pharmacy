@@ -39,7 +39,6 @@ function Footer() {
       { name: "Express.js", icon: SiExpress },
       { name: "Prisma", icon: SiPrisma },
       { name: "JWT", icon: SiJsonwebtokens },
-      { name: "RBAC" },
     ],
 
     "Database & Cache": [
@@ -110,51 +109,40 @@ function Footer() {
           </div>
 
           {/* Tech Stack */}
-          <div className="space-y-10 w-full">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {Object.keys(techStack)
-                .map((group, idx) => {
-                  // Ensure Frontend is first column and Backend is second
-                  const orderKey =
-                    group === "Frontend"
-                      ? 0
-                      : group === "Backend"
-                        ? 1
-                        : 2 + idx;
-                  return { group, orderKey };
-                })
-                .sort((a, b) => a.orderKey - b.orderKey)
-                .map(({ group }) => {
-                  const items = techStack[group];
-                  return (
-                    <section key={group} className="min-h-[120px]">
-                      <h3 className="mb-4 text-lg font-semibold text-slate-800">
-                        {group}
-                      </h3>
+          <div className="space-y-10 w-full md:col-span-3">
+            {/* Two-column layout: Frontend on left, others on right */}
 
-                      <div className="flex flex-wrap gap-4">
-                        {items.map((item) => {
-                          const Icon = item.icon;
-                          return (
-                            <div
-                              key={item.name}
-                              className="group rounded-2xl border border-slate-200 bg-white p-3 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg w-28 sm:w-32 md:w-40 text-center"
-                            >
-                              <div className="flex flex-col items-center gap-2">
-                                {Icon && (
-                                  <Icon className="text-3xl text-slate-700" />
-                                )}
-                                <span className="text-xs font-medium break-words">
-                                  {item.name}
-                                </span>
-                              </div>
+            <div className="mt-4 flex justify-end">
+              {["Frontend", "Backend", "Database & Cache", "DevOps"].map(
+                (group) => (
+                  <div key={group} className="min-h-[120px] text-center">
+                    <h3 className="mb-4 text-lg font-semibold text-slate-800">
+                      {group}
+                    </h3>
+
+                    <div className="flex flex-col gap-6">
+                      {(techStack[group] || []).map((item) => {
+                        const Icon = item.icon;
+                        return (
+                          <div
+                            key={item.name}
+                            className="group w-40 mx-auto rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg text-center"
+                          >
+                            <div className="flex flex-col items-center gap-3">
+                              {Icon && (
+                                <Icon className="text-3xl text-slate-700" />
+                              )}
+                              <span className="text-sm font-medium break-words">
+                                {item.name}
+                              </span>
                             </div>
-                          );
-                        })}
-                      </div>
-                    </section>
-                  );
-                })}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ),
+              )}
             </div>
           </div>
         </div>
