@@ -26,8 +26,21 @@ const app = express();
 app.use(helmet());
 app.use(
   cors({
-    origin: env.CLIENT_URL,
-    credentials: true, // Allow storing cookies from client
+    origin: (origin, callback) => {
+      const allowed = [
+        env.CLIENT_URL, // URL Vercel (production)
+        "http://localhost:5173", // local dev
+        "http://localhost:4173", // vite preview
+      ].filter(Boolean);
+
+      // Cho phép request không có origin (Postman, curl, server-to-server)
+      if (!origin || allowed.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
   }),
 );
 
