@@ -6,7 +6,7 @@ const REFRESH_TOKEN_COOKIE = "refreshToken"; //cookie name
 const cookieOptions = {
   httpOnly: true, // JS phía client KHÔNG đọc được → chống XSS lấy token
   secure: process.env.NODE_ENV === "production", // chỉ gửi qua HTTPS ở production
-  sameSite: "strict", // chống CSRF — chỉ gửi cookie cùng origin
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "strict", // chống CSRF — chỉ gửi cookie cùng origin
   maxAge: 7 * 24 * 60 * 60 * 1000, // thời gian sống cookie = 7 ngày (tính bằng ms)
 };
 
