@@ -47,11 +47,23 @@ Vercel Build: 46s
 - Web run 4: 
 Remove mt-12 in Footer
 
-First Contentful Paint: 3.0s
-Largest Contentful Paint: 3.2s
-Total Blocking Time: 10ms
-Cumulative Layout Shift: 0.187
-Speed Index: 4.5s
+First Contentful Paint: 2.9s
+Largest Contentful Paint: 3.0s
+Total Blocking Time: 0ms
+Cumulative Layout Shift: 0.163
+Speed Index: 4.1s
 
-Render Build: 50s
-Vercel Build: 46s
+Render Build: 51s
+Vercel Build: 48s
+
+- Web run 5:
+Add style={{ minHeight: "60vh" }} in main in Layout
+
+First Contentful Paint: 2.9s
+Largest Contentful Paint: 3.0s
+Total Blocking Time: 0ms
+Cumulative Layout Shift: 0.163
+Speed Index: 4.1s
+
+Render Build: 51s
+Vercel Build: 48s

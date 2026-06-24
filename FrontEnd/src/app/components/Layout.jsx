@@ -13,7 +13,7 @@ function Layout() {
       style={{ backgroundColor: "#f4f5f7" }}
     >
       <Header />
-      <main className="flex-1">
+      <main className="flex-1" style={{ minHeight: "60vh" }}>
         <Outlet />
       </main>
       <Footer />
