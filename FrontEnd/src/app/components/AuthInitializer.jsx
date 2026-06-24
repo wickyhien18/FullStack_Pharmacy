@@ -57,16 +57,20 @@ export default function AuthInitializer({ children }) {
 
     const init = async () => {
       const hasSession = localStorage.getItem("hasSession");
+      console.log("[Auth] hasSession:", hasSession); // ← thêm
 
       // ── Bước 1: Khôi phục session — PHẢI xong trước khi render children ──
       if (hasSession) {
         try {
           const { data } = await api.post("/auth/refresh-token");
+          console.log("[Auth] refresh response:", data); // ← thêm
           if (data?.data?.accessToken) {
             const profileRes = await api.get("/auth/profile", {
               headers: { Authorization: `Bearer ${data.data.accessToken}` },
             });
+            console.log("[Auth] profile response:", profileRes.data); // ← thêm
             setAuth(profileRes.data.data, data.data.accessToken);
+            console.log("[Auth] setAuth called"); // ← thêm
           }
         } catch (err) {
           if (err.response?.status === 401) {
