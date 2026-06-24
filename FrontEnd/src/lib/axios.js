@@ -7,7 +7,7 @@ import axios from "axios";
 import { useAuthStore } from "@/stores/auth.store.js";
 
 const api = axios.create({
-  baseURL: "/api", // Vite proxy chuyển /api → http://localhost:3000/api
+  baseURL: import.meta.env.VITE_API_URL || "/api", // Vite proxy chuyển /api → http://localhost:3000/api
   withCredentials: true, // gửi kèm cookie (refresh token) trong mọi request
   timeout: 10000, // timeout 10 giây
 });
