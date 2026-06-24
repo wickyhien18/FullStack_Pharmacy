@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router";
+import { createBrowserRouter } from "react-router-dom";
 import { lazy, Suspense } from "react";
 // import PromotionsPage from "./pages/PromotionsPage";
 // import BlogPage from "./pages/BlogPage";

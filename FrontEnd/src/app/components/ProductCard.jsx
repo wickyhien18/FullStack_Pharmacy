@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import { ShoppingCart, Heart, Star } from "lucide-react";
 import { formatPrice } from "../data/products.js";
 import { useCart } from "@/hooks/useCart.js";

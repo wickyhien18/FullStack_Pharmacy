@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams, Link } from "react-router";
+import { useParams, Link } from "react-router-dom";
 import { ShoppingCart, Minus, Plus, ChevronRight, Check } from "lucide-react";
 import { formatPrice } from "../data/products";
 import { ProductCard } from "../components/ProductCard";

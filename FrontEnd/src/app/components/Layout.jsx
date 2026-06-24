@@ -2,7 +2,7 @@
 // Layout.jsx — Quay về bản đơn giản, không cần Context nữa
 // Overlay được xử lý hoàn toàn trong AuthInitializer
 // ================================================================
-import { Outlet } from "react-router";
+import { Outlet } from "react-router-dom";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
 

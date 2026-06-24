@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Outlet, NavLink, useNavigate } from "react-router";
+import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../stores/auth.store.js";
 import {
   LayoutDashboard,
