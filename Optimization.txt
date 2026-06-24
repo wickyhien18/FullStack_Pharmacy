@@ -2,3 +2,9 @@
 Buid command: npm install && npx prisma generate
 package.json: db:generate: "prisma generate"
 Build time: 45s
+
+- Render:
+Buid command: npm ci && npx prisma generate
+package.json: postinstall: "prisma generate"
+              delete db:generate: "prisma generate"
+Build time: 46s
