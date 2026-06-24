@@ -1,0 +1,4 @@
+- Render:
+Buid command: npm install && npx prisma generate
+package.json: db:generate: "prisma generate"
+Build time: 45s
