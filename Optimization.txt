@@ -23,8 +23,23 @@ Speed Index: 10.7s
 Add lazy to route.js in FrondEnd
 Add into vercel.json static cache API respone 
 
-First Contentful Paint: 3.5s
-Largest Contentful Paint: 4.6s
-Total Blocking Time: 10ms
+First Contentful Paint: 3.1s
+Largest Contentful Paint: 4.2s
+Total Blocking Time: 20ms
 Cumulative Layout Shift: 0.239
-Speed Index: 10.7s
+Speed Index: 4.2s
+
+Render Build: 60s
+Vercel Build: 47s
+
+- Web run 3: 
+Add Loading lazy and style= aspectRatio: "400/176" in img to ProductCard
+
+First Contentful Paint: 3.1s
+Largest Contentful Paint: 4.2s
+Total Blocking Time: 20ms
+Cumulative Layout Shift: 0.239
+Speed Index: 4.2s
+
+Render Build: 60s
+Vercel Build: 47s
