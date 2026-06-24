@@ -1,5 +1,5 @@
 // ================================================================
-// product.routes.js
+// product.route.jsx
 // ================================================================
 import { Router } from "express";
 import * as productController from "../controllers/product.controller.js";

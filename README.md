@@ -135,7 +135,7 @@ FrontEnd/src/
 │   ├── components/  # Shared UI components and layouts
 │   ├── data/        # Local static data
 │   ├── pages/       # Customer and admin pages
-│   └── routes.js    # Client route definitions
+│   └── route.jsx    # Client route definitions
 ├── hooks/           # API and utility hooks
 ├── lib/             # Axios configuration
 ├── stores/          # Zustand stores

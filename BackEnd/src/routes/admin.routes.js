@@ -1,5 +1,5 @@
 // ================================================================
-// admin.routes.js — Tất cả route cần ROLE_ADMIN
+// admin.route.jsx — Tất cả route cần ROLE_ADMIN
 // ================================================================
 import { Router } from "express";
 import * as adminController from "../controllers/admin.controller.js";

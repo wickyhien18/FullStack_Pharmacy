@@ -1,5 +1,5 @@
 // ================================================================
-// order.routes.js — Tất cả route đều cần đăng nhập
+// order.route.jsx — Tất cả route đều cần đăng nhập
 // ================================================================
 import { Router } from "express";
 import * as orderController from "../controllers/order.controller.js";
