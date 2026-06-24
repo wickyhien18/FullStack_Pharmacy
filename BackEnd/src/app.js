@@ -31,6 +31,7 @@ app.use(
         env.CLIENT_URL, // URL Vercel (production)
         "http://localhost:5173", // local dev
         "http://localhost:4173", // vite preview
+        "https://full-stack-pharmacy.vercel.app",
       ].filter(Boolean);
 
       // Cho phép request không có origin (Postman, curl, server-to-server)
