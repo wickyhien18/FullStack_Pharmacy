@@ -31,13 +31,11 @@ function Footer() {
       { name: "React", icon: FaReact },
       { name: "Vite", icon: SiVite },
       { name: "Tailwind", icon: SiTailwindcss },
-      { name: "React Router", icon: SiReactrouter },
     ],
 
     Backend: [
       { name: "Node.js", icon: FaNodeJs },
       { name: "Express.js", icon: SiExpress },
-      { name: "Prisma", icon: SiPrisma },
       { name: "JWT", icon: SiJsonwebtokens },
     ],
 
