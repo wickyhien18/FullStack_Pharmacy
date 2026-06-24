@@ -8,3 +8,6 @@ Buid command: npm ci && npx prisma generate
 package.json: postinstall: "prisma generate"
               delete db:generate: "prisma generate"
 Build time: 46s
+
+- Vercel:
+Build time: 40s
