@@ -42,7 +42,7 @@ function Footer() {
     "Database & Cache": [
       { name: "PostgreSQL", icon: SiPostgresql },
       { name: "Supabase", icon: SiSupabase },
-      { name: "Redis", icon: SiRedis },
+      // { name: "Redis", icon: SiRedis },
     ],
 
     DevOps: [

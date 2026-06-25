@@ -10,7 +10,6 @@ export const getProducts = async (req, res) => {
   try {
     const { page, limit, skip } = parsePagination(req);
     const { search, categoryId, sort, minPrice, maxPrice } = req.query;
-    // console.log("[getProducts] query:", req.query);
     const data = await productService.getProducts({
       page,
       limit,
