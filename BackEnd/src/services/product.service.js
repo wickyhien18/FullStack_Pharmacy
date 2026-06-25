@@ -102,7 +102,7 @@ export const getProducts = async ({
   //   return cached;
   // }
 
-  console.log("[Cache] MISS:", cacheKey);
+  // console.log("[Cache] MISS:", cacheKey);
 
   const where = buildWhere({ search, categoryId, minPrice, maxPrice });
   const orderBy = buildOrderBy(sort);
