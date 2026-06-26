@@ -143,7 +143,7 @@ export const deleteRefreshToken = (refreshToken) => {
   });
 };
 
-export const deleteRefreshTokensByUserId = (userId) => {
+export const deleteAllRefreshTokensByUserId = (userId) => {
   return prisma.refreshToken.deleteMany({
     where: { userId },
   });

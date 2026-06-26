@@ -3,6 +3,7 @@ import { env } from "../config/env.js";
 import * as jwt from "../utils/jwt.js";
 import { getDeviceInfo } from "../utils/device.js";
 import * as authRepository from "../repositories/auth.repository.js";
+import { sendOTPEmail } from "../services/email.service.js";
 
 // ── GET REFRESHTOKEN EXPIRY ────────────────────────────────────────────────
 const getRefreshTokenExpiry = () => {
@@ -196,4 +197,47 @@ export const getProfile = async (userId) => {
   if (!user.isActive) throw { status: 403, message: "Tài khoản đang bị khóa" };
 
   return formatUser(user);
+};
+
+// ── UPDATE PROFILE (FULLNAME OR PHONE) ───────────────────────────
+export const updateProfile = async (userId, { fullName, phone }) => {
+  if (phone) {
+    const existing = await authRepository.findUserByPhone(phone, userId);
+    if (existing)
+      throw { status: 409, message: "Số điện thoại đã được sử dụng" };
+  }
+
+  const updateData = {};
+  if (fullName) updateData.fullName = fullName;
+  if (phone) updateData.phone = phone;
+
+  const user = await authRepository.updateUserProfile(userId, updateData);
+  return formatUser(user);
+};
+
+// ── CHANGE PASSWORD ─────────────────────────────────────────────────
+export const changePassword = async (
+  userId,
+  { currentPassword, newPassword },
+) => {
+  if (!currentPassword || !newPassword)
+    throw { status: 400, message: "Vui lòng nhập đầy đủ mật khẩu cũ và mới" };
+  if (currentPassword === newPassword)
+    throw { status: 400, message: "Mật khẩu mới phải khác mật khẩu cũ" };
+  if (newPassword.length < 8)
+    throw { status: 400, message: "Mật khẩu mới phải có ít nhất 8 ký tự" };
+
+  const user = await authRepository.findUserPasswordById(userId);
+  if (!user) throw { status: 404, message: "Không tìm thấy người dùng" };
+
+  const isMatch = await bcrypt.compare(currentPassword, user.password);
+  if (!isMatch) throw { status: 400, message: "Mật khẩu hiện tại không đúng" };
+
+  const hashed = await bcrypt.hash(newPassword, env.BCRYPT_ROUNDS || 10);
+  await authRepository.updateUserPassword(userId, hashed);
+
+  // Logout tất cả thiết bị sau khi đổi mật khẩu
+  await authRepository.deleteAllRefreshTokensByUserId(userId);
+
+  return { message: "Đổi mật khẩu thành công. Vui lòng đăng nhập lại." };
 };
