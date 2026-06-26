@@ -241,3 +241,46 @@ export const changePassword = async (
 
   return { message: "Đổi mật khẩu thành công. Vui lòng đăng nhập lại." };
 };
+
+// ── SEND OTP TO CONFIRM CHANGE NEW EMAIL ───────────────────────────────────
+export const requestEmailChange = async (userId, newEmail) => {
+  if (!newEmail) throw { status: 400, message: "Vui lòng nhập email mới" };
+
+  // Kiểm tra email mới chưa được dùng
+  const existing = await authRepository.existUserEmail(newEmail, userId);
+  if (existing) throw { status: 409, message: "Email đã được sử dụng" };
+
+  // Tạo OTP 6 số
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 phút
+
+  // Lưu OTP vào DB
+  await authRepository.saveEmailOTP(userId, newEmail, otp, expiresAt);
+
+  // Gửi email
+  await sendOTPEmail(newEmail, otp);
+
+  return { message: "Mã OTP đã được gửi đến email mới của bạn" };
+};
+
+// ── CONFIRM EMAIL AND CHANGE EMAIL ───────────────────────────────
+export const verifyEmailChange = async (userId, otp) => {
+  if (!otp) throw { status: 400, message: "Vui lòng nhập mã OTP" };
+
+  const record = await authRepository.findEmailOTP(userId);
+  if (!record)
+    throw { status: 404, message: "Không tìm thấy yêu cầu đổi email" };
+
+  if (record.expiresAt < new Date())
+    throw { status: 400, message: "Mã OTP đã hết hạn. Vui lòng gửi lại." };
+
+  if (record.otp !== otp) throw { status: 400, message: "Mã OTP không đúng" };
+
+  // Cập nhật email
+  await authRepository.updateUserProfile(userId, { email: record.newEmail });
+
+  // Xoá OTP sau khi dùng
+  await authRepository.deleteEmailOTP(userId);
+
+  return { message: "Đổi email thành công" };
+};
