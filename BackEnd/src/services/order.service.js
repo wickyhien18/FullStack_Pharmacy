@@ -58,7 +58,6 @@ export const createOrder = async (userId, { shippingAddress, note }) => {
     shippingAddress,
     note,
     totalPrice,
-    // paymentMethod bỏ vì không có trong schema
   });
 
   // Xoá cart sau khi đặt hàng thành công

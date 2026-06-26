@@ -55,8 +55,6 @@ export const createOrder = async ({
         note,
         orderStatus: "PENDING",
         paymentStatus: "PENDING",
-        // originalPrice  ← KHÔNG có trong schema → bỏ
-        // paymentMethod  ← KHÔNG có trong schema → bỏ
       },
     });
 
@@ -67,7 +65,8 @@ export const createOrder = async ({
       });
 
       if (!product) throw new Error("Sản phẩm không tồn tại");
-      if ((product.inventory?.quantity ?? 0) < item.quantity) {
+      const currentQty = medicine.inventory?.quantity ?? 0;
+      if (currentQty < item.quantity) {
         throw new Error(`Sản phẩm "${product.name}" không đủ hàng`);
       }
 
@@ -78,11 +77,10 @@ export const createOrder = async ({
           quantity: item.quantity,
           unitPrice: product.price,
           totalPrice: Number(product.price) * item.quantity,
-          // productName ← KHÔNG có trong schema → bỏ
-          // productUnit ← KHÔNG có trong schema → bỏ
         },
       });
 
+      const newQty = currentQty - item.quantity;
       await tx.inventory.update({
         where: { productId: item.productId },
         data: { quantity: { decrement: item.quantity } },
