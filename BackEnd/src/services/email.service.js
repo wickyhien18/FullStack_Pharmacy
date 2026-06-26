@@ -3,16 +3,16 @@
 // Cài: npm install resend
 // Thêm vào .env: RESEND_API_KEY=re_xxx
 // ================================================================
-import { Resend } from 'resend';
-import { env } from '../config/env.js';
+import { Resend } from "resend";
+import { env } from "../config/env.js";
 
 const resend = new Resend(env.RESEND_API_KEY);
 
 export const sendOTPEmail = async (toEmail, otp) => {
   const { error } = await resend.emails.send({
-    from:    'Nhà Thuốc Wicky Hien <noreply@yourdomain.com>', // đổi thành domain của bạn
-    to:      toEmail,
-    subject: 'Xác nhận đổi email — Mã OTP của bạn',
+    from: "Nhà Thuốc Wicky Hien <giaphien1008@gmail.com>", // đổi thành domain của bạn
+    to: toEmail,
+    subject: "Xác nhận đổi email — Mã OTP của bạn",
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 24px; background: #f8fafc; border-radius: 12px;">
         <div style="text-align: center; margin-bottom: 24px;">
@@ -46,5 +46,6 @@ export const sendOTPEmail = async (toEmail, otp) => {
     `,
   });
 
-  if (error) throw { status: 500, message: `Gửi email thất bại: ${error.message}` };
+  if (error)
+    throw { status: 500, message: `Gửi email thất bại: ${error.message}` };
 };

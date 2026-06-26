@@ -83,7 +83,7 @@ function Footer() {
             <div className="space-y-2 text-sm text-gray-600">
               <div className="flex items-center gap-2">
                 <Mail size={14} style={{ color: "#1250dc" }} />
-                <span>giaphienhap2005@gmail.com</span>
+                <span>giaphien1008@gmail.com</span>
               </div>
               <div className="flex items-center gap-2">
                 <Github size={14} style={{ color: "#1250dc" }} />
