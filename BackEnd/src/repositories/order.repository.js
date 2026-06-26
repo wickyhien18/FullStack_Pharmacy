@@ -65,7 +65,7 @@ export const createOrder = async ({
       });
 
       if (!product) throw new Error("Sản phẩm không tồn tại");
-      const currentQty = medicine.inventory?.quantity ?? 0;
+      const currentQty = product.inventory?.quantity ?? 0;
       if (currentQty < item.quantity) {
         throw new Error(`Sản phẩm "${product.name}" không đủ hàng`);
       }
