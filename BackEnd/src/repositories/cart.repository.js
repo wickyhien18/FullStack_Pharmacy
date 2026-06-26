@@ -23,7 +23,7 @@ export const findCartByUserId = (userId) => {
 // Tìm cart item theo cartId + productId
 export const findCartItem = (cartId, productId) => {
   return prisma.cartItem.findUnique({
-    where: { uk_cart_product: { cartId, productId } },
+    where: { uk_cart_medicine: { cartId, productId } },
   });
 };
 
