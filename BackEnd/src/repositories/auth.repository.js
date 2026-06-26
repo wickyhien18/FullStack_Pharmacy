@@ -74,6 +74,29 @@ export const existUser = (email, userName, phone) => {
   });
 };
 
+export const existUserPhone = (phone, excludeUserId) => {
+  return prisma.user.findFirst({
+    where: { phone, userId: { not: excludeUserId } },
+  });
+};
+
+export const existUserEmail = (email, excludeUserId) => {
+  return prisma.user.findFirst({
+    where: {
+      email,
+      userId: { not: excludeUserId },
+    },
+  });
+};
+
+export const updateUserProfile = (userId, data) => {
+  return prisma.user.update({
+    where: { userId: BigInt(userId) },
+    data: { ...data, updatedAt: new Date() },
+    include: { role: true },
+  });
+};
+
 export const deleteRefreshToken = (refreshToken) => {
   return prisma.refreshToken.delete({
     where: { token: refreshToken },
