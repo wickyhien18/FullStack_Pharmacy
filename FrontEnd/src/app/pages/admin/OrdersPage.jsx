@@ -349,23 +349,30 @@ export default function OrdersPage() {
 
       {/* Phân trang */}
       {data?.totalPages > 1 && (
-        <div className="flex justify-center gap-2 mt-4">
+        <div className="flex justify-center items-center gap-2 mt-4">
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
-            className="px-3 py-1.5 rounded-lg border border-gray-200 text-sm disabled:opacity-40"
+            className="px-4 py-2 text-sm rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            ← Trước
+            Trước
           </button>
-          <span className="px-3 py-1.5 text-sm text-gray-600">
-            {page} / {data.totalPages}
-          </span>
+          {Array.from({ length: data.totalPages }, (_, i) => i + 1).map((p) => (
+            <button
+              key={p}
+              onClick={() => setPage(p)}
+              className={`w-9 h-9 text-sm rounded-lg font-medium transition-colors ${page === p ? "text-white" : "border border-gray-200 hover:bg-gray-50 text-gray-700"}`}
+              style={page === p ? { backgroundColor: "#1250dc" } : {}}
+            >
+              {p}
+            </button>
+          ))}
           <button
             onClick={() => setPage((p) => Math.min(data.totalPages, p + 1))}
             disabled={page === data.totalPages}
-            className="px-3 py-1.5 rounded-lg border border-gray-200 text-sm disabled:opacity-40"
+            className="px-4 py-2 text-sm rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            Sau →
+            Sau
           </button>
         </div>
       )}

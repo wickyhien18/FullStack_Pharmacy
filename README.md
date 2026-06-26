@@ -1,4 +1,4 @@
-# Pharmacy Management System
+# Pharmacy E-commerce Platform
 
 > A full-stack pharmacy management and e-commerce system for managing products, inventory, customer orders, authentication, and role-based administration.
 
