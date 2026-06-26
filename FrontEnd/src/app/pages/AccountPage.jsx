@@ -438,10 +438,10 @@ function AccountPage() {
                 className="w-full py-3 rounded-xl text-white font-semibold text-sm hover:opacity-90 transition-opacity flex justify-center items-center gap-2"
                 style={{ backgroundColor: "#1250dc" }}
               >
+                Đăng nhập
                 {isLoggingIn && (
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 )}
-                Đăng nhập
               </button>
             </form>
           ) : (

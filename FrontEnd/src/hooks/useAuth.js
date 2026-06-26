@@ -6,11 +6,13 @@ import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useAuthStore } from "@/stores/auth.store.js";
+import { useCart } from "@/hooks/useCart.js";
 import api from "@/lib/axios.js";
 
 export const useAuth = () => {
   const navigate = useNavigate();
   const { setAuth, clearAuth, user, isAuthenticated } = useAuthStore();
+  const { clearCart } = useCart();
 
   // ── Login mutation ────────────────────────────────────────────
   // useMutation: dùng cho các action thay đổi data (POST/PUT/DELETE)
@@ -57,7 +59,8 @@ export const useAuth = () => {
       // Dù API lỗi vẫn clear state — user phải thoát được
     } finally {
       localStorage.removeItem("hasSession");
-      localStorage.removeItem("appInitialized"); // ← thêm dòng này
+      localStorage.removeItem("appInitialized");
+      clearCart();
       clearAuth();
       navigate("/");
       toast.success("Đã đăng xuất");
