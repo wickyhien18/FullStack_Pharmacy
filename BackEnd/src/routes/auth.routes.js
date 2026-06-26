@@ -28,4 +28,17 @@ router.post("/logout", authController.logout);
 router.post("/logout-all", authenticate, authController.logoutAll);
 router.get("/profile", authenticate, authController.getProfile);
 
+router.put("/profile", authenticate, authController.updateProfile);
+router.put("/change-password", authenticate, authController.changePassword);
+router.post(
+  "/request-email-change",
+  authenticate,
+  authController.requestEmailChange,
+);
+router.post(
+  "/verify-email-change",
+  authenticate,
+  authController.verifyEmailChange,
+);
+
 export default router;
