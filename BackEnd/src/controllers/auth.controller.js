@@ -84,3 +84,55 @@ export const getProfile = async (req, res) => {
     sendError(res, error.message, error.status || 500);
   }
 };
+
+// PUT /api/auth/profile
+export const updateProfile = async (req, res) => {
+  try {
+    const { fullName, phone } = req.body;
+    if (!fullName && !phone)
+      return sendError(res, "Vui lòng nhập thông tin cần cập nhật", 400);
+    const data = await authService.updateProfile(req.user.userId, {
+      fullName,
+      phone,
+    });
+    return sendSuccess(res, data, "Cập nhật thông tin thành công");
+  } catch (err) {
+    return sendError(res, err.message, err.status || 500);
+  }
+};
+
+// PUT /api/auth/change-password
+export const changePassword = async (req, res) => {
+  try {
+    const data = await authService.changePassword(req.user.userId, req.body);
+    res.clearCookie("refreshToken");
+    return sendSuccess(res, data, data.message);
+  } catch (err) {
+    return sendError(res, err.message, err.status || 500);
+  }
+};
+
+// POST /api/auth/request-email-change
+export const requestEmailChange = async (req, res) => {
+  try {
+    const { newEmail } = req.body;
+    const data = await authService.requestEmailChange(
+      req.user.userId,
+      newEmail,
+    );
+    return sendSuccess(res, data, data.message);
+  } catch (err) {
+    return sendError(res, err.message, err.status || 500);
+  }
+};
+
+// POST /api/auth/verify-email-change
+export const verifyEmailChange = async (req, res) => {
+  try {
+    const { otp } = req.body;
+    const data = await authService.verifyEmailChange(req.user.userId, otp);
+    return sendSuccess(res, data, data.message);
+  } catch (err) {
+    return sendError(res, err.message, err.status || 500);
+  }
+};
