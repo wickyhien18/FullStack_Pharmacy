@@ -62,6 +62,12 @@ export const findAllTokensByUser = (userId) => {
   });
 };
 
+export const findEmailOTP = (userId) => {
+  return prisma.otpVerification.findUnique({
+    where: { userId },
+  });
+};
+
 //PRISMA CREATE
 export const createUser = (userData) => {
   return prisma.user.create({
@@ -140,5 +146,20 @@ export const deleteRefreshToken = (refreshToken) => {
 export const deleteRefreshTokensByUserId = (userId) => {
   return prisma.refreshToken.deleteMany({
     where: { userId },
+  });
+};
+
+export const deleteEmailOTP = (userId) => {
+  return prisma.otpVerification.findUnique({
+    where: { userId },
+  });
+};
+
+//PISMA UPSERT
+export const saveEmailOTP = (userId, newEmail, otp, expiresAt) => {
+  return prisma.otpVerification.upsert({
+    where: { userId },
+    update: { newEmail, otp, expiresAt, createdAt: new Date() },
+    create: { userId, newEmail, otp, expiresAt },
   });
 };
