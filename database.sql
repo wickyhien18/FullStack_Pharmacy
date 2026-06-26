@@ -319,6 +319,18 @@ CREATE TABLE product_images (
  
 CREATE INDEX idx_product_images_product_id ON product_images(product_id);
 
+-- ----------------------------------------------------------------
+-- 16. OTP-VERIFICATIONS
+-- ----------------------------------------------------------------
+CREATE TABLE otp_verifications (
+  id         BIGSERIAL PRIMARY KEY,
+  user_id    BIGINT NOT NULL UNIQUE REFERENCES users(user_id) ON DELETE CASCADE,
+  new_email  VARCHAR(255) NOT NULL,
+  otp        VARCHAR(10) NOT NULL,
+  expires_at TIMESTAMP NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
 -- ================================================================
 -- SEED DATA
 -- ================================================================
