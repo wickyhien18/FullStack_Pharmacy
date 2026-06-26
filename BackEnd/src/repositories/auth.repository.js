@@ -1,5 +1,6 @@
 import { prisma } from "../config/prisma.js";
 
+//PRISMA FIND
 export const findUserByEmail = (email) => {
   return prisma.user.findUnique({
     where: { email },
@@ -27,13 +28,6 @@ export const findUserById = (userId) => {
   });
 };
 
-export const createUser = (userData) => {
-  return prisma.user.create({
-    data: userData,
-    include: { role: true },
-  });
-};
-
 export const findRoleByName = (name) => {
   return prisma.role.findUnique({
     where: { roleName: name },
@@ -53,19 +47,36 @@ export const findRefreshToken = (token) => {
   });
 };
 
+export const findUserPasswordById = (userId) => {
+  return prisma.user.findUnique({
+    where: { userId: userId },
+    select: { userId: true, password: true },
+  });
+};
+
+export const findAllTokensByUser = (userId) => {
+  return prisma.refreshToken.findMany({
+    where: { userId },
+    select: { id: true, deviceInfo: true, createdAt: true, expireAt: true },
+    orderBy: { createdAt: "desc" },
+  });
+};
+
+//PRISMA CREATE
+export const createUser = (userData) => {
+  return prisma.user.create({
+    data: userData,
+    include: { role: true },
+  });
+};
+
 export const saveRefreshToken = (userId, token, expireAt, deviceInfo) => {
   return prisma.refreshToken.create({
     data: { userId, token, expireAt, deviceInfo },
   });
 };
 
-export const updateRefreshTokenById = (id, newToken, newExpireAt) => {
-  return prisma.refreshToken.update({
-    where: { id },
-    data: { token: newToken, expireAt: newExpireAt },
-  });
-};
-
+//PRISMA EXIST
 export const existUser = (email, userName, phone) => {
   return prisma.user.findFirst({
     where: {
@@ -89,23 +100,19 @@ export const existUserEmail = (email, excludeUserId) => {
   });
 };
 
+//PRISMA UPDATE
+export const updateRefreshTokenById = (id, newToken, newExpireAt) => {
+  return prisma.refreshToken.update({
+    where: { id },
+    data: { token: newToken, expireAt: newExpireAt },
+  });
+};
+
 export const updateUserProfile = (userId, data) => {
   return prisma.user.update({
-    where: { userId: BigInt(userId) },
+    where: { userId },
     data: { ...data, updatedAt: new Date() },
     include: { role: true },
-  });
-};
-
-export const deleteRefreshToken = (refreshToken) => {
-  return prisma.refreshToken.delete({
-    where: { token: refreshToken },
-  });
-};
-
-export const deleteRefreshTokensByUserId = (userId) => {
-  return prisma.refreshToken.deleteMany({
-    where: { userId },
   });
 };
 
@@ -116,10 +123,22 @@ export const updateLastActivity = (userId) => {
   });
 };
 
-export const findAllTokensByUser = (userId) => {
-  return prisma.refreshToken.findMany({
+export const updateUserPassword = (userId, hashedPasword) => {
+  return prisma.user.update({
     where: { userId },
-    select: { id: true, deviceInfo: true, createdAt: true, expireAt: true },
-    orderBy: { createdAt: "desc" },
+    data: { password: hashedPasword, updateAt: new Date() },
+  });
+};
+
+//PRISMA DELETE
+export const deleteRefreshToken = (refreshToken) => {
+  return prisma.refreshToken.delete({
+    where: { token: refreshToken },
+  });
+};
+
+export const deleteRefreshTokensByUserId = (userId) => {
+  return prisma.refreshToken.deleteMany({
+    where: { userId },
   });
 };
