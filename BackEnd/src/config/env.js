@@ -20,8 +20,8 @@ export const env = {
   SUPABASE_STORAGE_BUCKET:
     process.env.SUPABASE_STORAGE_BUCKET || "product-images",
   BCRYPT_ROUNDS: parseInt(process.env.BCRYPT_ROUNDS || "10"),
-  GMAIL_USER: process.env.GMAIL_USER || "",
-  GMAIL_APP_PASS: process.env.GMAIL_APP_PASS || "",
+  RESEND_API_KEY: requireEnv("RESEND_API_KEY"),
+  RESEND_FROM_EMAIL: process.env.RESEND_FROM_EMAIL || "noreply@example.com",
   isDev: process.env.NODE_ENV !== "production",
   isProd: process.env.NODE_ENV === "production",
 };

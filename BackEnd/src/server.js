@@ -25,8 +25,6 @@ const start = async () => {
     }
   }
 
-  await verifyMailer(); // ← thêm dòng này
-
   app.listen(env.PORT, () => {
     console.log(`[Server] Running on http://localhost:${env.PORT}`);
     console.log(`[Server] Environment: ${env.NODE_ENV}`);
