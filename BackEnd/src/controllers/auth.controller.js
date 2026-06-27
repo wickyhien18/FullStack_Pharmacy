@@ -136,3 +136,25 @@ export const verifyEmailChange = async (req, res) => {
     return sendError(res, err.message, err.status || 500);
   }
 };
+
+// POST /api/auth/forgot-password (không cần authenticate)
+export const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const data = await authService.forgotPassword(email);
+    return sendSuccess(res, data, data.message);
+  } catch (err) {
+    return sendError(res, err.message, err.status || 500);
+  }
+};
+
+// POST /api/auth/reset-password (không cần authenticate)
+export const resetPassword = async (req, res) => {
+  try {
+    const { email, otp, newPassword } = req.body;
+    const data = await authService.resetPassword(email, otp, newPassword);
+    return sendSuccess(res, data, data.message);
+  } catch (err) {
+    return sendError(res, err.message, err.status || 500);
+  }
+};
