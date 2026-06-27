@@ -246,7 +246,7 @@ export const changePassword = async (
   await authRepository.updateUserPassword(userId, hashed);
 
   // Logout tất cả thiết bị sau khi đổi mật khẩu
-  await authRepository.deleteAllRefreshTokensByUserId(userId);
+  await authRepository.deleteAllRefreshTokensByUser(userId);
 
   return { message: "Đổi mật khẩu thành công. Vui lòng đăng nhập lại." };
 };
