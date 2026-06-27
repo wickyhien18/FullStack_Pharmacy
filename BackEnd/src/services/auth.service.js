@@ -73,26 +73,32 @@ export const register = async ({
   // Nếu 1 trong 2 fail → rollback cả 2
   const { prisma } = await import("../config/prisma.js");
 
-  const user = await prisma.$transaction(async (tx) => {
-    const newUser = await tx.user.create({
-      data: {
-        userName,
-        fullName,
-        email,
-        phone,
-        password: hashedPassword,
-        roleId: role.roleId,
-      },
-      include: { role: true },
-    });
+  const user = await prisma.$transaction(
+    async (tx) => {
+      const newUser = await tx.user.create({
+        data: {
+          userName,
+          fullName,
+          email,
+          phone,
+          password: hashedPassword,
+          roleId: role.roleId,
+        },
+        include: { role: true },
+      });
 
-    // Tạo cart ngay sau khi tạo user
-    await tx.cart.create({
-      data: { userId: newUser.userId },
-    });
+      // Tạo cart ngay sau khi tạo user
+      await tx.cart.create({
+        data: { userId: newUser.userId },
+      });
 
-    return newUser;
-  });
+      return newUser;
+    },
+    {
+      timeout: 30000, // tăng lên 30 giây
+      maxWait: 10000, // chờ tối đa 10 giây để lấy connection
+    },
+  );
 
   return { user: formatUser(user) };
 };

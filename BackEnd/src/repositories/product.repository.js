@@ -114,36 +114,42 @@ export const syncProductImagesAndUpdateProduct = ({
   newImageUrls,
   updateData,
 }) => {
-  return prisma.$transaction(async (tx) => {
-    const deleteWhere =
-      keptImageIds.length > 0
-        ? { productId, imageId: { notIn: keptImageIds } }
-        : { productId };
+  return prisma.$transaction(
+    async (tx) => {
+      const deleteWhere =
+        keptImageIds.length > 0
+          ? { productId, imageId: { notIn: keptImageIds } }
+          : { productId };
 
-    await tx.productImage.deleteMany({ where: deleteWhere });
+      await tx.productImage.deleteMany({ where: deleteWhere });
 
-    await Promise.all(
-      keptImageIds.map((imageId, index) =>
-        tx.productImage.update({
-          where: { imageId },
-          data: { displayOrder: index },
-        }),
-      ),
-    );
+      await Promise.all(
+        keptImageIds.map((imageId, index) =>
+          tx.productImage.update({
+            where: { imageId },
+            data: { displayOrder: index },
+          }),
+        ),
+      );
 
-    if (newImageUrls.length > 0) {
-      await tx.productImage.createMany({
-        data: newImageUrls.map((imageUrl, index) => ({
-          productId,
-          imageUrl,
-          displayOrder: keptImageIds.length + index,
-        })),
+      if (newImageUrls.length > 0) {
+        await tx.productImage.createMany({
+          data: newImageUrls.map((imageUrl, index) => ({
+            productId,
+            imageUrl,
+            displayOrder: keptImageIds.length + index,
+          })),
+        });
+      }
+
+      return tx.product.update({
+        where: { productId },
+        data: updateData,
       });
-    }
-
-    return tx.product.update({
-      where: { productId },
-      data: updateData,
-    });
-  });
+    },
+    {
+      timeout: 30000, // tăng lên 30 giây
+      maxWait: 10000, // chờ tối đa 10 giây để lấy connection
+    },
+  );
 };

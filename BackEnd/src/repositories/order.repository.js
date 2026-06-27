@@ -45,61 +45,67 @@ export const createOrder = async ({
   note,
   totalPrice,
 }) => {
-  return prisma.$transaction(async (tx) => {
-    const order = await tx.order.create({
-      data: {
-        user: { connect: { userId } },
-        orderCode,
-        totalPrice,
-        shippingAddress,
-        note,
-        orderStatus: "PENDING",
-        paymentStatus: "PENDING",
-      },
-    });
-
-    for (const item of items) {
-      const product = await tx.product.findUnique({
-        where: { productId: item.productId },
-        include: { inventory: true },
-      });
-
-      if (!product) throw new Error("Sản phẩm không tồn tại");
-      const currentQty = product.inventory?.quantity ?? 0;
-      if (currentQty < item.quantity) {
-        throw new Error(`Sản phẩm "${product.name}" không đủ hàng`);
-      }
-
-      await tx.orderItem.create({
+  return prisma.$transaction(
+    async (tx) => {
+      const order = await tx.order.create({
         data: {
-          order: { connect: { orderId: order.orderId } },
-          product: { connect: { productId: item.productId } },
-          quantity: item.quantity,
-          unitPrice: product.price,
-          totalPrice: Number(product.price) * item.quantity,
+          user: { connect: { userId } },
+          orderCode,
+          totalPrice,
+          shippingAddress,
+          note,
+          orderStatus: "PENDING",
+          paymentStatus: "PENDING",
         },
       });
 
-      const newQty = currentQty - item.quantity;
-      await tx.inventory.update({
-        where: { productId: item.productId },
-        data: { quantity: { decrement: item.quantity } },
-      });
+      for (const item of items) {
+        const product = await tx.product.findUnique({
+          where: { productId: item.productId },
+          include: { inventory: true },
+        });
 
-      // ← THÊM: ghi log EXPORT khi đặt hàng
-      await writeInventoryLog(tx, {
-        productId: item.productId,
-        changeType: "EXPORT",
-        quantity: item.quantity,
-        previousQuantity: currentQty,
-        newQuantity: newQty,
-        referenceId: order.orderId,
-        note: `Xuất kho cho đơn hàng ${order.orderCode}`,
-      });
-    }
+        if (!product) throw new Error("Sản phẩm không tồn tại");
+        const currentQty = product.inventory?.quantity ?? 0;
+        if (currentQty < item.quantity) {
+          throw new Error(`Sản phẩm "${product.name}" không đủ hàng`);
+        }
 
-    return order;
-  });
+        await tx.orderItem.create({
+          data: {
+            order: { connect: { orderId: order.orderId } },
+            product: { connect: { productId: item.productId } },
+            quantity: item.quantity,
+            unitPrice: product.price,
+            totalPrice: Number(product.price) * item.quantity,
+          },
+        });
+
+        const newQty = currentQty - item.quantity;
+        await tx.inventory.update({
+          where: { productId: item.productId },
+          data: { quantity: { decrement: item.quantity } },
+        });
+
+        // ← THÊM: ghi log EXPORT khi đặt hàng
+        await writeInventoryLog(tx, {
+          productId: item.productId,
+          changeType: "EXPORT",
+          quantity: item.quantity,
+          previousQuantity: currentQty,
+          newQuantity: newQty,
+          referenceId: order.orderId,
+          note: `Xuất kho cho đơn hàng ${order.orderCode}`,
+        });
+      }
+
+      return order;
+    },
+    {
+      timeout: 30000, // tăng lên 30 giây
+      maxWait: 10000, // chờ tối đa 10 giây để lấy connection
+    },
+  );
 };
 
 export const findOrdersByUser = async (userId, { skip, limit }) => {
@@ -135,43 +141,49 @@ export const findOrderByUserIdAndOrderId = async (orderId, userId) => {
 };
 
 export const handleCancelOrderPending = async (orderId, reason) => {
-  return prisma.$transaction(async (tx) => {
-    const order = await tx.order.update({
-      where: { orderId },
-      data: {
-        orderStatus: "CANCELLED",
-        cancelledBy: "USER",
-        cancelledReason: reason || "Người dùng huỷ đơn",
-        cancelledAt: new Date(),
-      },
-    });
-
-    const items = await tx.orderItem.findMany({ where: { orderId } });
-
-    for (const item of items) {
-      const inventory = await tx.inventory.findUnique({
-        where: { productId: item.productId },
-      });
-      const currentQty = inventory?.quantity ?? 0;
-      const newQty = currentQty + item.quantity;
-
-      await tx.inventory.update({
-        where: { productId: item.productId },
-        data: { quantity: { increment: item.quantity } },
+  return prisma.$transaction(
+    async (tx) => {
+      const order = await tx.order.update({
+        where: { orderId },
+        data: {
+          orderStatus: "CANCELLED",
+          cancelledBy: "USER",
+          cancelledReason: reason || "Người dùng huỷ đơn",
+          cancelledAt: new Date(),
+        },
       });
 
-      // ← THÊM: ghi log IMPORT khi hoàn kho
-      await writeInventoryLog(tx, {
-        productId: item.productId,
-        changeType: "IMPORT",
-        quantity: item.quantity,
-        previousQuantity: currentQty,
-        newQuantity: newQty,
-        referenceId: orderId,
-        note: `Hoàn kho do huỷ đơn hàng`,
-      });
-    }
-  });
+      const items = await tx.orderItem.findMany({ where: { orderId } });
+
+      for (const item of items) {
+        const inventory = await tx.inventory.findUnique({
+          where: { productId: item.productId },
+        });
+        const currentQty = inventory?.quantity ?? 0;
+        const newQty = currentQty + item.quantity;
+
+        await tx.inventory.update({
+          where: { productId: item.productId },
+          data: { quantity: { increment: item.quantity } },
+        });
+
+        // ← THÊM: ghi log IMPORT khi hoàn kho
+        await writeInventoryLog(tx, {
+          productId: item.productId,
+          changeType: "IMPORT",
+          quantity: item.quantity,
+          previousQuantity: currentQty,
+          newQuantity: newQty,
+          referenceId: orderId,
+          note: `Hoàn kho do huỷ đơn hàng`,
+        });
+      }
+    },
+    {
+      timeout: 30000, // tăng lên 30 giây
+      maxWait: 10000, // chờ tối đa 10 giây để lấy connection
+    },
+  );
 };
 
 export const cancelOrderShipping = async (orderId, reason) => {
@@ -197,37 +209,43 @@ export const cancelOrderDelivered = async (orderId, reason) => {
 };
 
 export const handleCancelOrderDelivedAndShipping = async (orderId, status) => {
-  return prisma.$transaction(async (tx) => {
-    await tx.order.update({
-      where: { orderId },
-      data: { orderStatus: status, cancelledAt: new Date() },
-    });
-
-    const items = await tx.orderItem.findMany({ where: { orderId } });
-    for (const item of items) {
-      const inventory = await tx.inventory.findUnique({
-        where: { productId: item.productId },
-      });
-      const currentQty = inventory?.quantity ?? 0;
-      const newQty = currentQty + item.quantity;
-
-      await tx.inventory.update({
-        where: { productId: item.productId },
-        data: { quantity: { increment: item.quantity } },
+  return prisma.$transaction(
+    async (tx) => {
+      await tx.order.update({
+        where: { orderId },
+        data: { orderStatus: status, cancelledAt: new Date() },
       });
 
-      // ← THÊM: ghi log IMPORT khi hoàn kho
-      await writeInventoryLog(tx, {
-        productId: item.productId,
-        changeType: "IMPORT",
-        quantity: item.quantity,
-        previousQuantity: currentQty,
-        newQuantity: newQty,
-        referenceId: orderId,
-        note: `Hoàn kho do huỷ đơn hàng (${status})`,
-      });
-    }
-  });
+      const items = await tx.orderItem.findMany({ where: { orderId } });
+      for (const item of items) {
+        const inventory = await tx.inventory.findUnique({
+          where: { productId: item.productId },
+        });
+        const currentQty = inventory?.quantity ?? 0;
+        const newQty = currentQty + item.quantity;
+
+        await tx.inventory.update({
+          where: { productId: item.productId },
+          data: { quantity: { increment: item.quantity } },
+        });
+
+        // ← THÊM: ghi log IMPORT khi hoàn kho
+        await writeInventoryLog(tx, {
+          productId: item.productId,
+          changeType: "IMPORT",
+          quantity: item.quantity,
+          previousQuantity: currentQty,
+          newQuantity: newQty,
+          referenceId: orderId,
+          note: `Hoàn kho do huỷ đơn hàng (${status})`,
+        });
+      }
+    },
+    {
+      timeout: 30000, // tăng lên 30 giây
+      maxWait: 10000, // chờ tối đa 10 giây để lấy connection
+    },
+  );
 };
 
 export const rejectOrder = async (orderId, status, reason) => {
@@ -245,57 +263,63 @@ export const rejectOrder = async (orderId, status, reason) => {
 
 // Xử lý hoàn hàng: đổi status RETURNED + hoàn tồn kho + ghi nhận hoàn tiền
 export const approveReturnOrder = async (orderId, totalPrice) => {
-  return prisma.$transaction(async (tx) => {
-    // 1. Đổi status đơn hàng → RETURNED
-    await tx.order.update({
-      where: { orderId },
-      data: {
-        orderStatus: "RETURNED",
-        cancelledAt: new Date(),
-      },
-    });
-
-    // 2. Hoàn tồn kho + ghi log
-    const items = await tx.orderItem.findMany({ where: { orderId } });
-    for (const item of items) {
-      const inventory = await tx.inventory.findUnique({
-        where: { productId: item.productId },
-      });
-      const currentQty = inventory?.quantity ?? 0;
-      const newQty = currentQty + item.quantity;
-
-      await tx.inventory.update({
-        where: { productId: item.productId },
-        data: { quantity: { increment: item.quantity } },
+  return prisma.$transaction(
+    async (tx) => {
+      // 1. Đổi status đơn hàng → RETURNED
+      await tx.order.update({
+        where: { orderId },
+        data: {
+          orderStatus: "RETURNED",
+          cancelledAt: new Date(),
+        },
       });
 
-      // ← THÊM: ghi log IMPORT khi hoàn kho
-      await writeInventoryLog(tx, {
-        productId: item.productId,
-        changeType: "IMPORT",
-        quantity: item.quantity,
-        previousQuantity: currentQty,
-        newQuantity: newQty,
-        referenceId: orderId,
-        note: `Hoàn kho do hoàn hàng`,
+      // 2. Hoàn tồn kho + ghi log
+      const items = await tx.orderItem.findMany({ where: { orderId } });
+      for (const item of items) {
+        const inventory = await tx.inventory.findUnique({
+          where: { productId: item.productId },
+        });
+        const currentQty = inventory?.quantity ?? 0;
+        const newQty = currentQty + item.quantity;
+
+        await tx.inventory.update({
+          where: { productId: item.productId },
+          data: { quantity: { increment: item.quantity } },
+        });
+
+        // ← THÊM: ghi log IMPORT khi hoàn kho
+        await writeInventoryLog(tx, {
+          productId: item.productId,
+          changeType: "IMPORT",
+          quantity: item.quantity,
+          previousQuantity: currentQty,
+          newQuantity: newQty,
+          referenceId: orderId,
+          note: `Hoàn kho do hoàn hàng`,
+        });
+      }
+
+      // 3. Ghi nhận hoàn tiền vào bảng payments
+      // Tìm payment gốc (nếu có) để lấy paymentMethod
+      const existingPayment = await tx.payment.findFirst({
+        where: { orderId },
+        orderBy: { createdAt: "desc" },
       });
-    }
 
-    // 3. Ghi nhận hoàn tiền vào bảng payments
-    // Tìm payment gốc (nếu có) để lấy paymentMethod
-    const existingPayment = await tx.payment.findFirst({
-      where: { orderId },
-      orderBy: { createdAt: "desc" },
-    });
-
-    await tx.payment.create({
-      data: {
-        orderId,
-        paymentMethod: existingPayment?.paymentMethod || "COD",
-        amount: totalPrice,
-        status: "REFUNDED",
-        paidAt: new Date(),
-      },
-    });
-  });
+      await tx.payment.create({
+        data: {
+          orderId,
+          paymentMethod: existingPayment?.paymentMethod || "COD",
+          amount: totalPrice,
+          status: "REFUNDED",
+          paidAt: new Date(),
+        },
+      });
+    },
+    {
+      timeout: 30000, // tăng lên 30 giây
+      maxWait: 10000, // chờ tối đa 10 giây để lấy connection
+    },
+  );
 };
