@@ -2,7 +2,6 @@ import "dotenv/config";
 import app from "./app.js";
 import { env } from "./config/env.js";
 import { prisma } from "./config/prisma.js";
-import { verifyMailer } from "./services/email.service.js";
 
 BigInt.prototype.toJSON = function () {
   return this.toString();

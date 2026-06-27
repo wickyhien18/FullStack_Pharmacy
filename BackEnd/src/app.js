@@ -22,6 +22,8 @@ import cartRoutes from "./routes/cart.routes.js";
 
 const app = express();
 
+// Render/Vercel dùng reverse proxy — cần trust proxy để rate-limit hoạt động đúng
+app.set("trust proxy", 1);
 // ── Security ─────────────────────────────────────────────────────
 app.use(helmet());
 app.use(
