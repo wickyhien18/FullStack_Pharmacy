@@ -3,7 +3,10 @@ import { env } from "../config/env.js";
 import * as jwt from "../utils/jwt.js";
 import { getDeviceInfo } from "../utils/device.js";
 import * as authRepository from "../repositories/auth.repository.js";
-import { sendOTPEmail } from "../services/email.service.js";
+import {
+  sendOTPEmail,
+  sendResetPasswordEmail,
+} from "../services/email.service.js";
 
 // ── GET REFRESHTOKEN EXPIRY ────────────────────────────────────────────────
 const getRefreshTokenExpiry = () => {
@@ -289,4 +292,67 @@ export const verifyEmailChange = async (userId, otp) => {
   await authRepository.deleteEmailOTP(userId);
 
   return { message: "Đổi email thành công" };
+};
+
+// ── FORGOTPASSWORD ──────────────────
+export const forgotPassword = async (email) => {
+  if (!email) throw { status: 400, message: "Vui lòng nhập email" };
+
+  const user = await authRepository.findUserByEmail(email);
+  if (!user)
+    throw { status: 404, message: "Email không tồn tại trong hệ thống" };
+  if (!user.isActive) throw { status: 403, message: "Tài khoản đang bị khóa" };
+
+  // Tạo OTP 6 số
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 phút
+
+  // Dùng lại bảng otp_verifications, newEmail = email hiện tại (để phân biệt flow)
+  await authRepository.saveEmailOTP(
+    user.userId,
+    `reset:${email}`,
+    otp,
+    expiresAt,
+  );
+
+  // Gửi email OTP reset mật khẩu
+  await sendResetPasswordEmail(email, user.fullName, otp);
+
+  return { message: "Mã OTP đã được gửi đến email của bạn" };
+};
+
+// ── Reset mật khẩu bằng OTP ──────────────────────────────────────
+export const resetPassword = async (email, otp, newPassword) => {
+  if (!email || !otp || !newPassword)
+    throw { status: 400, message: "Vui lòng nhập đầy đủ thông tin" };
+  if (newPassword.length < 8)
+    throw { status: 400, message: "Mật khẩu mới phải có ít nhất 8 ký tự" };
+
+  const user = await authRepository.findUserByEmail(email);
+  if (!user) throw { status: 404, message: "Email không tồn tại" };
+
+  const record = await authRepository.findEmailOTP(user.userId);
+  if (!record)
+    throw { status: 404, message: "Không tìm thấy yêu cầu đặt lại mật khẩu" };
+
+  // Kiểm tra đúng flow reset (không phải flow đổi email)
+  if (record.newEmail !== `reset:${email}`)
+    throw { status: 400, message: "Yêu cầu không hợp lệ" };
+
+  if (record.expiresAt < new Date())
+    throw { status: 400, message: "Mã OTP đã hết hạn. Vui lòng gửi lại." };
+
+  if (record.otp !== otp) throw { status: 400, message: "Mã OTP không đúng" };
+
+  // Hash mật khẩu mới và cập nhật
+  const hashed = await bcrypt.hash(newPassword, env.BCRYPT_ROUNDS || 10);
+  await authRepository.updateUserPassword(user.userId, hashed);
+
+  // Xoá OTP sau khi dùng
+  await authRepository.deleteEmailOTP(user.userId);
+
+  // Logout tất cả thiết bị (bảo mật)
+  await authRepository.deleteAllRefreshTokensByUser(user.userId);
+
+  return { message: "Đặt lại mật khẩu thành công. Vui lòng đăng nhập lại." };
 };

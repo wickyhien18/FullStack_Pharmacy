@@ -14,6 +14,10 @@ export const prisma =
       },
     },
     log: env.isDev ? ["query", "error", "warn"] : ["error"],
+    transactionOptions: {
+      timeout: 30000, // 30 giây thay vì 5 giây mặc định
+      maxWait: 10000,
+    },
   });
 
 if (env.isDev) globalForPrisma.prisma = prisma;
