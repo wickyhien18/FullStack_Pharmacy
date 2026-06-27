@@ -4,11 +4,28 @@ export const findAllCategories = () => {
   return prisma.category.findMany({ orderBy: { name: "asc" } });
 };
 
-export const findAllCategoriesWithCount = () => {
-  return prisma.category.findMany({
-    include: { _count: { select: { products: true } } },
-    orderBy: { name: "asc" },
-  });
+export const findAllCategoriesWithCount = async () => {
+  const [categories, counts] = await Promise.all([
+    findAllCategories(),
+    prisma.product.groupBy({
+      by: ["categoryId"],
+      where: {
+        deletedAt: null,
+      },
+      _count: {
+        productId: true,
+      },
+    }),
+  ]);
+
+  const countMap = new Map(
+    counts.map((item) => [item.categoryId?.toString(), item._count.productId]),
+  );
+
+  return categories.map((category) => ({
+    ...category,
+    productCount: countMap.get(category.categoryId.toString()) ?? 0,
+  }));
 };
 
 export const findCategoryById = (categoryId) => {

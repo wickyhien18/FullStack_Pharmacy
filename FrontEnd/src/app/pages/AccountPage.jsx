@@ -465,6 +465,7 @@ function AccountPage() {
     queryKey: ["my-orders"],
     queryFn: () => api.get("/orders/my").then((r) => r.data.data),
     enabled: isAuthenticated && activeSubTab === "orders",
+    staleTime: 0,
   });
 
   const updateProfileMutation = useMutation({
@@ -829,7 +830,12 @@ function AccountPage() {
           />
         )}
         {showChangeEmail && (
-          <ChangeEmailModal onClose={() => setShowChangeEmail(false)} />
+          <ChangeEmailModal
+            onClose={() => {
+              setShowChangeEmail(false);
+              window.location.reload();
+            }}
+          />
         )}
         {showChangePwd && (
           <ChangePasswordModal

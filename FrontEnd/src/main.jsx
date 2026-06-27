@@ -12,9 +12,10 @@ import "./styles/index.css";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 5, // 5 phút
+      staleTime: 1000 * 30, // 30 giây — sau đó coi là stale
+      refetchOnWindowFocus: true, // fetch lại khi focus tab
+      refetchOnMount: true, // fetch lại khi component mount (chuyển trang)
       retry: 1,
-      refetchOnWindowFocus: false,
     },
   },
 });

@@ -16,7 +16,7 @@ export const useCart = () => {
     queryKey: ["cart"],
     queryFn: () => api.get("/cart").then((r) => r.data.data),
     enabled: isAuthenticated, // không fetch khi chưa login
-    staleTime: 1000 * 60, // cache 1 phút
+    staleTime: 0,
   });
 
   // Invalidate cart cache sau mỗi mutation
