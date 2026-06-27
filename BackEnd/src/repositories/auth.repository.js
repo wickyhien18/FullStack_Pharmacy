@@ -132,7 +132,7 @@ export const updateLastActivity = (userId) => {
 export const updateUserPassword = (userId, hashedPasword) => {
   return prisma.user.update({
     where: { userId },
-    data: { password: hashedPasword, updateAt: new Date() },
+    data: { password: hashedPasword, updatedAt: new Date() },
   });
 };
 
