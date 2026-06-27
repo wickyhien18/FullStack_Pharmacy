@@ -22,12 +22,11 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
-    const userAgent = req.headers["user-agent"];
     const { email, password } = req.body;
 
     const { accessToken, refreshToken, user } = await authService.login(
       { email, password },
-      userAgent,
+      req,
     );
     res.cookie(REFRESH_TOKEN_COOKIE, refreshToken, cookieOptions);
     return sendSuccess(res, { accessToken, user }, "Login successful");

@@ -107,7 +107,7 @@ export const register = async ({
 };
 
 // ── LOGIN ─────────────────────────────────────────────────────────
-export const login = async ({ email, password }, userAgent) => {
+export const login = async ({ email, password }, req) => {
   const user = await authRepository.findUserByEmail(email);
 
   //401 - Unauthorized - incorrect email or password in database => NOT sure you have account?
@@ -119,7 +119,7 @@ export const login = async ({ email, password }, userAgent) => {
   if (!isMatch)
     throw { status: 401, message: "Email hoặc mật khẩu không đúng" };
 
-  const deviceInfo = getDeviceInfo(userAgent);
+  const deviceInfo = getDeviceInfo(req);
   const accessToken = jwt.generateAccessTokens(buildTokenPayload(user));
   const refreshToken = jwt.generateRefreshToken();
   const expireAt = getRefreshTokenExpiry();
