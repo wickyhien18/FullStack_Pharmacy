@@ -2,6 +2,7 @@ import "dotenv/config";
 import app from "./app.js";
 import { env } from "./config/env.js";
 import { prisma } from "./config/prisma.js";
+import { verifyMailer } from "./services/email.service.js";
 
 BigInt.prototype.toJSON = function () {
   return this.toString();
@@ -23,6 +24,8 @@ const start = async () => {
       await new Promise((r) => setTimeout(r, 2000));
     }
   }
+
+  await verifyMailer(); // ← thêm dòng này
 
   app.listen(env.PORT, () => {
     console.log(`[Server] Running on http://localhost:${env.PORT}`);

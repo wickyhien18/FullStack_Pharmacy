@@ -3,14 +3,31 @@
 // Cài: npm install resend
 // Thêm vào .env: RESEND_API_KEY=re_xxx
 // ================================================================
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 import { env } from "../config/env.js";
 
-const resend = new Resend(env.RESEND_API_KEY);
+// Tạo transporter — kết nối đến Gmail SMTP
+export const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: env.GMAIL_USER, // email Gmail của bạn
+    pass: env.GMAIL_APP_PASS, // App Password 16 ký tự
+  },
+});
+
+// Verify kết nối khi server khởi động
+export const verifyMailer = async () => {
+  try {
+    await transporter.verify();
+    console.log("[Mailer] Gmail SMTP connected");
+  } catch (err) {
+    console.error("[Mailer] Gmail SMTP failed:", err.message);
+  }
+};
 
 export const sendOTPEmail = async (toEmail, otp) => {
-  const { error } = await resend.emails.send({
-    from: "Nhà Thuốc Wicky Hien <giaphien1008@gmail.com>", // đổi thành domain của bạn
+  const { error } = await transporter.sendMail({
+    from: '"Nhà Thuốc Wicky Hien" <${env.GMAIL_USER}>', // đổi thành domain của bạn
     to: toEmail,
     subject: "Xác nhận đổi email — Mã OTP của bạn",
     html: `
@@ -51,8 +68,8 @@ export const sendOTPEmail = async (toEmail, otp) => {
 };
 
 export const sendResetPasswordEmail = async (toEmail, fullName, otp) => {
-  const { error } = await resend.emails.send({
-    from: "Nhà Thuốc Wicky Hien <noreply@yourdomain.com>",
+  const { error } = await transporter.sendMail({
+    from: '"Nhà Thuốc Wicky Hien" <${env.GMAIL_USER}>',
     to: toEmail,
     subject: "Đặt lại mật khẩu — Mã OTP của bạn",
     html: `
