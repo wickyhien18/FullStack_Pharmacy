@@ -85,31 +85,31 @@ function ProductListPage() {
     })) || [];
 
   const activeCategory = liveCategories.find((c) => c.id === categorySlug);
-  const totalMedicineCount = liveCategories.reduce(
+  const totalProductCount = liveCategories.reduce(
     (sum, c) => sum + (Number(c.count) || 0),
     0,
   );
 
   // Map API response → shape ProductCard cần — giữ nguyên các field bạn đang dùng
-  const liveMedicines = (productsData?.items || []).map((m, index) => ({
+  const liveProducts = (productsData?.items || []).map((m, index) => ({
     id: m.slug || m.productId,
     productId: m.productId,
     name: m.name,
-    brand: m.manufacturerName || "Dược phẩm",
+    // brand: m.manufacturerName || "Dược phẩm",
     category: m.categorySlug || "products",
     price: m.price,
-    originalPrice: m.originalPrice || m.price * 1.15,
-    discount: m.originalPrice
-      ? Math.round((1 - m.price / m.originalPrice) * 100)
-      : 15,
+    // originalPrice: m.originalPrice || m.price * 1.15,
+    // discount: m.originalPrice
+    //   ? Math.round((1 - m.price / m.originalPrice) * 100)
+    //   : 15,
     stock: m.stock || 50,
     image: m.primaryImage || FALLBACK_IMAGE,
-    images: [m.primaryImage || FALLBACK_IMAGE],
-    description: m.description || "",
+    // images: [m.primaryImage || FALLBACK_IMAGE],
+    // description: m.description || "",
     unit: m.unit || "Hộp",
-    isFlashSale: index % 5 === 0,
-    isBestSeller: index % 5 === 1,
-    isFeatured: index % 5 === 2,
+    // isFlashSale: index % 5 === 0,
+    // isBestSeller: index % 5 === 1,
+    // isFeatured: index % 5 === 2,
   }));
 
   // Tổng số trang — lấy từ backend, không tính frontend nữa
@@ -164,7 +164,7 @@ function ProductListPage() {
                 <span
                   className={`text-xs ${!categorySlug ? "text-white/70" : "text-gray-400"}`}
                 >
-                  {totalMedicineCount}
+                  {totalProductCount}
                 </span>
               </button>
               {liveCategories.map((cat) => (
@@ -286,7 +286,7 @@ function ProductListPage() {
                   className={`text-sm px-3 py-2 rounded-lg text-left ${!categorySlug ? "text-white" : "bg-gray-50 text-gray-700"}`}
                   style={!categorySlug ? { backgroundColor: "#1250dc" } : {}}
                 >
-                  Tất cả ({totalMedicineCount})
+                  Tất cả ({totalProductCount})
                 </button>
                 {liveCategories.map((cat) => (
                   <button
@@ -330,9 +330,9 @@ function ProductListPage() {
               </div>
             )}
 
-            {liveMedicines.length > 0 ? (
+            {liveProducts.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {liveMedicines.map((p) => (
+                {liveProducts.map((p) => (
                   <ProductCard key={p.id} product={p} />
                 ))}
               </div>

@@ -9,7 +9,10 @@ import NotFoundPage from "./NotFoundPage";
 
 const FALLBACK_IMAGE =
   "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&h=400&fit=crop&auto=format";
-const tabs = ["Mô tả", "Thành phần", "Hướng dẫn sử dụng"];
+const tabs = [
+  "Mô tả",
+  // , "Thành phần", "Hướng dẫn sử dụng"
+];
 
 function ProductDetailPage() {
   const { id } = useParams();
@@ -56,8 +59,8 @@ function ProductDetailPage() {
     stock: m.stock || 50,
     images: imageList,
     description: m.description || "",
-    ingredients: "Dược chất hoạt tính",
-    usage: "Theo chỉ định của bác sĩ",
+    // ingredients: "Dược chất hoạt tính",
+    // usage: "Theo chỉ định của bác sĩ",
     unit: m.unit || "Hộp",
   };
 
@@ -69,17 +72,17 @@ function ProductDetailPage() {
         id: item.slug,
         productId: item.productId,
         name: item.name,
-        brand: item.manufacturerName || "Dược phẩm",
+        // brand: item.manufacturerName || "Dược phẩm",
         price: item.price,
         stock: item.stock || 50,
         image: item.primaryImage || item.image || FALLBACK_IMAGE,
-        images: [item.primaryImage || item.image || FALLBACK_IMAGE],
-        description: item.description || "",
+        // images: [item.primaryImage || item.image || FALLBACK_IMAGE],
+        // description: item.description || "",
         unit: item.unit || "Hộp",
       })) || [];
 
   const handleAddToCart = () => {
-    addToCart(product, qty);
+    addToCart(product.productId.toString(), qty);
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   };
@@ -210,15 +213,6 @@ function ProductDetailPage() {
               )}
             </button>
           </div>
-
-          <Link
-            to="/cart"
-            onClick={() => addToCart(product, qty)}
-            className="block w-full text-center py-3 rounded-xl border-2 font-semibold text-sm transition-colors hover:bg-blue-50"
-            style={{ borderColor: "#1250dc", color: "#1250dc" }}
-          >
-            Mua ngay
-          </Link>
         </div>
       </div>
 

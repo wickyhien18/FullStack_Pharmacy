@@ -50,12 +50,6 @@ function ProductCard({ product, showDiscount = true }) {
             ⚡ Flash
           </span>
         )} */}
-        {/* <button
-          onClick={handleWishlist}
-          className={`absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center shadow-sm transition-all ${isWishlisted ? "bg-red-50 text-red-500" : "bg-white text-gray-400 hover:text-red-400"}`}
-        >
-          <Heart size={16} fill={isWishlisted ? "currentColor" : "none"} />
-        </button> */}
       </div>
 
       <div className="p-3 flex flex-col flex-1">
