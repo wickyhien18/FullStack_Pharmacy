@@ -5,7 +5,7 @@ import react from "@vitejs/plugin-react";
 
 var stdin_default = defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
-  const apiUrl = "";
+  let apiUrl = "";
   if (env.NODE_ENV === "production")
     apiUrl = env.VITE_API_URL || "http://localhost:3000";
   else apiUrl = "http://localhost:3000";
