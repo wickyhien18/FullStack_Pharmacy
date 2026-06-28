@@ -1,26 +1,37 @@
 import * as categoryRepo from "../repositories/category.repository.js";
+import { countProductsByCategory } from "../repositories/product.repository.js";
 import slugify from "slugify";
 
 const generateSlug = (name) =>
   slugify(name, { lower: true, strict: true, locale: "vi" });
 
-const formatCategory = (c, withCount = false) => ({
+const formatCategory = (c) => ({
   categoryId: c.categoryId.toString(),
   name: c.name,
   slug: c.slug,
-  ...(withCount && { count: c._count?.products ?? 0 }),
 });
 
 export const getCategories = async () => {
   const categories = await categoryRepo.findAllCategories();
-  const items = categories.map((c) => formatCategory(c));
-  return { items, total: items.length };
+  return categories.map((c) => formatCategory(c));
 };
 
 export const getCategoriesWithCount = async () => {
-  const categories = await categoryRepo.findAllCategoriesWithCount();
-  const items = categories.map((c) => formatCategory(c, true));
-  return { items, total: items.length };
+  const [categories, counts] = await Promise.all([
+    categoryRepo.findAllCategories(),
+    countProductsByCategory(),
+  ]);
+
+  const countMap = new Map(
+    counts.map((item) => [item.categoryId.toString(), item._count.productId]),
+  );
+
+  return categories.map((category) => ({
+    categoryId: category.categoryId.toString(),
+    name: category.name,
+    slug: category.slug,
+    count: countMap.get(category.categoryId.toString()) ?? 0,
+  }));
 };
 
 export const createCategory = async ({ name }) => {

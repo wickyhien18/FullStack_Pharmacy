@@ -62,6 +62,18 @@ export const findProductWithImages = (productId) => {
   });
 };
 
+export const countProductsByCategory = () => {
+  return prisma.product.groupBy({
+    by: ["categoryId"],
+    where: {
+      deletedAt: null,
+    },
+    _count: {
+      productId: true,
+    },
+  });
+};
+
 // Tạo Product mới
 export const createProduct = (data) => {
   return prisma.product.create({ data });
