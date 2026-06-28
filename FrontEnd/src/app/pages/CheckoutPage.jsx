@@ -20,8 +20,6 @@ const steps = ["Địa chỉ giao hàng", "Thanh toán", "Xác nhận"];
 const paymentMethods = [
   { id: "cod", label: "Thanh toán khi nhận hàng (COD)", icon: "💵" },
   { id: "vnpay", label: "VNPAY - QR Code", icon: "📱" },
-  { id: "momo", label: "Ví MoMo", icon: "💜" },
-  { id: "bank", label: "Thẻ ngân hàng / Thẻ quốc tế", icon: "💳" },
 ];
 const ORDER_PROCESSING_STEPS = [
   {

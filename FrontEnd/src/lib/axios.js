@@ -9,8 +9,22 @@ import { useAuthStore } from "@/stores/auth.store.js";
 const api = axios.create({
   baseURL: "/api",
   withCredentials: true, // gửi kèm cookie (refresh token) trong mọi request
-  timeout: 10000, // timeout 10 giây
+  timeout: 15000, // timeout 10 giây
 });
+
+// ── Retry helper ─────────────────────────────────────────────────
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+const retryRequest = async (config, retries = 2, delay = 1000) => {
+  for (let i = 0; i < retries; i++) {
+    try {
+      await sleep(delay * (i + 1)); // delay tăng dần: 1s, 2s
+      return await api(config);
+    } catch (err) {
+      if (i === retries - 1) throw err;
+    }
+  }
+};
 
 // ── Request Interceptor ───────────────────────────────────────
 // Chạy TRƯỚC mỗi request — tự động gắn access token vào header
@@ -42,6 +56,23 @@ api.interceptors.response.use(
   // Response lỗi
   async (error) => {
     const originalRequest = error.config;
+    const status = error.response?.status;
+
+    // ── Retry khi gặp 502/503 (server tạm thời không sẵn sàng) ──
+    if ((status === 502 || status === 503) && !originalRequest._retried) {
+      originalRequest._retried = true;
+      console.warn(`[API] ${status} error, retrying in 2s...`);
+
+      try {
+        return await retryRequest(originalRequest);
+      } catch (retryErr) {
+        // Sau 2 lần retry vẫn lỗi → hiện thông báo thân thiện
+        return Promise.reject({
+          ...retryErr,
+          _userMessage: "Server đang bận, vui lòng thử lại sau.",
+        });
+      }
+    }
 
     // Nếu lỗi 401 và chưa thử refresh (tránh loop vô tận), và không phải request login/register
     if (

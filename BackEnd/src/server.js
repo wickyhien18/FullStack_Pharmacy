@@ -24,27 +24,27 @@ const start = async () => {
     }
   }
 
+  // ── Keep-alive ping mỗi 4 phút ────────────────────────────────
+  // Giữ Supabase connection sống — free tier đóng idle connection sau ~5 phút
+  // Trên Render free tier: cũng giúp tránh cold start nếu dùng cron ping từ ngoài
+  setInterval(
+    async () => {
+      try {
+        await prisma.$queryRaw`SELECT 1`;
+        console.log("[DB] Keep-alive ping OK");
+      } catch (err) {
+        console.warn(
+          "[DB] Keep-alive ping failed, will reconnect on next request:",
+          err.message,
+        );
+      }
+    },
+    4 * 60 * 1000,
+  ); // 4 phút
+
   app.listen(env.PORT, () => {
     console.log(`[Server] Running on http://localhost:${env.PORT}`);
     console.log(`[Server] Environment: ${env.NODE_ENV}`);
-
-    // ── Keep-alive ping mỗi 4 phút ────────────────────────────────
-    // Giữ Supabase connection sống — free tier đóng idle connection sau ~5 phút
-    // Trên Render free tier: cũng giúp tránh cold start nếu dùng cron ping từ ngoài
-    setInterval(
-      async () => {
-        try {
-          await prisma.$queryRaw`SELECT 1`;
-          console.log("[DB] Keep-alive ping OK");
-        } catch (err) {
-          console.warn(
-            "[DB] Keep-alive ping failed, will reconnect on next request:",
-            err.message,
-          );
-        }
-      },
-      4 * 60 * 1000,
-    ); // 4 phút
   });
 };
 
@@ -53,6 +53,17 @@ process.on("SIGTERM", async () => {
   console.log("[Server] SIGTERM received, shutting down...");
   await prisma.$disconnect();
   process.exit(0);
+});
+
+// Bắt lỗi không được xử lý — tránh server crash
+process.on("uncaughtException", (err) => {
+  console.error("[Server] Uncaught Exception:", err);
+  // Không exit — để server tiếp tục chạy
+});
+
+process.on("unhandledRejection", (reason) => {
+  console.error("[Server] Unhandled Rejection:", reason);
+  // Không exit — để server tiếp tục chạy
 });
 
 start();

@@ -272,16 +272,14 @@ function CartPage() {
               Phương thức thanh toán
             </h3>
             <div className="flex flex-wrap gap-2">
-              {["Visa", "Mastercard", "VNPAY", "Momo", "ZaloPay", "COD"].map(
-                (pm) => (
-                  <span
-                    key={pm}
-                    className="text-xs px-2.5 py-1.5 bg-gray-100 rounded-lg text-gray-600"
-                  >
-                    {pm}
-                  </span>
-                ),
-              )}
+              {["VNPAY", "COD - Thanh toán khi nhận hàng"].map((pm) => (
+                <span
+                  key={pm}
+                  className="text-xs px-2.5 py-1.5 bg-gray-100 rounded-lg text-gray-600"
+                >
+                  {pm}
+                </span>
+              ))}
             </div>
           </div>
         </div>
