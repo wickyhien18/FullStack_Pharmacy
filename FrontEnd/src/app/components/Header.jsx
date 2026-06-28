@@ -41,14 +41,17 @@ function Header() {
     "san-pham-me-va-be": "👩‍🍼",
   };
 
+  const categoriesArray = Array.isArray(categoriesData)
+    ? categoriesData
+    : categoriesData?.items || [];
+
   const liveCategories =
-    categoriesData?.items?.map((c) => ({
+    (categoriesArray || []).map((c) => ({
       id: c.slug,
       name: c.name,
       icon: categoryIconMap[c.slug] || "💊",
       slug: c.slug,
     })) || [];
-  console.log(liveCategories);
 
   const handleSearch = (e) => {
     e.preventDefault();

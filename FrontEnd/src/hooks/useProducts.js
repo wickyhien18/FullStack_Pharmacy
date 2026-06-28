@@ -40,7 +40,7 @@ export const useCategories = () => {
 // Lấy danh sách categories số lượng thuốc cùng loại
 export const useCategoriesWithCount = () => {
   return useQuery({
-    queryKey: ["categories", "count"],
+    queryKey: ["categories-count"],
     queryFn: () => api.get("/categories/count").then((r) => r.data.data),
 
     staleTime: 1000 * 60 * 30, // cache 30 phút — categories ít thay đổi
