@@ -68,9 +68,12 @@ function ProductListPage() {
     "duoc-my-pham": "✨",
     "thiet-bi-y-te": "🩺",
     "thuoc-ho-hap": "🫁",
-    "thuoc-tieu-hoa": "🧪",
     "thuoc-tim-mach": "❤️",
     "vitamin-khoang-chat": "💊",
+    "thuoc-tieu-hoa": "🤢",
+    "thuoc-giam-dau-ha-sot": "🤧",
+    "cham-soc-da": "💅",
+    "san-pham-me-va-be": "👩‍🍼",
   };
 
   const liveCategories =

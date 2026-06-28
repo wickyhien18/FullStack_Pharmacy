@@ -33,9 +33,12 @@ function Header() {
     "duoc-my-pham": "✨",
     "thiet-bi-y-te": "🩺",
     "thuoc-ho-hap": "🫁",
-    "thuoc-tieu-hoa": "🧪",
     "thuoc-tim-mach": "❤️",
     "vitamin-khoang-chat": "💊",
+    "thuoc-tieu-hoa": "🤢",
+    "thuoc-giam-dau-ha-sot": "🤧",
+    "cham-soc-da": "💅",
+    "san-pham-me-va-be": "👩‍🍼",
   };
 
   const liveCategories =
@@ -45,6 +48,7 @@ function Header() {
       icon: categoryIconMap[c.slug] || "💊",
       slug: c.slug,
     })) || [];
+  console.log(liveCategories);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -74,40 +78,6 @@ function Header() {
               ))}
           </span>
         </Link>
-
-        {/* <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <a
-              href="tel:18006928"
-              className="flex items-center gap-1 hover:text-blue-200 transition-colors"
-            >
-              <Phone size={12} />
-              <span>Hotline: 1800 6928 (Miễn phí)</span>
-            </a>
-            <span className="hidden md:flex items-center gap-1">
-              <Package size={12} />
-              <Link
-                to="/account"
-                className="hover:text-blue-200 transition-colors"
-              >
-                Tra cứu đơn hàng
-              </Link>
-            </span>
-          </div>
-          <div className="flex items-center gap-4">
-            <span className="hidden md:flex items-center gap-1">
-              <Bell size={12} />
-              <span>Nhận thông báo khuyến mãi</span>
-            </span>
-            <Link
-              to="/pharmacies"
-              className="flex items-center gap-1 hover:text-blue-200 transition-colors"
-            >
-              <MapPin size={12} />
-              <span>Tìm nhà thuốc</span>
-            </Link>
-          </div>
-        </div> */}
       </div>
 
       {/* Main header */}
@@ -155,18 +125,6 @@ function Header() {
             </div>
           </form>
 
-          {/* Services icons */}
-          {/* <div className="hidden lg:flex items-center gap-1 text-xs text-gray-600">
-            <div className="flex flex-col items-center gap-0.5 cursor-pointer hover:text-blue-700 px-2 py-1 rounded-lg hover:bg-blue-50">
-              <FileText size={20} className="text-gray-500" />
-              <span>Đơn thuốc</span>
-            </div>
-            <div className="flex flex-col items-center gap-0.5 cursor-pointer hover:text-blue-700 px-2 py-1 rounded-lg hover:bg-blue-50">
-              <Stethoscope size={20} className="text-gray-500" />
-              <span>Tư vấn</span>
-            </div>
-          </div> */}
-
           {/* Action icons */}
           <div className="flex items-center gap-2">
             <Link
@@ -179,23 +137,6 @@ function Header() {
                 {user && isAuthenticated ? user.userName : "Đăng Nhập"}{" "}
               </span>
             </Link>
-            {/* <Link
-              to="/wishlist"
-              className="relative flex flex-col items-center gap-0.5 text-xs text-gray-600 hover:text-blue-700 cursor-pointer px-2 py-1 rounded-lg hover:bg-blue-50 hidden md:flex"
-            >
-              <div className="relative">
-                <Heart size={20} />
-                {wishlist.length > 0 && (
-                  <span
-                    className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center"
-                    style={{ fontSize: "9px" }}
-                  >
-                    {wishlist.length}
-                  </span>
-                )}
-              </div>
-              <span>Yêu thích</span>
-            </Link> */}
             <Link
               to="/cart"
               className="relative flex flex-col items-center gap-0.5 text-xs text-gray-600 hover:text-blue-700 cursor-pointer px-2 py-1 rounded-lg hover:bg-blue-50"
