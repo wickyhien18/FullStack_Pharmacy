@@ -5,7 +5,10 @@ import react from "@vitejs/plugin-react";
 
 var stdin_default = defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
-  const apiUrl = env.VITE_API_URL || "http://localhost:3000";
+  const apiUrl = "";
+  if (env.NODE_ENV === "production")
+    apiUrl = env.VITE_API_URL || "http://localhost:3000";
+  else apiUrl = "http://localhost:3000";
   return {
     plugins: [
       // The React and Tailwind plugins are both required for Make, even if

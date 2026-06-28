@@ -42,9 +42,11 @@ function ProductListPage() {
   const { data: categoriesData, isLoading: isLoadingCategories } =
     useCategoriesWithCount();
   const categorySlug = searchParams.get("category") || "";
-  const matchedCategory = categoriesData?.items?.find(
-    (c) => c.slug === categorySlug,
-  );
+
+  const categoriesArray = Array.isArray(categoriesData)
+    ? categoriesData
+    : categoriesData?.items || [];
+  const matchedCategory = categoriesArray.find((c) => c.slug === categorySlug);
   const categoryId = matchedCategory ? matchedCategory.categoryId : "";
 
   // ── Fetch từ backend với đầy đủ params ──────────────────────────
@@ -72,7 +74,7 @@ function ProductListPage() {
   };
 
   const liveCategories =
-    categoriesData?.items?.map((c) => ({
+    (categoriesArray || []).map((c) => ({
       id: c.slug,
       name: c.name,
       icon: categoryIconMap[c.slug] || "💊",

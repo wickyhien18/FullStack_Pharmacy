@@ -41,11 +41,8 @@ export const useCategories = () => {
 export const useCategoriesWithCount = () => {
   return useQuery({
     queryKey: ["categories", "count"],
-    queryFn: () =>
-      api.get("/categories/count").then((r) => {
-        r.data.data;
-        console.log(r.data.data);
-      }),
+    queryFn: () => api.get("/categories/count").then((r) => r.data.data),
+
     staleTime: 1000 * 60 * 30, // cache 30 phút — categories ít thay đổi
   });
 };

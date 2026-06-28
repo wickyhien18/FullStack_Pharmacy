@@ -134,8 +134,12 @@ function HomePage() {
     "vitamin-khoang-chat": "💊",
   };
 
+  const categoriesArray = Array.isArray(categoriesData)
+    ? categoriesData
+    : categoriesData?.items || [];
+
   const liveCategories =
-    categoriesData?.items?.map((c) => ({
+    (categoriesArray || []).map((c) => ({
       id: c.slug,
       name: c.name,
       icon: categoryIconMap[c.slug] || "💊",
