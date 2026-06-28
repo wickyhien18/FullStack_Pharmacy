@@ -11,9 +11,17 @@ export const findProducts = ({ skip, limit, where, orderBy }) => {
     skip,
     take: limit,
     orderBy,
-    include: {
-      category: { select: { categoryId: true, name: true, slug: true } },
-      manufacturer: { select: { manufacturerId: true, name: true } },
+    select: {
+      productId: true,
+      name: true,
+      slug: true,
+      image: true,
+      price: true,
+      unit: true,
+      status: true,
+      deletedAt: true,
+      // Relations
+      category: { select: { name: true, slug: true } },
       inventory: { select: { quantity: true } },
       _count: { select: { orderItems: true } },
     },

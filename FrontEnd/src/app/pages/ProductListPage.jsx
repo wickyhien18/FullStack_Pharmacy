@@ -95,17 +95,10 @@ function ProductListPage() {
     id: m.slug || m.productId,
     productId: m.productId,
     name: m.name,
-    // brand: m.manufacturerName || "Dược phẩm",
     category: m.categorySlug || "products",
     price: m.price,
-    // originalPrice: m.originalPrice || m.price * 1.15,
-    // discount: m.originalPrice
-    //   ? Math.round((1 - m.price / m.originalPrice) * 100)
-    //   : 15,
     stock: m.stock || 50,
     image: m.primaryImage || FALLBACK_IMAGE,
-    // images: [m.primaryImage || FALLBACK_IMAGE],
-    // description: m.description || "",
     unit: m.unit || "Hộp",
     // isFlashSale: index % 5 === 0,
     // isBestSeller: index % 5 === 1,

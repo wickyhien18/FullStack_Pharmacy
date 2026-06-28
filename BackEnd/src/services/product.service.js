@@ -59,6 +59,19 @@ const formatProduct = (m) => ({
   name: m.name,
   slug: m.slug,
   price: Number(m.price),
+  unit: m.unit,
+  status: m.status,
+  categorySlug: m.category?.slug || null,
+  stock: m.inventory?.quantity ?? 0,
+  primaryImage: m.image || null,
+});
+
+// Format product trả về client
+const formatProductForSlug = (m) => ({
+  productId: m.productId.toString(),
+  name: m.name,
+  slug: m.slug,
+  price: Number(m.price),
   originalPrice: m.originalPrice ? Number(m.originalPrice) : null,
   unit: m.unit,
   status: m.status,
@@ -134,7 +147,7 @@ export const getProductBySlug = async (slug) => {
   const product = await productRepo.findProductBySlug(slug);
   if (!product) throw { status: 404, message: "Không tìm thấy sản phẩm" };
 
-  const result = formatProduct(product);
+  const result = formatProductForSlug(product);
 
   // Cache 10 phút / Cache for 10 minutes
   // await setCache(cacheKey, result, 600);
