@@ -1,17 +1,27 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ShoppingCart, Heart, Star } from "lucide-react";
 import { formatPrice } from "../data/products.js";
 import { useCart } from "@/hooks/useCart.js";
+import { useAuthStore } from "@/stores/auth.store.js";
+
 function ProductCard({ product, showDiscount = true }) {
   const { addToCart } = useCart();
+  const { isAuthenticated } = useAuthStore();
+  const navigate = useNavigate();
   const [added, setAdded] = useState(false);
   // const isWishlisted = wishlist.includes(product.id);
   const handleAddToCart = (e) => {
     e.preventDefault();
+
+    if (!isAuthenticated) {
+      navigate("/account");
+      return;
+    }
+
     addToCart(product.productId.toString(), 1);
     setAdded(true);
-    setTimeout(() => setAdded(false), 1500);
+    setTimeout(() => setAdded(false), 2000);
   };
   // const handleWishlist = (e) => {
   //   e.preventDefault();
@@ -93,11 +103,13 @@ function ProductCard({ product, showDiscount = true }) {
           style={added ? {} : { borderColor: "#1250dc" }}
         >
           {added ? (
-            "\u2713 \u0110\xE3 th\xEAm"
+            <span className="flex items-center justify-center gap-1.5">
+              ✓ Đã thêm vào giỏ
+            </span>
           ) : (
             <span className="flex items-center justify-center gap-1.5">
               <ShoppingCart size={14} />
-              Chọn mua
+              {isAuthenticated ? "Chọn mua" : "Đăng nhập để mua"}
             </span>
           )}
         </button>
