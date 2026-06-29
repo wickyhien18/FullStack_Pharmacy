@@ -1,5 +1,10 @@
 import { useEffect } from "react";
-import { Outlet, NavLink, useNavigate } from "react-router-dom";
+import {
+  Outlet,
+  NavLink,
+  useNavigate,
+  ScrollRestoration,
+} from "react-router-dom";
 import { useAuthStore } from "../../stores/auth.store.js";
 import {
   LayoutDashboard,
@@ -34,6 +39,7 @@ export default function AdminLayout() {
 
   return (
     <div className="flex h-screen bg-gray-100">
+      <ScrollRestoration />
       <aside className="w-64 bg-white shadow-sm flex flex-col shrink-0">
         <div className="p-6 border-b">
           <h1 className="text-lg font-bold text-blue-700">

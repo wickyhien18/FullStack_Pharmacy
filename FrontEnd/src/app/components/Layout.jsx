@@ -2,7 +2,7 @@
 // Layout.jsx — Quay về bản đơn giản, không cần Context nữa
 // Overlay được xử lý hoàn toàn trong AuthInitializer
 // ================================================================
-import { Outlet } from "react-router-dom";
+import { Outlet, ScrollRestoration } from "react-router-dom";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
 
@@ -12,6 +12,7 @@ function Layout() {
       className="min-h-screen flex flex-col"
       style={{ backgroundColor: "#f4f5f7" }}
     >
+      <ScrollRestoration />
       <Header />
       <main className="flex-1" style={{ minHeight: "60vh" }}>
         <Outlet />
