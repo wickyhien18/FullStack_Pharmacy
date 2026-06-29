@@ -30,7 +30,7 @@ app.use(
   cors({
     origin: (origin, callback) => {
       const allowed = [
-        env.CLIENT_URL.split(","), // URL Vercel (production)
+        ...env.CLIENT_URL.split(","), // URL Vercel (production)
         "http://localhost:5173", // local dev
         "http://localhost:4173", // vite preview
       ].filter(Boolean);
