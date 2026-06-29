@@ -30,12 +30,10 @@ app.use(
   cors({
     origin: (origin, callback) => {
       const allowed = [
-        env.CLIENT_URL, // URL Vercel (production)
+        env.CLIENT_URL.split(","), // URL Vercel (production)
         "http://localhost:5173", // local dev
         "http://localhost:4173", // vite preview
-        "https://www.pharmacywicky.site",
       ].filter(Boolean);
-
       // Cho phép request không có origin (Postman, curl, server-to-server)
       if (!origin || allowed.includes(origin)) {
         callback(null, true);
