@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ShoppingCart, Minus, Plus, ChevronRight, Check } from "lucide-react";
-import { formatPrice } from "../data/products";
 import { ProductCard } from "../components/ProductCard";
 import { useCart } from "@/hooks/useCart.js";
 import { useProduct, useProducts } from "../../hooks/useProducts.js";
@@ -22,7 +21,7 @@ function ProductDetailPage() {
     limit: 10,
   });
 
-  const { addToCart } = useCart();
+  const { addToCart, formatPrice } = useCart();
   const [qty, setQty] = useState(1);
   const [activeTab, setActiveTab] = useState(0);
   const [activeImg, setActiveImg] = useState(0);
