@@ -9,11 +9,17 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { useCart } from "@/hooks/useCart.js";
-import { formatPrice } from "../data/products.js";
 import { useState } from "react";
 function CartPage() {
-  const { items, removeItem, updateItem, totalItems, totalPrice, isLoading } =
-    useCart();
+  const {
+    items,
+    removeItem,
+    updateItem,
+    totalItems,
+    totalPrice,
+    isLoading,
+    formatPrice,
+  } = useCart();
 
   const [coupon, setCoupon] = useState("");
   const [couponApplied, setCouponApplied] = useState(false);

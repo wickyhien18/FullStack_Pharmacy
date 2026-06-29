@@ -11,7 +11,6 @@ import {
   Truck,
 } from "lucide-react";
 import { useCart } from "@/hooks/useCart.js";
-import { formatPrice } from "../data/products.js";
 import api from "../../lib/axios.js";
 import { useAuth } from "../../hooks/useAuth.js";
 import toast from "react-hot-toast";
@@ -55,7 +54,7 @@ const validateShippingForm = (values) => {
 };
 
 function CheckoutPage() {
-  const { items, totalPrice, totalItems, clearCart } = useCart();
+  const { items, totalPrice, totalItems, clearCart, formatPrice } = useCart();
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState(0);

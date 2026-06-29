@@ -1,12 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ShoppingCart, Heart, Star } from "lucide-react";
-import { formatPrice } from "../data/products.js";
 import { useCart } from "@/hooks/useCart.js";
 import { useAuthStore } from "@/stores/auth.store.js";
 
 function ProductCard({ product, showDiscount = true }) {
-  const { addToCart } = useCart();
+  const { addToCart, formatPrice } = useCart();
   const { isAuthenticated } = useAuthStore();
   const navigate = useNavigate();
   const [added, setAdded] = useState(false);

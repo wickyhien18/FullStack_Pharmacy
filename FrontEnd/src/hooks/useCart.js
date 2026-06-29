@@ -146,12 +146,20 @@ export const useCart = () => {
       toast.error(err.response?.data?.message || "Xoá thất bại"),
   });
 
+  const formatPrice = (price) =>
+    new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(price);
+
   return {
     cart,
     isLoading,
     items: cart?.items || [],
     totalItems: cart?.totalItems || 0,
     totalPrice: cart?.totalPrice || 0,
+
+    formatPrice,
 
     addToCart: (productId, quantity = 1) =>
       addMutation.mutate({ productId: productId.toString(), quantity }),
