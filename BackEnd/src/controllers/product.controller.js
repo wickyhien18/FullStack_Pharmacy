@@ -29,6 +29,9 @@ export const getProducts = async (req, res) => {
 // GET /api/products/:slug
 export const getProductBySlug = async (req, res) => {
   try {
+    console.log("Params:", req.params); // xem slug có đến không
+    console.log("URL:", req.url);
+
     const data = await productService.getProductBySlug(req.params.slug);
     return sendSuccess(res, data, "Lấy thông tin thuốc thành công");
   } catch (err) {

@@ -68,29 +68,22 @@ const formatProduct = (m) => ({
 
 // Format product trả về client
 const formatProductForSlug = (m) => ({
-  productId: m.productId.toString(),
+  productId: m.productId?.toString(),
   name: m.name,
   slug: m.slug,
   price: Number(m.price),
-  originalPrice: m.originalPrice ? Number(m.originalPrice) : null,
   unit: m.unit,
   status: m.status,
   description: m.description,
-  categoryId: m.categoryId?.toString(),
-  categoryName: m.category?.name || null,
-  categorySlug: m.category?.slug || null,
-  manufacturerId: m.manufacturerId?.toString(),
-  manufacturerName: m.manufacturer?.name || null,
-  stock: m.inventory?.quantity ?? 0,
+  manufacturerName: m.manufacturerName || null,
+  stock: m.quantity ?? 0,
   primaryImage: m.image || null,
   images:
     m.images?.map((img) => ({
-      // ← thêm block này
-      imageId: img.imageId.toString(),
       imageUrl: img.imageUrl,
+      displayOrder: img.displayOrder,
     })) || [],
-  expireDate: m.expireDate,
-  createdAt: m.createdAt,
+  expireDate: m.expireDate || null,
 });
 
 // Lấy danh sách products
