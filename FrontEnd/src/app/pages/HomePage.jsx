@@ -10,7 +10,6 @@ import {
   // TestTube,
 } from "lucide-react";
 import { ProductCard } from "../components/ProductCard";
-import { formatPrice } from "../data/products";
 import {
   useProducts,
   useCategoriesWithCount,
@@ -377,88 +376,7 @@ function HomePage() {
           ))}
         </div>
       </section>
-      {/* Flash Sale - hidden until promotion feature is ready */}
-      {false && (
-        <section
-          className="rounded-2xl overflow-hidden"
-          style={{
-            background: "linear-gradient(135deg, #e53935 0%, #c62828 100%)",
-          }}
-        >
-          <div className="p-5">
-            <div className="flex items-center justify-between mb-5">
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2 text-white">
-                  <Zap size={22} fill="white" />
-                  <span className="font-bold text-xl">FLASH SALE</span>
-                </div>
-                <CountdownTimer targetTime={flashSaleEnd} />
-              </div>
-              <Link
-                to="/products?sale=flash"
-                className="text-white/80 hover:text-white text-sm flex items-center gap-1 transition-colors"
-              >
-                Xem thêm <ArrowRight size={14} />
-              </Link>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {flashSale.slice(0, 4).map((p) => (
-                <Link
-                  key={p.id}
-                  to={`/products/${p.id}`}
-                  className="bg-white rounded-xl p-3 hover:shadow-lg transition-shadow group"
-                >
-                  <div className="relative">
-                    <img
-                      src={p.image}
-                      alt={p.name}
-                      className="w-full h-32 object-cover rounded-lg mb-2 group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <span
-                      className="absolute top-1 left-1 text-white text-xs font-bold px-1.5 py-0.5 rounded-md"
-                      style={{ backgroundColor: "#e53935" }}
-                    >
-                      -{p.discount}%
-                    </span>
-                  </div>
-                  <div className="text-xs text-gray-500 mb-1">{p.brand}</div>
-                  <div className="text-sm font-medium text-gray-800 line-clamp-2 mb-2">
-                    {p.name}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <span
-                      className="font-bold text-sm"
-                      style={{ color: "#e53935" }}
-                    >
-                      {formatPrice(p.price)}
-                    </span>
-                  </div>
-                  {p.originalPrice && (
-                    <div className="text-xs text-gray-400 line-through">
-                      {formatPrice(p.originalPrice)}
-                    </div>
-                  )}
-                  {/* Stock bar */}
-                  <div className="mt-2">
-                    <div className="text-xs text-gray-500 mb-1">
-                      Đã bán {p.sold}
-                    </div>
-                    <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                      <div
-                        className="h-full rounded-full"
-                        style={{
-                          backgroundColor: "#e53935",
-                          width: `${Math.min(90, (p.sold / (p.sold + p.stock)) * 100)}%`,
-                        }}
-                      />
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
+
       {/* Best Sellers */}
       {/* <section className="bg-white rounded-2xl p-6">
         <div className="flex items-center justify-between mb-5">
