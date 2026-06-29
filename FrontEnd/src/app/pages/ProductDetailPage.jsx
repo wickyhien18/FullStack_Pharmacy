@@ -5,9 +5,8 @@ import { ProductCard } from "../components/ProductCard";
 import { useCart } from "@/hooks/useCart.js";
 import { useProduct, useProducts } from "../../hooks/useProducts.js";
 import NotFoundPage from "./NotFoundPage";
+import { productDetailMain, productDetailThumb } from "../../lib/imageUrl.js";
 
-const FALLBACK_IMAGE =
-  "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&h=400&fit=crop&auto=format";
 const tabs = [
   "Mô tả",
   // , "Thành phần", "Hướng dẫn sử dụng"
@@ -45,7 +44,7 @@ function ProductDetailPage() {
     if (m.images && m.images.length > 0) {
       return m.images.map((img) => img.imageUrl || img);
     }
-    const primary = m.primaryImage || m.image || FALLBACK_IMAGE;
+    const primary = m.primaryImage || m.image;
     return [primary];
   })();
 
@@ -71,12 +70,9 @@ function ProductDetailPage() {
         id: item.slug,
         productId: item.productId,
         name: item.name,
-        // brand: item.manufacturerName || "Dược phẩm",
         price: item.price,
         stock: item.stock || 50,
-        image: item.primaryImage || item.image || FALLBACK_IMAGE,
-        // images: [item.primaryImage || item.image || FALLBACK_IMAGE],
-        // description: item.description || "",
+        image: item.primaryImage || item.image,
         unit: item.unit || "Hộp",
       })) || [];
 
@@ -109,12 +105,9 @@ function ProductDetailPage() {
           {/* Ảnh lớn */}
           <div className="bg-white rounded-2xl overflow-hidden mb-3 border border-gray-100">
             <img
-              src={product.images[activeImg] || FALLBACK_IMAGE}
+              src={productDetailMain(product.images[activeImg])}
               alt={product.name}
               className="w-full h-80 object-contain p-4"
-              onError={(e) => {
-                e.target.src = FALLBACK_IMAGE;
-              }}
             />
           </div>
 
@@ -132,12 +125,9 @@ function ProductDetailPage() {
                   }`}
                 >
                   <img
-                    src={img || FALLBACK_IMAGE}
+                    src={productDetailThumb(img)}
                     alt={`Ảnh ${i + 1}`}
                     className="w-full h-full object-contain p-1"
-                    onError={(e) => {
-                      e.target.src = FALLBACK_IMAGE;
-                    }}
                   />
                 </button>
               ))}

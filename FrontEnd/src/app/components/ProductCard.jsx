@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { ShoppingCart, Heart, Star } from "lucide-react";
 import { useCart } from "@/hooks/useCart.js";
 import { useAuthStore } from "@/stores/auth.store.js";
+import { productCardImage } from "../../lib/imageUrl.js";
 
 function ProductCard({ product, showDiscount = true }) {
   const { addToCart, formatPrice } = useCart();
@@ -36,7 +37,7 @@ function ProductCard({ product, showDiscount = true }) {
         style={{ aspectRatio: "400/176" }}
       >
         <img
-          src={product.image}
+          src={productCardImage(product.image)}
           alt={product.name}
           width={400}
           height={176}

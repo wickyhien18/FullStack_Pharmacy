@@ -14,6 +14,7 @@ import { useCart } from "@/hooks/useCart.js";
 import api from "../../lib/axios.js";
 import { useAuth } from "../../hooks/useAuth.js";
 import toast from "react-hot-toast";
+import { productThumb } from "../../lib/imageUrl.js";
 
 const steps = ["Địa chỉ giao hàng", "Thanh toán", "Xác nhận"];
 const paymentMethods = [
@@ -511,10 +512,7 @@ function CheckoutPage() {
                     className="flex items-center gap-3 py-3"
                   >
                     <img
-                      src={
-                        item.image ||
-                        "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&h=400&fit=crop&auto=format"
-                      }
+                      src={productThumb(item.image)}
                       alt={item.name}
                       className="w-12 h-12 object-cover rounded-lg border border-gray-100"
                     />
@@ -566,10 +564,7 @@ function CheckoutPage() {
             {items.map((item) => (
               <div key={item.cartItemId} className="flex items-center gap-2">
                 <img
-                  src={
-                    item.image ||
-                    "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&h=400&fit=crop&auto=format"
-                  }
+                  src={productThumb(item.image)}
                   alt=""
                   className="w-10 h-10 object-cover rounded-lg border border-gray-100 shrink-0"
                 />

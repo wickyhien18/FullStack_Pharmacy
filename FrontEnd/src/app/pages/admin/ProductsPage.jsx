@@ -7,6 +7,7 @@ import { Plus, Pencil, Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../../../lib/axios.js";
 import ProductFormModal from "./ProductFormModal.jsx";
+import { adminTableImage } from "../../../lib/imageUrl.js";
 
 const formatPrice = (p) =>
   new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(
@@ -97,9 +98,9 @@ export default function ProductsPage() {
                   <tr key={m.productId} className="hover:bg-gray-50">
                     <td className="px-4 py-3">
                       <img
-                        src={m.primaryImage || "/placeholder.png"}
+                        src={adminTableImage(m.primaryImage)}
                         alt={m.name}
-                        className="w-10 h-10 object-contain rounded-lg border border-gray-100"
+                        className="w-15 h-15 object-contain rounded-lg border border-gray-100"
                       />
                     </td>
                     <td className="px-4 py-3">

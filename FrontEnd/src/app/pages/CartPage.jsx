@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useCart } from "@/hooks/useCart.js";
 import { useState } from "react";
+import { productThumb } from "../../lib/imageUrl.js";
 function CartPage() {
   const {
     items,
@@ -27,17 +28,17 @@ function CartPage() {
   const shipping = totalPrice >= 15e4 ? 0 : 3e4;
   const discount = couponApplied ? Math.floor(totalPrice * 0.1) : 0;
   const finalTotal = totalPrice - discount + shipping;
-  const handleCoupon = () => {
-    if (coupon.toUpperCase() === "LONGCHAU10") {
-      setCouponApplied(true);
-      setCouponError("");
-    } else {
-      setCouponError(
-        "M\xE3 gi\u1EA3m gi\xE1 kh\xF4ng h\u1EE3p l\u1EC7 ho\u1EB7c \u0111\xE3 h\u1EBFt h\u1EA1n",
-      );
-      setCouponApplied(false);
-    }
-  };
+  // const handleCoupon = () => {
+  //   if (coupon.toUpperCase() === "LONGCHAU10") {
+  //     setCouponApplied(true);
+  //     setCouponError("");
+  //   } else {
+  //     setCouponError(
+  //       "M\xE3 gi\u1EA3m gi\xE1 kh\xF4ng h\u1EE3p l\u1EC7 ho\u1EB7c \u0111\xE3 h\u1EBFt h\u1EA1n",
+  //     );
+  //     setCouponApplied(false);
+  //   }
+  // };
   if (isLoading) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-16 text-center">
@@ -107,10 +108,7 @@ function CartPage() {
                 <div key={item.cartItemId} className="p-5 flex gap-4">
                   <Link to={`/products/${item.productId}`} className="shrink-0">
                     <img
-                      src={
-                        item.image ||
-                        "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&h=400&fit=crop&auto=format"
-                      }
+                      src={productThumb(item.image)}
                       alt={item.name}
                       className="w-20 h-20 object-cover rounded-xl border border-gray-100"
                     />
