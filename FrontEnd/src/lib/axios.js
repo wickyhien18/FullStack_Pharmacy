@@ -80,7 +80,8 @@ api.interceptors.response.use(
       !originalRequest._retry &&
       !originalRequest.url.includes("/auth/refresh-token") &&
       !originalRequest.url.includes("/auth/login") &&
-      !originalRequest.url.includes("/auth/register")
+      !originalRequest.url.includes("/auth/register") &&
+      !originalRequest.url.includes("/cart")
     ) {
       // Nếu đang refresh rồi → đưa request vào hàng đợi chờ
       if (isRefreshing) {

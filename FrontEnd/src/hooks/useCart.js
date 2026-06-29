@@ -27,6 +27,55 @@ export const useCart = () => {
   const addMutation = useMutation({
     mutationFn: ({ productId, quantity }) =>
       api.post("/cart/items", { productId, quantity }),
+    // Chạy TRƯỚC khi gọi API — cập nhật UI ngay
+    onMutate: async ({ productId, quantity }) => {
+      // Huỷ bất kỳ refetch nào đang chạy để tránh overwrite optimistic update
+      await queryClient.cancelQueries({ queryKey: ["cart"] });
+
+      // Lưu lại state cũ để rollback nếu cần
+      const previousCart = queryClient.getQueryData(["cart"]);
+
+      // Cập nhật cache ngay lập tức
+      queryClient.setQueryData(["cart"], (old) => {
+        if (!old) return old;
+
+        const existingItem = old.items?.find(
+          (item) => item.productId?.toString() === productId?.toString(),
+        );
+
+        let newItems;
+        if (existingItem) {
+          // Tăng quantity nếu đã có trong giỏ
+          newItems = old.items.map((item) =>
+            item.productId?.toString() === productId?.toString()
+              ? { ...item, quantity: item.quantity + quantity }
+              : item,
+          );
+        } else {
+          // Thêm item mới (tạm thời, chưa có cartItemId thật)
+          newItems = [
+            ...(old.items || []),
+            {
+              cartItemId: `temp-${Date.now()}`,
+              productId,
+              quantity,
+              name: "Đang tải...",
+              price: 0,
+              image: null,
+            },
+          ];
+        }
+
+        return {
+          ...old,
+          items: newItems,
+          totalItems: (old.totalItems || 0) + quantity,
+        };
+      });
+
+      return { previousCart }; // trả về context để dùng trong onError
+    },
+
     onSuccess: () => {
       invalidateCart();
       toast.success("Đã thêm vào giỏ hàng");
@@ -39,6 +88,28 @@ export const useCart = () => {
   const updateMutation = useMutation({
     mutationFn: ({ cartItemId, quantity }) =>
       api.patch(`/cart/items/${cartItemId}`, { quantity }),
+    onMutate: async ({ cartItemId, quantity }) => {
+      await queryClient.cancelQueries({ queryKey: ["cart"] });
+      const previousCart = queryClient.getQueryData(["cart"]);
+
+      queryClient.setQueryData(["cart"], (old) => {
+        if (!old) return old;
+        const newItems = old.items.map((item) =>
+          item.cartItemId?.toString() === cartItemId?.toString()
+            ? { ...item, quantity }
+            : item,
+        );
+        const totalItems = newItems.reduce((sum, i) => sum + i.quantity, 0);
+        const totalPrice = newItems.reduce(
+          (sum, i) => sum + (i.price || 0) * i.quantity,
+          0,
+        );
+        return { ...old, items: newItems, totalItems, totalPrice };
+      });
+
+      return { previousCart };
+    },
+
     onSuccess: invalidateCart,
     onError: (err) =>
       toast.error(err.response?.data?.message || "Cập nhật thất bại"),
@@ -47,6 +118,26 @@ export const useCart = () => {
   // Xoá item
   const removeMutation = useMutation({
     mutationFn: (cartItemId) => api.delete(`/cart/items/${cartItemId}`),
+    onMutate: async (cartItemId) => {
+      await queryClient.cancelQueries({ queryKey: ["cart"] });
+      const previousCart = queryClient.getQueryData(["cart"]);
+
+      queryClient.setQueryData(["cart"], (old) => {
+        if (!old) return old;
+        const newItems = old.items.filter(
+          (item) => item.cartItemId?.toString() !== cartItemId?.toString(),
+        );
+        const totalItems = newItems.reduce((sum, i) => sum + i.quantity, 0);
+        const totalPrice = newItems.reduce(
+          (sum, i) => sum + (i.price || 0) * i.quantity,
+          0,
+        );
+        return { ...old, items: newItems, totalItems, totalPrice };
+      });
+
+      return { previousCart };
+    },
+
     onSuccess: () => {
       invalidateCart();
       toast.success("Đã xoá khỏi giỏ hàng");
@@ -68,7 +159,7 @@ export const useCart = () => {
       updateMutation.mutate({ cartItemId, quantity }),
     removeItem: (cartItemId) => removeMutation.mutate(cartItemId),
 
-    clearCart: () => queryClient.invalidateQueries({ queryKey: ["cart"] }),
+    clearCart: () => invalidateCart(),
 
     isAdding: addMutation.isPending,
     isUpdating: updateMutation.isPending,
