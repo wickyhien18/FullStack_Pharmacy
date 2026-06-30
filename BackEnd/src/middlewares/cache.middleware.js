@@ -16,6 +16,7 @@ import { getCache, setCache } from "../config/redis.js";
 export const cacheResponse =
   (ttl = 300) =>
   async (req, res, next) => {
+    const startTime = performance.now();
     // Cache key = URL + query string
     // VD / Example: cache:api/products?page=1&limit=20&search=vitamin
     const key = `cache:${req.originalUrl}`;
@@ -23,6 +24,8 @@ export const cacheResponse =
     // Check cache trước / Check cache first
     const cached = await getCache(key);
     if (cached) {
+      const duration = (performance.now() - startTime).toFixed(2);
+      console.log(`[HTTP Cache] HIT: ${key} | Duration: ${duration}ms`);
       // Cache hit — trả về ngay / Return immediately
       return res.json({ success: true, message: "OK", data: cached });
     }
@@ -35,6 +38,8 @@ export const cacheResponse =
       if (body?.success && body?.data) {
         setCache(key, body.data, ttl); // fire and forget — không await
       }
+      const duration = (performance.now() - startTime).toFixed(2);
+      console.log(`[HTTP Cache] MISS: ${key} | Duration: ${duration}ms`);
       return originalJson(body);
     };
 

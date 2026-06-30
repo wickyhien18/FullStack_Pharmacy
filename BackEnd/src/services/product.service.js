@@ -97,6 +97,7 @@ export const getProducts = async ({
   minPrice,
   maxPrice,
 }) => {
+  const startTime = performance.now();
   // Cache key bao gồm tất cả params — params khác = cache khác
   // Cache key includes all params — different params = different cache
   const cacheKey = `products:list:${page}:${limit}:${search || ""}:${categoryId || ""}:${sort || ""}:${minPrice || ""}:${maxPrice || ""}`;
@@ -104,7 +105,8 @@ export const getProducts = async ({
   // Check cache trước / Check cache first
   const cached = await getCache(cacheKey);
   if (cached) {
-    console.log("[Cache] HIT:", cacheKey);
+    const duration = (performance.now() - startTime).toFixed(2);
+    console.log(`[Cache] HIT: ${cacheKey} | Duration: ${duration}ms`);
     return cached;
   }
 
@@ -127,15 +129,23 @@ export const getProducts = async ({
   // Lưu cache 5 phút / Cache for 5 minutes
   await setCache(cacheKey, result, 300);
 
+  const duration = (performance.now() - startTime).toFixed(2);
+  console.log(`[Database Query] MISS: ${cacheKey} | Duration: ${duration}ms`);
+
   return result;
 };
 
 // Lấy chi tiết 1 product
 export const getProductBySlug = async (slug) => {
+  const startTime = performance.now();
   const cacheKey = `products:detail:${slug}`;
 
   const cached = await getCache(cacheKey);
-  if (cached) return cached;
+  if (cached) {
+    const duration = (performance.now() - startTime).toFixed(2);
+    console.log(`[Cache] HIT: ${cacheKey} | Duration: ${duration}ms`);
+    return cached;
+  }
   const product = await productRepo.findProductBySlug(slug);
   if (!product) throw { status: 404, message: "Không tìm thấy sản phẩm" };
 
@@ -143,6 +153,9 @@ export const getProductBySlug = async (slug) => {
 
   // Cache 10 phút / Cache for 10 minutes
   await setCache(cacheKey, result, 600);
+
+  const duration = (performance.now() - startTime).toFixed(2);
+  console.log(`[Database Query] MISS: ${cacheKey} | Duration: ${duration}ms`);
 
   return result;
 };
