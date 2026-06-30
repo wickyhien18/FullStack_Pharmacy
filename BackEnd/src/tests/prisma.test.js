@@ -5,40 +5,19 @@ BigInt.prototype.toJSON = function () {
 };
 
 async function main() {
-  const rows = await prisma.$queryRaw`
-    SELECT
-      p.product_id as productId,
-      p.name,
-      p.slug,
-      p.image,
-      p.price,
-      p.unit,
-      p.description,
-      p.status,
-      p.deleted_at as deletedAt,
-      m.name AS manufacturerName,
-      i.quantity,
-      p.expire_date as expireDate,
-      COALESCE(
-        JSON_AGG(
-          JSON_BUILD_OBJECT(
-            'imageUrl', pi.image_url,
-            'displayOrder', pi.display_order
-          ) ORDER BY pi.display_order ASC
-        ) FILTER (WHERE pi.image_id IS NOT NULL),
-        '[]'
-      ) AS images
-    FROM products p
-    LEFT JOIN manufacturers m ON p.manufacturer_id = m.manufacturer_id
-    LEFT JOIN inventory i ON p.product_id = i.product_id
-    LEFT JOIN product_images pi ON p.product_id = pi.product_id
-    WHERE p.slug = ${"smecta-3g-1782089050368"}
-      AND p.deleted_at IS NULL
-    GROUP BY p.product_id, m.name, i.quantity
-    LIMIT 1
+  const result = await prisma.$queryRaw`
+    SELECT rt.id,
+    rt.token,
+    rt.expire_at as "expireAt",
+    rt.device_info as "deviceInfo",
+    u.is_active as "isActive",
+    r.role_name
+    FROM refresh_tokens rt
+    join users u on rt.user_id = u.user_id
+    join roles r on u.role_id = r.role_id
+    where rt.token = ${"243cac74057e2a2e51e29962e1a92047a050abc7b0e5ccbec605c6e07715a862e6a4191da2c8b338b1ae1ba17e60e7e8d6a0c71e42603ac31ddf0c44ddea90c7"}
+      and rt.device_info = ${"Chrome on Linux [7d0c6a299634dcef]"}
   `;
-
-  const result = rows[0];
 
   console.log("Result:", JSON.stringify(result, null, 2));
 }

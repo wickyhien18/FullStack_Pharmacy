@@ -47,6 +47,8 @@ model RefreshToken {
   deviceInfo String?   @map("device_info") @db.VarChar(255)
   user       User      @relation(fields: [userId], references: [userId], onDelete: Cascade, onUpdate: NoAction)
 
+  @@index([token, deviceInfo], map: "idx_refresh_token_token_device_info")
+  @@index([userId], map: "idx_refresh_token_user")
   @@map("refresh_tokens")
 }
 
@@ -94,6 +96,7 @@ model Product {
   @@index([categoryId], map: "idx_products_category")
   @@index([manufacturerId], map: "idx_products_manufacturer")
   @@index([name(ops: raw("gin_trgm_ops"))], map: "idx_products_name_trgm", type: Gin)
+  @@index([slug], map: "idx_products_slug")
   @@map("products")
 }
 
@@ -143,6 +146,7 @@ model Cart {
   items     CartItem[]
   user      User?      @relation(fields: [userId], references: [userId], onDelete: Cascade, onUpdate: NoAction)
 
+  @@index([userId], map: "idx_cart_user")
   @@map("carts")
 }
 
@@ -155,6 +159,7 @@ model CartItem {
   product    Product @relation(fields: [productId], references: [productId], onDelete: Cascade, onUpdate: NoAction, map: "cart_items_medicine_id_fkey")
 
   @@unique([cartId, productId], name: "uk_cart_medicine", map: "uk_cart_medicine")
+  @@index([cartId], map: "idx_cart_items_cart")
   @@map("cart_items")
 }
 
@@ -179,6 +184,7 @@ model Order {
 
   @@index([orderStatus], map: "idx_orders_status")
   @@index([userId], map: "idx_orders_user")
+  @@index([userId, createdAt(sort: Desc)], map: "idx_orders_user_created")
   @@map("orders")
 }
 
@@ -238,6 +244,7 @@ model OtpVerification {
   createdAt DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
   users     User      @relation(fields: [userId], references: [userId], onDelete: Cascade, onUpdate: NoAction)
 
+  @@index([userId], map: "idx_otp_user")
   @@map("otp_verifications")
 }
 
