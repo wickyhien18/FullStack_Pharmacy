@@ -160,8 +160,9 @@ api.interceptors.response.use(
         return api(originalRequest);
       } catch (refreshError) {
         useAuthStore.getState().clearAuth();
+        const hadSession = localStorage.getItem("hasSession");
         localStorage.removeItem("hasSession");
-        if (window.location.pathname !== "/account") {
+        if (hadSession && window.location.pathname !== "/account") {
           window.location.href = "/account";
         }
         return Promise.reject(refreshError);
