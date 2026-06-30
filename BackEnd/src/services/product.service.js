@@ -61,8 +61,8 @@ const formatProduct = (m) => ({
   price: Number(m.price),
   unit: m.unit,
   status: m.status,
-  categorySlug: m.category?.slug || null,
-  stock: m.inventory?.quantity ?? 0,
+  categorySlug: m.categorySlug || null,
+  stock: m.inventoryQuantity ?? 0,
   primaryImage: m.image || null,
 });
 
@@ -113,13 +113,12 @@ export const getProducts = async ({
   const where = buildWhere({ search, categoryId, minPrice, maxPrice });
   const orderBy = buildOrderBy(sort);
 
-  const [products, total] = await Promise.all([
-    productRepo.findProducts({ skip, limit, where, orderBy }),
-    productRepo.countProducts(where),
-  ]);
+  const rows = await productRepo.findProducts({ skip, limit, where, orderBy });
+
+  const total = rows.length > 0 ? Number(rows[0].totalCount) : 0;
 
   const result = buildPaginatedResponse(
-    products.map(formatProduct),
+    rows.map(formatProduct),
     total,
     page,
     limit,

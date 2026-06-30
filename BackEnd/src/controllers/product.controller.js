@@ -22,6 +22,7 @@ export const getProducts = async (req, res) => {
     });
     return sendSuccess(res, data, "Lấy danh sách thuốc thành công");
   } catch (err) {
+    console.error("getProducts error:", err);
     return sendError(res, err.message, err.status || 500);
   }
 };

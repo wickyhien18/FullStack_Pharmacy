@@ -1,31 +1,70 @@
 // ================================================================
 // Product.repository.js — Truy vấn DB cho Products
 // ================================================================
-import { prisma } from "../config/prisma.js";
+import { prisma, Prisma } from "../config/prisma.js";
 
 // Lấy danh sách Products có filter + phân trang
 // params = { skip, limit, search, categoryId, sort }
-export const findProducts = ({ skip, limit, where, orderBy }) => {
-  return prisma.product.findMany({
-    where,
-    skip,
-    take: limit,
-    orderBy,
-    select: {
-      productId: true,
-      name: true,
-      slug: true,
-      image: true,
-      price: true,
-      unit: true,
-      status: true,
-      deletedAt: true,
-      // Relations
-      category: { select: { slug: true } },
-      inventory: { select: { quantity: true } },
-      _count: { select: { orderItems: true } },
-    },
-  });
+export const findProducts = async ({ skip, limit, where, orderBy }) => {
+  const conditions = [Prisma.sql`p.deleted_at IS NULL`];
+
+  if (where.status) {
+    conditions.push(Prisma.sql`p.status = ${where.status}`);
+  }
+  if (where.name?.contains) {
+    conditions.push(
+      Prisma.sql`p.name ILIKE ${"%" + where.name.contains + "%"}`,
+    );
+  }
+  if (where.categoryId) {
+    conditions.push(Prisma.sql`p.category_id = ${where.categoryId}`);
+  }
+  if (where.price?.gte !== undefined) {
+    conditions.push(Prisma.sql`p.price >= ${where.price.gte}`);
+  }
+  if (where.price?.lte !== undefined) {
+    conditions.push(Prisma.sql`p.price <= ${where.price.lte}`);
+  }
+
+  const whereClause = Prisma.join(conditions, " AND ");
+
+  let orderByClause;
+  if (orderBy.price) {
+    orderByClause =
+      orderBy.price === "asc"
+        ? Prisma.sql`p.price ASC`
+        : Prisma.sql`p.price DESC`;
+  } else if (orderBy.orderItems) {
+    orderByClause =
+      orderBy.orderItems._count === "asc"
+        ? Prisma.sql`"orderCount" ASC`
+        : Prisma.sql`"orderCount" DESC`;
+  } else {
+    orderByClause = Prisma.sql`p.created_at DESC`;
+  }
+
+  const rows = await prisma.$queryRaw`
+    SELECT
+      p.product_id AS "productId",
+      p.name,
+      p.slug,
+      p.image,
+      p.price,
+      p.unit,
+      p.status,
+      c.slug AS "categorySlug",
+      i.quantity AS "inventoryQuantity",
+      (SELECT COUNT(*) FROM order_items oi WHERE oi.product_id = p.product_id) AS "orderCount",
+      COUNT(*) OVER() AS "totalCount"
+    FROM products p
+    LEFT JOIN categories c ON p.category_id = c.category_id
+    LEFT JOIN inventory i ON p.product_id = i.product_id
+    WHERE ${whereClause}
+    ORDER BY ${orderByClause}
+    LIMIT ${limit} OFFSET ${skip}
+  `;
+
+  return rows;
 };
 
 // Đếm tổng số Products (dùng cho phân trang)

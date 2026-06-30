@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Prisma } from "@prisma/client";
 import { env } from "./env.js";
 
 // Singleton — tránh nhiều connection khi hot reload dev
@@ -37,3 +37,5 @@ const createPrismaClient = () => {
 export const prisma = globalForPrisma.prisma || createPrismaClient();
 
 if (env.isDev) globalForPrisma.prisma = prisma;
+
+export { Prisma };
