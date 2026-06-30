@@ -47,7 +47,6 @@ model RefreshToken {
   deviceInfo String?   @map("device_info") @db.VarChar(255)
   user       User      @relation(fields: [userId], references: [userId], onDelete: Cascade, onUpdate: NoAction)
 
-  @@index([token, deviceInfo], map: "idx_refresh_token_token_device_info")
   @@index([userId], map: "idx_refresh_token_user")
   @@map("refresh_tokens")
 }
