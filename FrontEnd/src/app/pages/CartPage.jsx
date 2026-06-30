@@ -4,13 +4,30 @@ import {
   Plus,
   Minus,
   ShoppingCart,
-  Tag,
   ChevronRight,
   ArrowLeft,
 } from "lucide-react";
 import { useCart } from "@/hooks/useCart.js";
 import { useState } from "react";
 import { productThumb } from "../../lib/imageUrl.js";
+
+// Skeleton cho 1 cart item
+function CartItemSkeleton() {
+  return (
+    <div className="p-5 flex gap-4 animate-pulse">
+      <div className="w-20 h-20 bg-gray-100 rounded-xl shrink-0" />
+      <div className="flex-1 space-y-2">
+        <div className="h-4 bg-gray-100 rounded w-3/4" />
+        <div className="h-3 bg-gray-100 rounded w-1/4" />
+        <div className="flex items-center justify-between mt-3">
+          <div className="h-8 bg-gray-100 rounded-lg w-24" />
+          <div className="h-5 bg-gray-100 rounded w-20" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function CartPage() {
   const {
     items,
@@ -22,37 +39,11 @@ function CartPage() {
     formatPrice,
   } = useCart();
 
-  const [coupon, setCoupon] = useState("");
-  const [couponApplied, setCouponApplied] = useState(false);
-  const [couponError, setCouponError] = useState("");
-  const shipping = totalPrice >= 15e4 ? 0 : 3e4;
-  const discount = couponApplied ? Math.floor(totalPrice * 0.1) : 0;
-  const finalTotal = totalPrice - discount + shipping;
-  // const handleCoupon = () => {
-  //   if (coupon.toUpperCase() === "LONGCHAU10") {
-  //     setCouponApplied(true);
-  //     setCouponError("");
-  //   } else {
-  //     setCouponError(
-  //       "M\xE3 gi\u1EA3m gi\xE1 kh\xF4ng h\u1EE3p l\u1EC7 ho\u1EB7c \u0111\xE3 h\u1EBFt h\u1EA1n",
-  //     );
-  //     setCouponApplied(false);
-  //   }
-  // };
-  if (isLoading) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 py-16 text-center">
-        <ShoppingCart size={64} className="mx-auto text-gray-300 mb-4" />
-        <h2
-          className="font-bold text-gray-800 mb-2"
-          style={{ fontSize: "1.25rem" }}
-        >
-          Đang tải giỏ hàng...
-        </h2>
-      </div>
-    );
-  }
-  if (items.length === 0) {
+  // FIX: Chỉ hiện "trống" khi đã load xong VÀ thực sự không có items
+  // Không hiện "trống" trong lúc đang loading
+  const isEmpty = !isLoading && items.length === 0;
+
+  if (isEmpty) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-16 text-center">
         <ShoppingCart size={64} className="mx-auto text-gray-300 mb-4" />
@@ -78,13 +69,14 @@ function CartPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-5">
-      {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-gray-500 mb-5">
         <Link to="/" className="hover:text-blue-700">
           Trang chủ
         </Link>
         <ChevronRight size={14} />
-        <span className="text-gray-800">Giỏ hàng ({totalItems} sản phẩm)</span>
+        <span className="text-gray-800">
+          Giỏ hàng {!isLoading && `(${totalItems} sản phẩm)`}
+        </span>
       </nav>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -93,7 +85,11 @@ function CartPage() {
           <div className="bg-white rounded-2xl overflow-hidden">
             <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
               <h2 className="font-semibold text-gray-800">
-                Sản phẩm trong giỏ ({totalItems})
+                {isLoading ? (
+                  <span className="inline-block h-5 bg-gray-100 rounded w-40 animate-pulse" />
+                ) : (
+                  `Sản phẩm trong giỏ (${totalItems})`
+                )}
               </h2>
               <Link
                 to="/products"
@@ -103,174 +99,124 @@ function CartPage() {
                 + Thêm sản phẩm
               </Link>
             </div>
+
             <div className="divide-y divide-gray-100">
-              {items.map((item) => (
-                <div key={item.cartItemId} className="p-5 flex gap-4">
-                  <Link to={`/products/${item.productId}`} className="shrink-0">
-                    <img
-                      src={productThumb(item.image)}
-                      alt={item.name}
-                      className="w-20 h-20 object-cover rounded-xl border border-gray-100"
-                    />
-                  </Link>
-                  <div className="flex-1 min-w-0">
-                    <Link
-                      to={`/products/${item.productId}`}
-                      className="font-medium text-sm text-gray-800 hover:text-blue-700 line-clamp-2 block mb-1"
-                    >
-                      {item.name}
-                    </Link>
-                    <div className="text-xs text-gray-500 mb-1">
-                      {/* {product.brand} ·  */}
-                      {item.unit}
-                    </div>
-                    {/* {product.discount && (
-                      <span
-                        className="text-xs text-white px-1.5 py-0.5 rounded font-medium"
-                        style={{ backgroundColor: "#e53935" }}
+              {isLoading
+                ? // Skeleton 3 items trong lúc loading
+                  Array(3)
+                    .fill(0)
+                    .map((_, i) => <CartItemSkeleton key={i} />)
+                : items.map((item) => (
+                    <div key={item.cartItemId} className="p-5 flex gap-4">
+                      <Link
+                        to={`/products/${item.productId}`}
+                        className="shrink-0"
                       >
-                        -{product.discount}%
-                      </span>
-                    )} */}
-                    <div className="flex items-center justify-between mt-2">
-                      <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
-                        <button
-                          onClick={() =>
-                            updateItem(item.cartItemId, item.quantity - 1)
-                          }
-                          className="px-2.5 py-1.5 hover:bg-gray-50 transition-colors"
+                        <img
+                          src={productThumb(item.image)}
+                          alt={item.name}
+                          className="w-20 h-20 object-cover rounded-xl border border-gray-100"
+                        />
+                      </Link>
+                      <div className="flex-1 min-w-0">
+                        <Link
+                          to={`/products/${item.productId}`}
+                          className="font-medium text-sm text-gray-800 hover:text-blue-700 line-clamp-2 block mb-1"
                         >
-                          <Minus size={14} />
-                        </button>
-                        <span className="px-3 py-1.5 text-sm font-medium border-x border-gray-200">
-                          {item.quantity}
-                        </span>
-                        <button
-                          onClick={() =>
-                            updateItem(item.cartItemId, item.quantity + 1)
-                          }
-                          className="px-2.5 py-1.5 hover:bg-gray-50 transition-colors"
-                        >
-                          <Plus size={14} />
-                        </button>
-                      </div>
-                      <div className="text-right">
-                        <div
-                          className="font-semibold text-sm"
-                          // style={{ color: "#e53935" }}
-                        >
-                          {formatPrice(item.price * item.quantity)}
+                          {item.name}
+                        </Link>
+                        <div className="text-xs text-gray-500 mb-1">
+                          {item.unit}
                         </div>
-                        {/* {product.originalPrice && (
-                          <div className="text-xs text-gray-400 line-through">
-                            {formatPrice(product.originalPrice * quantity)}
+                        <div className="flex items-center justify-between mt-2">
+                          <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
+                            <button
+                              onClick={() =>
+                                updateItem(item.cartItemId, item.quantity - 1)
+                              }
+                              disabled={item.quantity <= 1}
+                              className="px-2.5 py-1.5 hover:bg-gray-50 transition-colors disabled:opacity-40"
+                            >
+                              <Minus size={14} />
+                            </button>
+                            <span className="px-3 py-1.5 text-sm font-medium border-x border-gray-200">
+                              {item.quantity}
+                            </span>
+                            <button
+                              onClick={() =>
+                                updateItem(item.cartItemId, item.quantity + 1)
+                              }
+                              className="px-2.5 py-1.5 hover:bg-gray-50 transition-colors"
+                            >
+                              <Plus size={14} />
+                            </button>
                           </div>
-                        )} */}
+                          <div className="font-semibold text-sm">
+                            {formatPrice(item.price * item.quantity)}
+                          </div>
+                        </div>
                       </div>
+                      <button
+                        onClick={() => removeItem(item.cartItemId)}
+                        className="shrink-0 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors self-start"
+                      >
+                        <Trash2 size={16} />
+                      </button>
                     </div>
-                  </div>
-                  <button
-                    onClick={() => removeItem(item.cartItemId)}
-                    className="shrink-0 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors self-start"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </div>
-              ))}
+                  ))}
             </div>
           </div>
         </div>
 
         {/* Order summary */}
         <div className="space-y-4">
-          {/* Coupon */}
-          {/* <div className="bg-white rounded-2xl p-5">
-            <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-              <Tag size={16} style={{ color: "#1250dc" }} /> Mã giảm giá
-            </h3>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={coupon}
-                onChange={(e) => setCoupon(e.target.value.toUpperCase())}
-                placeholder="Nhập mã giảm giá"
-                className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-blue-400"
-              />
-              <button
-                onClick={handleCoupon}
-                className="px-4 py-2 rounded-xl text-white text-sm font-medium transition-colors"
-                style={{ backgroundColor: "#1250dc" }}
-              >
-                Áp dụng
-              </button>
-            </div>
-            {couponApplied && (
-              <p className="text-xs text-green-600 mt-2">
-                ✓ Đã áp dụng mã LONGCHAU10 - Giảm 10%
-              </p>
-            )}
-            {couponError && (
-              <p className="text-xs text-red-500 mt-2">{couponError}</p>
-            )}
-            <p className="text-xs text-gray-400 mt-2">Thử mã: LONGCHAU10</p>
-          </div> */}
-
-          {/* Summary */}
           <div className="bg-white rounded-2xl p-5">
             <h3 className="font-semibold text-gray-800 mb-4">
               Tóm tắt đơn hàng
             </h3>
-            <div className="space-y-3 text-sm">
-              <div className="flex justify-between text-gray-600">
-                <span>Tạm tính ({totalItems} sản phẩm)</span>
-                <span>{formatPrice(totalPrice)}</span>
-              </div>
-              {/* {discount > 0 && (
-                <div className="flex justify-between text-green-600">
-                  <span>Giảm giá (10%)</span>
-                  <span>-{formatPrice(discount)}</span>
+            {isLoading ? (
+              <div className="space-y-3 animate-pulse">
+                <div className="flex justify-between">
+                  <div className="h-4 bg-gray-100 rounded w-1/2" />
+                  <div className="h-4 bg-gray-100 rounded w-1/4" />
                 </div>
-              )} */}
-              {/* <div className="flex justify-between text-gray-600">
-                <span>Phí vận chuyển</span>
-                <span
-                  className={shipping === 0 ? "text-green-600 font-medium" : ""}
-                >
-                  {shipping === 0 ? "Mi\u1EC5n ph\xED" : formatPrice(shipping)}
-                </span>
-              </div> */}
-              {/* {totalPrice < 15e4 && (
-                <p className="text-xs text-blue-700 bg-blue-50 p-2 rounded-lg">
-                  Thêm {formatPrice(15e4 - totalPrice)} để được miễn phí vận
-                  chuyển
-                </p>
-              )} */}
-              <div className="border-t border-gray-100 pt-3 flex justify-between font-bold text-base">
-                <span>Tổng cộng</span>
-                <span style={{ color: "#e53935" }}>
-                  {
-                    // formatPrice(finalTotal)
-                    formatPrice(totalPrice)
-                  }
-                </span>
+                <div className="flex justify-between border-t pt-3">
+                  <div className="h-5 bg-gray-100 rounded w-1/3" />
+                  <div className="h-5 bg-gray-100 rounded w-1/4" />
+                </div>
+                <div className="h-11 bg-gray-100 rounded-xl mt-4" />
               </div>
-            </div>
-            <Link
-              to="/checkout"
-              className="mt-4 block w-full text-center py-3 rounded-xl text-white font-semibold text-sm transition-colors hover:opacity-90"
-              style={{ backgroundColor: "#1250dc" }}
-            >
-              Tiến hành đặt hàng →
-            </Link>
-            <Link
-              to="/products"
-              className="mt-3 block w-full text-center py-2.5 rounded-xl border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition-colors"
-            >
-              ← Tiếp tục mua sắm
-            </Link>
+            ) : (
+              <>
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between text-gray-600">
+                    <span>Tạm tính ({totalItems} sản phẩm)</span>
+                    <span>{formatPrice(totalPrice)}</span>
+                  </div>
+                  <div className="border-t border-gray-100 pt-3 flex justify-between font-bold text-base">
+                    <span>Tổng cộng</span>
+                    <span style={{ color: "#e53935" }}>
+                      {formatPrice(totalPrice)}
+                    </span>
+                  </div>
+                </div>
+                <Link
+                  to="/checkout"
+                  className="mt-4 block w-full text-center py-3 rounded-xl text-white font-semibold text-sm hover:opacity-90"
+                  style={{ backgroundColor: "#1250dc" }}
+                >
+                  Tiến hành đặt hàng →
+                </Link>
+                <Link
+                  to="/products"
+                  className="mt-3 block w-full text-center py-2.5 rounded-xl border border-gray-200 text-sm text-gray-600 hover:bg-gray-50"
+                >
+                  ← Tiếp tục mua sắm
+                </Link>
+              </>
+            )}
           </div>
 
-          {/* Payment methods */}
           <div className="bg-white rounded-2xl p-5">
             <h3 className="font-semibold text-gray-800 mb-3 text-sm">
               Phương thức thanh toán
@@ -291,4 +237,5 @@ function CartPage() {
     </div>
   );
 }
+
 export { CartPage as default };

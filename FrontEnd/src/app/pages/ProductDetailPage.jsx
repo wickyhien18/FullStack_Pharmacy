@@ -26,14 +26,47 @@ function ProductDetailPage() {
   const [activeImg, setActiveImg] = useState(0);
   const [added, setAdded] = useState(false);
 
-  if (isLoading) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 py-16 text-center">
-        <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-        <p className="text-gray-500">Đang tải chi tiết sản phẩm...</p>
+  // THAY bằng skeleton layout đúng với cấu trúc trang:
+  const ProductDetailSkeleton = () => (
+    <div className="max-w-7xl mx-auto px-4 py-5 animate-pulse">
+      {/* Breadcrumb skeleton */}
+      <div className="flex items-center gap-2 mb-5">
+        <div className="h-4 bg-gray-100 rounded w-16" />
+        <div className="h-4 bg-gray-100 rounded w-4" />
+        <div className="h-4 bg-gray-100 rounded w-20" />
+        <div className="h-4 bg-gray-100 rounded w-4" />
+        <div className="h-4 bg-gray-100 rounded w-40" />
       </div>
-    );
-  }
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+        {/* Ảnh skeleton */}
+        <div>
+          <div className="bg-gray-100 rounded-2xl h-80 mb-3" />
+          <div className="flex gap-2">
+            {Array(3)
+              .fill(0)
+              .map((_, i) => (
+                <div key={i} className="w-20 h-20 bg-gray-100 rounded-xl" />
+              ))}
+          </div>
+        </div>
+
+        {/* Info skeleton */}
+        <div className="space-y-4">
+          <div className="h-4 bg-gray-100 rounded w-24" />
+          <div className="h-7 bg-gray-100 rounded w-3/4" />
+          <div className="h-5 bg-gray-100 rounded w-1/2" />
+          <div className="bg-blue-50 rounded-xl p-4">
+            <div className="h-10 bg-gray-100 rounded w-1/3" />
+            <div className="h-3 bg-gray-100 rounded w-16 mt-2" />
+          </div>
+          <div className="h-12 bg-gray-100 rounded-xl" />
+          <div className="h-12 bg-blue-50 rounded-xl" />
+        </div>
+      </div>
+    </div>
+  );
+  if (isLoading) return <ProductDetailSkeleton />;
 
   if (!m) return <NotFoundPage />;
 

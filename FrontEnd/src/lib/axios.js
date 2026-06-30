@@ -1,47 +1,42 @@
 // ================================================================
-// axios.js — Axios instance với interceptors
-// Tất cả API call trong app đều dùng instance này, không dùng
-// axios trực tiếp, để config 1 lần dùng mọi nơi.
+// axios.js — Fixed version
+// 1. Bỏ exclude /cart khỏi refresh logic
+// 2. Thêm proactive token refresh (refresh trước 2 phút khi hết hạn)
+// 3. Fix race condition: AuthInitializer và interceptor không refresh đồng thời
 // ================================================================
 import axios from "axios";
 import { useAuthStore } from "@/stores/auth.store.js";
 
 const api = axios.create({
   baseURL: "/api",
-  withCredentials: true, // gửi kèm cookie (refresh token) trong mọi request
-  timeout: 15000, // timeout 10 giây
+  withCredentials: true,
+  timeout: 15000,
 });
 
-// ── Retry helper ─────────────────────────────────────────────────
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-
-const retryRequest = async (config, retries = 2, delay = 1000) => {
-  for (let i = 0; i < retries; i++) {
-    try {
-      await sleep(delay * (i + 1)); // delay tăng dần: 1s, 2s
-      return await api(config);
-    } catch (err) {
-      if (i === retries - 1) throw err;
-    }
+// ── Token expiry helpers ──────────────────────────────────────────
+// Decode JWT payload để lấy thời gian hết hạn (exp)
+const getTokenExpiry = (token) => {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.exp * 1000; // convert sang milliseconds
+  } catch {
+    return null;
   }
 };
 
-// ── Request Interceptor ───────────────────────────────────────
-// Chạy TRƯỚC mỗi request — tự động gắn access token vào header
-api.interceptors.request.use((config) => {
-  const { accessToken } = useAuthStore.getState();
-  if (accessToken) {
-    config.headers.Authorization = `Bearer ${accessToken}`;
-  }
-  return config;
-});
+// Kiểm tra token còn hạn không (tính trước 2 phút để proactive refresh)
+const isTokenExpiringSoon = (token, bufferMs = 2 * 60 * 1000) => {
+  const expiry = getTokenExpiry(token);
+  if (!expiry) return true;
+  return Date.now() > expiry - bufferMs;
+};
 
-// ── Response Interceptor ──────────────────────────────────────
-// Chạy SAU mỗi response — xử lý lỗi 401 (token hết hạn)
-let isRefreshing = false; // flag tránh gọi refresh nhiều lần cùng lúc
-let failedQueue = []; // hàng đợi các request bị lỗi 401
+// ── Shared refresh state — SINGLE SOURCE OF TRUTH ────────────────
+// Dùng chung giữa interceptor và AuthInitializer để tránh race condition
+let isRefreshing = false;
+let refreshPromise = null; // Promise dùng chung, không tạo nhiều lần
+let failedQueue = [];
 
-// Xử lý hàng đợi sau khi refresh xong
 const processQueue = (error, token = null) => {
   failedQueue.forEach(({ resolve, reject }) => {
     error ? reject(error) : resolve(token);
@@ -49,24 +44,89 @@ const processQueue = (error, token = null) => {
   failedQueue = [];
 };
 
+// Export để AuthInitializer dùng cùng lock
+export const refreshTokenOnce = async () => {
+  if (isRefreshing) {
+    // Đã có refresh đang chạy → đợi kết quả thay vì tạo request mới
+    return refreshPromise;
+  }
+
+  isRefreshing = true;
+  refreshPromise = (async () => {
+    try {
+      const { data } = await api.post("/auth/refresh-token");
+      const newToken = data.data.accessToken;
+      useAuthStore.getState().setAccessToken(newToken);
+      processQueue(null, newToken);
+      return newToken;
+    } catch (err) {
+      processQueue(err, null);
+      throw err;
+    } finally {
+      isRefreshing = false;
+      refreshPromise = null;
+    }
+  })();
+
+  return refreshPromise;
+};
+
+// ── Retry helper ─────────────────────────────────────────────────
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+const retryRequest = async (config, retries = 2, delay = 1000) => {
+  for (let i = 0; i < retries; i++) {
+    try {
+      await sleep(delay * (i + 1));
+      return await api(config);
+    } catch (err) {
+      if (i === retries - 1) throw err;
+    }
+  }
+};
+
+// ── Request Interceptor ───────────────────────────────────────────
+api.interceptors.request.use(async (config) => {
+  const { accessToken } = useAuthStore.getState();
+
+  if (accessToken) {
+    // Proactive refresh: nếu token sắp hết hạn (trong 2 phút) → refresh trước
+    if (
+      isTokenExpiringSoon(accessToken) &&
+      !config.url.includes("/auth/refresh-token") &&
+      !config.url.includes("/auth/login") &&
+      !config.url.includes("/auth/register")
+    ) {
+      try {
+        const newToken = await refreshTokenOnce();
+        config.headers.Authorization = `Bearer ${newToken}`;
+        return config;
+      } catch {
+        // Refresh fail → vẫn gửi request với token cũ, để interceptor response xử lý
+      }
+    }
+
+    config.headers.Authorization = `Bearer ${accessToken}`;
+  }
+
+  return config;
+});
+
+// ── Response Interceptor ──────────────────────────────────────────
 api.interceptors.response.use(
-  // Response thành công — trả về nguyên
   (response) => response,
 
-  // Response lỗi
   async (error) => {
     const originalRequest = error.config;
     const status = error.response?.status;
 
-    // ── Retry khi gặp 502/503 (server tạm thời không sẵn sàng) ──
+    // Retry 502/503
     if ((status === 502 || status === 503) && !originalRequest._retried) {
       originalRequest._retried = true;
-      console.warn(`[API] ${status} error, retrying in 2s...`);
-
+      console.warn(`[API] ${status} error, retrying...`);
       try {
         return await retryRequest(originalRequest);
       } catch (retryErr) {
-        // Sau 2 lần retry vẫn lỗi → hiện thông báo thân thiện
         return Promise.reject({
           ...retryErr,
           _userMessage: "Server đang bận, vui lòng thử lại sau.",
@@ -74,17 +134,16 @@ api.interceptors.response.use(
       }
     }
 
-    // Nếu lỗi 401 và chưa thử refresh (tránh loop vô tận), và không phải request login/register
+    // Xử lý 401 — KHÔNG exclude /cart nữa
     if (
-      error.response?.status === 401 &&
+      status === 401 &&
       !originalRequest._retry &&
       !originalRequest.url.includes("/auth/refresh-token") &&
       !originalRequest.url.includes("/auth/login") &&
-      !originalRequest.url.includes("/auth/register") &&
-      !originalRequest.url.includes("/cart")
+      !originalRequest.url.includes("/auth/register")
     ) {
-      // Nếu đang refresh rồi → đưa request vào hàng đợi chờ
       if (isRefreshing) {
+        // Đang refresh → đưa vào queue, đợi kết quả
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         }).then((token) => {
@@ -93,33 +152,19 @@ api.interceptors.response.use(
         });
       }
 
-      originalRequest._retry = true; // đánh dấu đã thử refresh
-      isRefreshing = true;
+      originalRequest._retry = true;
 
       try {
-        // Gọi refresh token — cookie tự động gửi kèm nhờ withCredentials
-        const { data } = await api.post("/auth/refresh-token");
-        const newToken = data.data.accessToken;
-
-        // Cập nhật token mới vào store
-        useAuthStore.getState().setAccessToken(newToken);
-
-        // Xử lý hàng đợi với token mới
-        processQueue(null, newToken);
-
-        // Thử lại request gốc với token mới
+        const newToken = await refreshTokenOnce();
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
         return api(originalRequest);
       } catch (refreshError) {
-        // Refresh thất bại → logout
-        processQueue(refreshError, null);
         useAuthStore.getState().clearAuth();
+        localStorage.removeItem("hasSession");
         if (window.location.pathname !== "/account") {
           window.location.href = "/account";
         }
         return Promise.reject(refreshError);
-      } finally {
-        isRefreshing = false;
       }
     }
 

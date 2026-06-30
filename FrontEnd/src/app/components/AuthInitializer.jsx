@@ -12,7 +12,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "@/stores/auth.store.js";
-import api from "@/lib/axios.js";
+import api, { refreshTokenOnce } from "@/lib/axios.js";
 
 const PREFETCH_TASKS = [
   {
@@ -62,16 +62,15 @@ export default function AuthInitializer({ children }) {
       // ── Bước 1: Khôi phục session — PHẢI xong trước khi render children ──
       if (hasSession) {
         try {
-          const { data } = await api.post("/auth/refresh-token");
-          console.log("[Auth] refresh response:", data); // ← thêm
-          if (data?.data?.accessToken) {
-            const profileRes = await api.get("/auth/profile", {
-              headers: { Authorization: `Bearer ${data.data.accessToken}` },
-            });
-            console.log("[Auth] profile response:", profileRes.data); // ← thêm
-            setAuth(profileRes.data.data, data.data.accessToken);
-            console.log("[Auth] setAuth called"); // ← thêm
-          }
+          // Dùng CHUNG refreshTokenOnce với axios.js interceptor
+          // Đảm bảo chỉ có 1 request refresh-token được gửi, dù
+          // có nhiều nơi cần token cùng lúc khi app vừa mount
+          const newToken = await refreshTokenOnce();
+
+          const profileRes = await api.get("/auth/profile", {
+            headers: { Authorization: `Bearer ${newToken}` },
+          });
+          setAuth(profileRes.data.data, newToken);
         } catch (err) {
           if (err.response?.status === 401) {
             localStorage.removeItem("hasSession");
@@ -79,6 +78,7 @@ export default function AuthInitializer({ children }) {
           } else if (err.response) {
             console.error("[AuthInitializer] Unexpected error:", err);
           }
+          // Lỗi network/timeout → giữ nguyên session, không logout oan
         }
       }
 

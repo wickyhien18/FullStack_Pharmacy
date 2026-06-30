@@ -118,14 +118,39 @@ function ProductListPage() {
     setPage(1);
   };
 
-  if (isLoadingProducts || isLoadingCategories) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 py-16 text-center">
-        <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-        <p className="text-gray-500">Đang tải danh sách sản phẩm...</p>
+  const ProductCardSkeleton = () => (
+    <div className="bg-white rounded-xl border border-gray-100 overflow-hidden animate-pulse">
+      <div className="h-44 bg-gray-100" />
+      <div className="p-3 space-y-2">
+        <div className="h-3 bg-gray-100 rounded" />
+        <div className="h-3 bg-gray-100 rounded w-2/3" />
+        <div className="h-3 bg-gray-100 rounded w-1/3 mt-1" />
+        <div className="h-8 bg-gray-100 rounded-lg mt-2" />
       </div>
-    );
-  }
+    </div>
+  );
+
+  // Skeleton Sidebar
+  const SidebarSkeleton = () => (
+    <div className="hidden md:block w-56 shrink-0 animate-pulse">
+      <div className="bg-white rounded-xl p-4 mb-4">
+        <div className="h-5 bg-gray-100 rounded w-1/2 mb-3" />
+        {Array(6)
+          .fill(0)
+          .map((_, i) => (
+            <div key={i} className="h-8 bg-gray-50 rounded-lg mb-1" />
+          ))}
+      </div>
+      <div className="bg-white rounded-xl p-4">
+        <div className="h-5 bg-gray-100 rounded w-2/3 mb-3" />
+        {Array(5)
+          .fill(0)
+          .map((_, i) => (
+            <div key={i} className="h-8 bg-gray-50 rounded-lg mb-1" />
+          ))}
+      </div>
+    </div>
+  );
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-5">
@@ -323,7 +348,15 @@ function ProductListPage() {
               </div>
             )}
 
-            {liveProducts.length > 0 ? (
+            {isLoadingProducts ? (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {Array(12)
+                  .fill(0)
+                  .map((_, i) => (
+                    <ProductCardSkeleton key={i} />
+                  ))}
+              </div>
+            ) : liveProducts.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {liveProducts.map((p) => (
                   <ProductCard key={p.id} product={p} />
