@@ -155,8 +155,11 @@ export const refreshToken = async (refreshToken) => {
   const tokenData = await authRepository.findRefreshToken(refreshToken);
   if (!tokenData) throw { status: 401, message: "Refresh token không hợp lệ" };
 
+  if (tokenData.isRevoked)
+    throw { status: 401, message: "Refresh token đã bị thu hồi" };
+
   if (tokenData.expireAt && tokenData.expireAt < new Date()) {
-    await authRepository.deleteRefreshToken(refreshToken);
+    await authRepository.revokeRefreshToken(refreshToken);
     throw {
       status: 401,
       message: "Refresh token đã hết hạn, vui lòng đăng nhập lại",
@@ -193,7 +196,7 @@ export const logout = async (refreshToken) => {
   const tokenData = await authRepository.findRefreshToken(refreshToken);
   if (!tokenData) throw { status: 400, message: "Refresh token không hợp lệ" };
 
-  await authRepository.deleteRefreshToken(refreshToken);
+  await authRepository.revokeRefreshToken(refreshToken);
 };
 
 // ── LOGOUT ALL DEVICES ────────────────────────────────────────────
@@ -248,7 +251,7 @@ export const changePassword = async (
   await authRepository.updateUserPassword(userId, hashed);
 
   // Logout tất cả thiết bị sau khi đổi mật khẩu
-  await authRepository.deleteAllRefreshTokensByUser(userId);
+  await authRepository.revokeAllRefreshTokensByUser(userId);
 
   return { message: "Đổi mật khẩu thành công. Vui lòng đăng nhập lại." };
 };
@@ -354,7 +357,7 @@ export const resetPassword = async (email, otp, newPassword) => {
   await authRepository.deleteEmailOTP(user.userId);
 
   // Logout tất cả thiết bị (bảo mật)
-  await authRepository.deleteAllRefreshTokensByUser(user.userId);
+  await authRepository.revokeAllRefreshTokensByUser(user.userId);
 
   return { message: "Đặt lại mật khẩu thành công. Vui lòng đăng nhập lại." };
 };

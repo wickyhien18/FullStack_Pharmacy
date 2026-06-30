@@ -45,6 +45,7 @@ export const findRefreshToken = async (token) => {
     SELECT rt.id,
     rt.token,
     rt.expire_at as "expireAt",
+    rt.is_revoked as "isRevoked",
     rt.device_info as "deviceInfo",
     u.user_id as "userId",
     u.user_name as "userName",
@@ -151,15 +152,17 @@ export const updateUserPassword = (userId, hashedPasword) => {
 };
 
 //PRISMA DELETE
-export const deleteRefreshToken = (refreshToken) => {
-  return prisma.refreshToken.delete({
+export const revokeRefreshToken = (refreshToken) => {
+  return prisma.refreshToken.update({
     where: { token: refreshToken },
+    data: { isRevoked: true, token: "" },
   });
 };
 
-export const deleteAllRefreshTokensByUser = (userId) => {
-  return prisma.refreshToken.deleteMany({
+export const revokeAllRefreshTokensByUser = (userId) => {
+  return prisma.refreshToken.updateMany({
     where: { userId },
+    data: { isRevoked: true, token: "" },
   });
 };
 
