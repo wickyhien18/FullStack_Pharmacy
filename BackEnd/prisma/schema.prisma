@@ -160,6 +160,7 @@ model CartItem {
 
   @@unique([cartId, productId], name: "uk_cart_medicine", map: "uk_cart_medicine")
   @@index([cartId], map: "idx_cart_items_cart")
+  @@index([productId], map: "idx_cart_items_product_id")
   @@map("cart_items")
 }
 
