@@ -20,18 +20,17 @@ const formatUser = (user) => ({
   userId: user.userId.toString(),
   userName: user.userName,
   fullName: user.fullName,
-  email: user.email,
-  phone: user.phone,
-  role: user.role ? user.role.roleName : null,
+  email: user.email || user.userEmail,
+  phone: user.phone || user.userPhone,
+  role: (user.role ? user.role.roleName : null) || user.roleName,
   isActive: user.isActive,
-  createdAt: user.createdAt,
 });
 
 // ── BUILD TOKEN PAYLOAD ────────────────────────────────────────────────
 const buildTokenPayload = (user) => ({
   userId: Number(user.userId),
   userName: user.userName,
-  role: user.role?.roleName || "ROLE_CUSTOMER",
+  role: user.role?.roleName || user.roleName || "ROLE_CUSTOMER",
 });
 
 // ── GET MY DEVICES ────────────────────────────────────────────────
@@ -149,6 +148,7 @@ export const login = async ({ email, password }, req) => {
 
 export const refreshToken = async (refreshToken) => {
   //401 - Unauthorized - can't find token or token is expired => can't know you are?
+
   if (!refreshToken)
     throw { status: 401, message: "Refresh token không tồn tại" };
 
@@ -163,7 +163,7 @@ export const refreshToken = async (refreshToken) => {
     };
   }
 
-  if (!tokenData.user.isActive)
+  if (!tokenData.isActive)
     throw { status: 403, message: "Tài khoản đang bị khóa" };
 
   const newToken = jwt.generateRefreshToken();
@@ -171,14 +171,16 @@ export const refreshToken = async (refreshToken) => {
 
   await authRepository.updateRefreshTokenById(tokenData.id, newToken, expireAt);
 
-  const accessToken = jwt.generateAccessTokens(
-    buildTokenPayload(tokenData.user),
-  );
+  const accessToken = jwt.generateAccessTokens({
+    userId: Number(tokenData.userId),
+    userName: tokenData.userName,
+    role: tokenData.roleName || "ROLE_CUSTOMER",
+  });
 
   return {
     accessToken,
     refreshToken: newToken,
-    user: formatUser(tokenData.user),
+    user: formatUser(tokenData),
   };
 };
 

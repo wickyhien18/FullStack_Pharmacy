@@ -40,11 +40,25 @@ export const findTokenByDevice = (userId, deviceInfo) => {
   });
 };
 
-export const findRefreshToken = (token) => {
-  return prisma.refreshToken.findUnique({
-    where: { token },
-    include: { user: { include: { role: true } } },
-  });
+export const findRefreshToken = async (token) => {
+  const rows = await prisma.$queryRaw`
+    SELECT rt.id,
+    rt.token,
+    rt.expire_at as "expireAt",
+    rt.device_info as "deviceInfo",
+    u.user_id as "userId",
+    u.user_name as "userName",
+    u.full_name as "fullName",
+    u.email as "userEmail",
+    u.phone as "userPhone", 
+    u.is_active as "isActive",
+    r.role_name as "roleName"
+    FROM refresh_tokens rt
+    join users u on rt.user_id = u.user_id
+    join roles r on u.role_id = r.role_id
+    where rt.token = ${token}
+  `;
+  return rows[0] ?? null;
 };
 
 export const findUserPasswordById = (userId) => {
@@ -150,7 +164,7 @@ export const deleteAllRefreshTokensByUser = (userId) => {
 };
 
 export const deleteEmailOTP = (userId) => {
-  return prisma.otpVerification.findUnique({
+  return prisma.otpVerification.delete({
     where: { userId },
   });
 };
