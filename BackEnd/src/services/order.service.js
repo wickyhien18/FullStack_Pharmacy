@@ -23,7 +23,6 @@ const formatOrder = (order) => ({
   createdAt: order.createdAt,
   items: order.items?.map((i) => ({
     orderItemId: i.orderItemId.toString(),
-    // Lấy từ relation thay vì column snapshot (không có trong schema)
     productName: i.product?.name || "Sản phẩm không còn tồn tại",
     productUnit: i.product?.unit || "Hộp",
     quantity: i.quantity,
@@ -42,9 +41,8 @@ export const createOrder = async (userId, { shippingAddress, note }) => {
   if (!cart) throw { status: 404, message: "Không tìm thấy giỏ hàng" };
   if (!cart.items.length) throw { status: 400, message: "Giỏ hàng trống" };
 
-  // Tính tổng tiền từ DB — không tin client gửi giá
   const totalPrice = cart.items.reduce(
-    (sum, item) => sum + Number(item.product.price) * item.quantity,
+    (sum, item) => sum + Number(item.productPrice) * item.itemQuantity,
     0,
   );
 
@@ -53,7 +51,7 @@ export const createOrder = async (userId, { shippingAddress, note }) => {
     orderCode: generateOrderCode(),
     items: cart.items.map((i) => ({
       productId: i.productId,
-      quantity: i.quantity,
+      quantity: i.itemQuantity,
     })),
     shippingAddress,
     note,

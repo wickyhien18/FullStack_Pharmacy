@@ -59,36 +59,46 @@ export const createOrder = async ({
         },
       });
 
-      for (const item of items) {
-        const product = await tx.product.findUnique({
-          where: { productId: item.productId },
-          include: { inventory: true },
-        });
+      // Lấy hết product + inventory 1 lần, không query lặp trong loop
+      const productIds = items.map((i) => i.productId);
+      const products = await tx.product.findMany({
+        where: { productId: { in: productIds } },
+        include: { inventory: true },
+      });
+      const productMap = new Map(
+        products.map((p) => [p.productId.toString(), p]),
+      );
 
+      const orderItemsData = [];
+      const inventoryUpdates = [];
+      const logsData = [];
+
+      for (const item of items) {
+        const product = productMap.get(item.productId.toString());
         if (!product) throw new Error("Sản phẩm không tồn tại");
+
         const currentQty = product.inventory?.quantity ?? 0;
         if (currentQty < item.quantity) {
           throw new Error(`Sản phẩm "${product.name}" không đủ hàng`);
         }
 
-        await tx.orderItem.create({
-          data: {
-            order: { connect: { orderId: order.orderId } },
-            product: { connect: { productId: item.productId } },
-            quantity: item.quantity,
-            unitPrice: product.price,
-            totalPrice: Number(product.price) * item.quantity,
-          },
+        orderItemsData.push({
+          orderId: order.orderId,
+          productId: item.productId,
+          quantity: item.quantity,
+          unitPrice: product.price,
+          totalPrice: Number(product.price) * item.quantity,
         });
 
         const newQty = currentQty - item.quantity;
-        await tx.inventory.update({
-          where: { productId: item.productId },
-          data: { quantity: { decrement: item.quantity } },
-        });
+        inventoryUpdates.push(
+          tx.inventory.update({
+            where: { productId: item.productId },
+            data: { quantity: { decrement: item.quantity } },
+          }),
+        );
 
-        // ← THÊM: ghi log EXPORT khi đặt hàng
-        await writeInventoryLog(tx, {
+        logsData.push({
           productId: item.productId,
           changeType: "EXPORT",
           quantity: item.quantity,
@@ -99,12 +109,18 @@ export const createOrder = async ({
         });
       }
 
+      // Batch insert orderItems — 1 query thay vì N query create riêng
+      await tx.orderItem.createMany({ data: orderItemsData });
+
+      // Inventory update vẫn phải chạy riêng từng cái (mỗi product khác where), nhưng dùng Promise.all để chạy song song thay vì tuần tự
+      await Promise.all(inventoryUpdates);
+
+      // Batch insert log
+      await tx.inventoryLog.createMany({ data: logsData });
+
       return order;
     },
-    {
-      timeout: 30000, // tăng lên 30 giây
-      maxWait: 10000, // chờ tối đa 10 giây để lấy connection
-    },
+    { timeout: 30000, maxWait: 10000 },
   );
 };
 
@@ -143,7 +159,7 @@ export const findOrderByUserIdAndOrderId = async (orderId, userId) => {
 export const handleCancelOrderPending = async (orderId, reason) => {
   return prisma.$transaction(
     async (tx) => {
-      const order = await tx.order.update({
+      await tx.order.update({
         where: { orderId },
         data: {
           orderStatus: "CANCELLED",
@@ -154,21 +170,30 @@ export const handleCancelOrderPending = async (orderId, reason) => {
       });
 
       const items = await tx.orderItem.findMany({ where: { orderId } });
+      const productIds = items.map((i) => i.productId);
+
+      const inventories = await tx.inventory.findMany({
+        where: { productId: { in: productIds } },
+      });
+      const invMap = new Map(
+        inventories.map((i) => [i.productId.toString(), i.quantity]),
+      );
+
+      const updates = [];
+      const logsData = [];
 
       for (const item of items) {
-        const inventory = await tx.inventory.findUnique({
-          where: { productId: item.productId },
-        });
-        const currentQty = inventory?.quantity ?? 0;
+        const currentQty = invMap.get(item.productId.toString()) ?? 0;
         const newQty = currentQty + item.quantity;
 
-        await tx.inventory.update({
-          where: { productId: item.productId },
-          data: { quantity: { increment: item.quantity } },
-        });
+        updates.push(
+          tx.inventory.update({
+            where: { productId: item.productId },
+            data: { quantity: { increment: item.quantity } },
+          }),
+        );
 
-        // ← THÊM: ghi log IMPORT khi hoàn kho
-        await writeInventoryLog(tx, {
+        logsData.push({
           productId: item.productId,
           changeType: "IMPORT",
           quantity: item.quantity,
@@ -178,11 +203,11 @@ export const handleCancelOrderPending = async (orderId, reason) => {
           note: `Hoàn kho do huỷ đơn hàng`,
         });
       }
+
+      await Promise.all(updates);
+      await tx.inventoryLog.createMany({ data: logsData });
     },
-    {
-      timeout: 30000, // tăng lên 30 giây
-      maxWait: 10000, // chờ tối đa 10 giây để lấy connection
-    },
+    { timeout: 30000, maxWait: 10000 },
   );
 };
 
@@ -217,20 +242,30 @@ export const handleCancelOrderDelivedAndShipping = async (orderId, status) => {
       });
 
       const items = await tx.orderItem.findMany({ where: { orderId } });
+      const productIds = items.map((i) => i.productId);
+
+      const inventories = await tx.inventory.findMany({
+        where: { productId: { in: productIds } },
+      });
+      const invMap = new Map(
+        inventories.map((i) => [i.productId.toString(), i.quantity]),
+      );
+
+      const updates = [];
+      const logsData = [];
+
       for (const item of items) {
-        const inventory = await tx.inventory.findUnique({
-          where: { productId: item.productId },
-        });
-        const currentQty = inventory?.quantity ?? 0;
+        const currentQty = invMap.get(item.productId.toString()) ?? 0;
         const newQty = currentQty + item.quantity;
 
-        await tx.inventory.update({
-          where: { productId: item.productId },
-          data: { quantity: { increment: item.quantity } },
-        });
+        updates.push(
+          tx.inventory.update({
+            where: { productId: item.productId },
+            data: { quantity: { increment: item.quantity } },
+          }),
+        );
 
-        // ← THÊM: ghi log IMPORT khi hoàn kho
-        await writeInventoryLog(tx, {
+        logsData.push({
           productId: item.productId,
           changeType: "IMPORT",
           quantity: item.quantity,
@@ -240,10 +275,13 @@ export const handleCancelOrderDelivedAndShipping = async (orderId, status) => {
           note: `Hoàn kho do huỷ đơn hàng (${status})`,
         });
       }
+
+      await Promise.all(updates);
+      await tx.inventoryLog.createMany({ data: logsData });
     },
     {
-      timeout: 30000, // tăng lên 30 giây
-      maxWait: 10000, // chờ tối đa 10 giây để lấy connection
+      timeout: 30000,
+      maxWait: 10000,
     },
   );
 };
@@ -265,7 +303,6 @@ export const rejectOrder = async (orderId, status, reason) => {
 export const approveReturnOrder = async (orderId, totalPrice) => {
   return prisma.$transaction(
     async (tx) => {
-      // 1. Đổi status đơn hàng → RETURNED
       await tx.order.update({
         where: { orderId },
         data: {
@@ -274,22 +311,31 @@ export const approveReturnOrder = async (orderId, totalPrice) => {
         },
       });
 
-      // 2. Hoàn tồn kho + ghi log
       const items = await tx.orderItem.findMany({ where: { orderId } });
+      const productIds = items.map((i) => i.productId);
+
+      const inventories = await tx.inventory.findMany({
+        where: { productId: { in: productIds } },
+      });
+      const invMap = new Map(
+        inventories.map((i) => [i.productId.toString(), i.quantity]),
+      );
+
+      const updates = [];
+      const logsData = [];
+
       for (const item of items) {
-        const inventory = await tx.inventory.findUnique({
-          where: { productId: item.productId },
-        });
-        const currentQty = inventory?.quantity ?? 0;
+        const currentQty = invMap.get(item.productId.toString()) ?? 0;
         const newQty = currentQty + item.quantity;
 
-        await tx.inventory.update({
-          where: { productId: item.productId },
-          data: { quantity: { increment: item.quantity } },
-        });
+        updates.push(
+          tx.inventory.update({
+            where: { productId: item.productId },
+            data: { quantity: { increment: item.quantity } },
+          }),
+        );
 
-        // ← THÊM: ghi log IMPORT khi hoàn kho
-        await writeInventoryLog(tx, {
+        logsData.push({
           productId: item.productId,
           changeType: "IMPORT",
           quantity: item.quantity,
@@ -300,8 +346,10 @@ export const approveReturnOrder = async (orderId, totalPrice) => {
         });
       }
 
-      // 3. Ghi nhận hoàn tiền vào bảng payments
-      // Tìm payment gốc (nếu có) để lấy paymentMethod
+      await Promise.all(updates);
+      await tx.inventoryLog.createMany({ data: logsData });
+
+      // Ghi nhận hoàn tiền — giữ nguyên, chỉ 1 query nên không cần tối ưu
       const existingPayment = await tx.payment.findFirst({
         where: { orderId },
         orderBy: { createdAt: "desc" },
@@ -318,8 +366,8 @@ export const approveReturnOrder = async (orderId, totalPrice) => {
       });
     },
     {
-      timeout: 30000, // tăng lên 30 giây
-      maxWait: 10000, // chờ tối đa 10 giây để lấy connection
+      timeout: 30000,
+      maxWait: 10000,
     },
   );
 };
