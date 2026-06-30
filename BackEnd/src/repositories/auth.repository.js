@@ -125,7 +125,7 @@ export const existUserEmail = (email, excludeUserId) => {
 export const updateRefreshTokenById = (id, newToken, newExpireAt) => {
   return prisma.refreshToken.update({
     where: { id },
-    data: { token: newToken, expireAt: newExpireAt },
+    data: { token: newToken, expireAt: newExpireAt, isRevoked: false },
   });
 };
 
