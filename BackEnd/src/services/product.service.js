@@ -165,6 +165,9 @@ export const getProductBySlug = async (slug) => {
 // Call when admin updates/deletes products to clear stale cache
 export const invalidateProductCache = async (slug = null) => {
   await deletePattern("products:list:*");
-  if (slug) await deletePattern(`products:detail:${slug}`);
+  await deletePattern("cache:/api/products*");
+  if (slug) {
+    await deletePattern(`products:detail:${slug}`);
+  }
   console.log("[Cache] Invalidated product cache");
 };

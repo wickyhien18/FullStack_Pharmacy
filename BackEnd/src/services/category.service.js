@@ -1,6 +1,12 @@
 import * as categoryRepo from "../repositories/category.repository.js";
 import { countProductsByCategory } from "../repositories/product.repository.js";
+import { deletePattern } from "../config/redis.js";
 import slugify from "slugify";
+
+const invalidateCategoryCache = async () => {
+  await deletePattern("cache:/api/categories*");
+  console.log("[Cache] Invalidated category cache");
+};
 
 const generateSlug = (name) =>
   slugify(name, { lower: true, strict: true, locale: "vi" });
@@ -42,6 +48,7 @@ export const createCategory = async ({ name }) => {
   if (existing) throw { status: 409, message: "Danh mục đã tồn tại" };
 
   const category = await categoryRepo.createCategory({ name, slug });
+  await invalidateCategoryCache();
   return formatCategory(category);
 };
 
@@ -56,6 +63,7 @@ export const updateCategory = async (categoryId, { name }) => {
     name,
     slug,
   });
+  await invalidateCategoryCache();
   return formatCategory(category);
 };
 
@@ -63,4 +71,5 @@ export const deleteCategory = async (categoryId) => {
   const existing = await categoryRepo.findCategoryById(BigInt(categoryId));
   if (!existing) throw { status: 404, message: "Không tìm thấy danh mục" };
   await categoryRepo.deleteCategory(BigInt(categoryId));
+  await invalidateCategoryCache();
 };

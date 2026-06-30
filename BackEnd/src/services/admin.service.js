@@ -6,6 +6,7 @@ import * as productRepo from "../repositories/product.repository.js";
 import { buildPaginatedResponse } from "../utils/pagination.js";
 import { sendError } from "../utils/response.js";
 import { uploadImage, deleteImage } from "./upload.service.js";
+import { invalidateProductCache } from "./product.service.js";
 import slugify from "slugify";
 
 const MAX_IMAGES = 3;
@@ -187,6 +188,8 @@ export const createproduct = async (data, files = []) => {
     await productRepo.createProductImages(product.productId, imageUrls);
   }
 
+  await invalidateProductCache();
+
   return { productId: product.productId.toString(), slug: product.slug };
 };
 
@@ -258,6 +261,11 @@ export const updateproduct = async (
     await adminRepo.createOrUpdateInventory(productId, data.stock);
   }
 
+  await invalidateProductCache(existing.slug);
+  if (updateData.slug) {
+    await invalidateProductCache(updateData.slug);
+  }
+
   return { productId, message: "Cập nhật thành công" };
 };
 
@@ -272,4 +280,5 @@ export const deleteproduct = async (productId) => {
     await deleteImage(img.imageUrl);
   }
   await productRepo.softDeleteProduct(BigInt(productId));
+  await invalidateProductCache(existing.slug);
 };

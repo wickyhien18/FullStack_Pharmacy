@@ -67,3 +67,22 @@ Speed Index: 4.1s
 
 Render Build: 50s
 Vercel Build: 55s
+
+- REDIS CACHE:
+BEFORE
+/api/products?page=1&limit=12 - 1112.53ms
+/api/products?limit=12 -  989.76ms
+/api/products?page=1&limit=12&sort=newest - 1434.46ms
+/api/products?categoryId=9&page=1&limit=12&sort=newest - 2604.58ms
+/api/products?categoryId=9&page=1&limit=12&sort=bestseller - 1421.23ms
+/api/products?categoryId=9&page=1&limit=12&sort=price-asc - 1416.90ms
+/api/products?categoryId=9&page=1&limit=12&sort=price-desc - 1415.36ms
+
+AFTER
+/api/products?page=1&limit=12 - 218.91ms
+/api/products?limit=12 - 219.33ms
+/api/products?page=1&limit=12&sort=newest - 218.64ms
+/api/products?categoryId=9&page=1&limit=12&sort=newest - 218.62ms
+/api/products?categoryId=9&page=1&limit=12&sort=bestseller - 218.53ms
+/api/products?categoryId=9&page=1&limit=12&sort=price-asc - 218.51ms
+/api/products?categoryId=9&page=1&limit=12&sort=price-desc - 218.71ms
