@@ -22,6 +22,7 @@ export const env = {
   BCRYPT_ROUNDS: parseInt(process.env.BCRYPT_ROUNDS || "10"),
   RESEND_API_KEY: requireEnv("RESEND_API_KEY"),
   RESEND_FROM_EMAIL: process.env.RESEND_FROM_EMAIL || "noreply@example.com",
+  REDIS_URL: process.env.REDIS_URL,
   isDev: process.env.NODE_ENV !== "production",
   isProd: process.env.NODE_ENV === "production",
 };

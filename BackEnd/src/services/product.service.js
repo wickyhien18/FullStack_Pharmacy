@@ -2,7 +2,7 @@
 // product.service.js — Business logic cho products
 // ================================================================
 import * as productRepo from "../repositories/product.repository.js";
-// import { getCache, setCache, deletePattern } from "../config/redis.js";
+import { getCache, setCache, deletePattern } from "../config/redis.js";
 import { buildPaginatedResponse } from "../utils/pagination.js";
 
 // Xây dựng where clause từ query params
@@ -99,16 +99,16 @@ export const getProducts = async ({
 }) => {
   // Cache key bao gồm tất cả params — params khác = cache khác
   // Cache key includes all params — different params = different cache
-  // const cacheKey = `products:list:${page}:${limit}:${search || ""}:${categoryId || ""}:${sort || ""}:${minPrice || ""}:${maxPrice || ""}`;
+  const cacheKey = `products:list:${page}:${limit}:${search || ""}:${categoryId || ""}:${sort || ""}:${minPrice || ""}:${maxPrice || ""}`;
 
   // Check cache trước / Check cache first
-  // const cached = await getCache(cacheKey);
-  // if (cached) {
-  //   console.log("[Cache] HIT:", cacheKey);
-  //   return cached;
-  // }
+  const cached = await getCache(cacheKey);
+  if (cached) {
+    console.log("[Cache] HIT:", cacheKey);
+    return cached;
+  }
 
-  // console.log("[Cache] MISS:", cacheKey);
+  console.log("[Cache] MISS:", cacheKey);
 
   const where = buildWhere({ search, categoryId, minPrice, maxPrice });
   const orderBy = buildOrderBy(sort);
@@ -126,24 +126,24 @@ export const getProducts = async ({
   );
 
   // Lưu cache 5 phút / Cache for 5 minutes
-  // await setCache(cacheKey, result, 300);
+  await setCache(cacheKey, result, 300);
 
   return result;
 };
 
 // Lấy chi tiết 1 product
 export const getProductBySlug = async (slug) => {
-  // const cacheKey = `products:detail:${slug}`;
+  const cacheKey = `products:detail:${slug}`;
 
-  // const cached = await getCache(cacheKey);
-  // if (cached) return cached;
+  const cached = await getCache(cacheKey);
+  if (cached) return cached;
   const product = await productRepo.findProductBySlug(slug);
   if (!product) throw { status: 404, message: "Không tìm thấy sản phẩm" };
 
   const result = formatProductForSlug(product);
 
   // Cache 10 phút / Cache for 10 minutes
-  // await setCache(cacheKey, result, 600);
+  await setCache(cacheKey, result, 600);
 
   return result;
 };
@@ -151,8 +151,8 @@ export const getProductBySlug = async (slug) => {
 // ── Invalidate Cache ──────────────────────────────────────────────
 // Gọi khi admin sửa/xoá sản phẩm để xoá cache cũ
 // Call when admin updates/deletes products to clear stale cache
-// export const invalidateProductCache = async (slug = null) => {
-//   await deletePattern("products:list:*");
-//   if (slug) await deletePattern(`products:detail:${slug}`);
-//   console.log("[Cache] Invalidated product cache");
-// };
+export const invalidateProductCache = async (slug = null) => {
+  await deletePattern("products:list:*");
+  if (slug) await deletePattern(`products:detail:${slug}`);
+  console.log("[Cache] Invalidated product cache");
+};
