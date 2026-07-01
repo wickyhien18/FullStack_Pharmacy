@@ -14,109 +14,109 @@ import {
   useProducts,
   useCategoriesWithCount,
 } from "../../hooks/useProducts.js";
-const bannerSlides = [
-  {
-    id: 1,
-    title: "Sản phẩm chăm sóc sức khỏe",
-    subtitle: "Tìm thuốc và sản phẩm phù hợp với nhu cầu của bạn",
-    cta: "Xem sản phẩm",
-    href: "/products",
-    bg: "linear-gradient(135deg, #1250dc 0%, #0a3a9e 100%)",
-    image:
-      "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=600&h=300&fit=crop&auto=format",
-  },
-  // {
-  //   id: 2,
-  //   title: "T\u01B0 v\u1EA5n s\u1EE9c kh\u1ECFe mi\u1EC5n ph\xED",
-  //   subtitle:
-  //     "\u0110\u1ED9i ng\u0169 d\u01B0\u1EE3c s\u0129 chuy\xEAn nghi\u1EC7p s\u1EB5n s\xE0ng 24/7",
-  //   cta: "T\u01B0 v\u1EA5n ngay",
-  //   href: "/blog",
-  //   bg: "linear-gradient(135deg, #00897b 0%, #00695c 100%)",
-  //   image:
-  //     "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=600&h=300&fit=crop&auto=format",
-  // },
-  {
-    id: 3,
-    title: "Giao h\xE0ng si\xEAu t\u1ED1c 2H",
-    subtitle: "Nh\u1EADn thu\u1ED1c ngay t\u1EA1i nh\xE0, to\xE0n qu\u1ED1c",
-    cta: "Xem s\u1EA3n ph\u1EA9m",
-    href: "/products",
-    bg: "linear-gradient(135deg, #e65100 0%, #bf360c 100%)",
-    image:
-      "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&h=300&fit=crop&auto=format",
-  },
-];
-const quickServices = [
-  {
-    title: "\u0110\u1EB7t thu\u1ED1c theo \u0111\u01A1n",
-    icon: <FileText size={24} />,
-    href: "/account",
-    color: "#1250dc",
-  },
-  {
-    title: "T\xECm nh\xE0 thu\u1ED1c",
-    icon: <MapPin size={24} />,
-    href: "/pharmacies",
-    color: "#00897b",
-  },
-  // {
-  //   title: "T\u01B0 v\u1EA5n d\u01B0\u1EE3c s\u0129",
-  //   icon: <Stethoscope size={24} />,
-  //   href: "/blog",
-  //   color: "#e65100",
-  // },
-  // {
-  //   title: "Ki\u1EC3m tra s\u1EE9c kh\u1ECFe",
-  //   icon: <TestTube size={24} />,
-  //   href: "/blog",
-  //   color: "#7b1fa2",
-  // },
-];
-function CountdownTimer({ targetTime }) {
-  const [timeLeft, setTimeLeft] = useState({
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
-  });
-  useEffect(() => {
-    const calc = () => {
-      const diff = Math.max(0, Math.floor((targetTime - Date.now()) / 1e3));
-      setTimeLeft({
-        hours: Math.floor(diff / 3600),
-        minutes: Math.floor((diff % 3600) / 60),
-        seconds: diff % 60,
-      });
-    };
-    calc();
-    const id = setInterval(calc, 1e3);
-    return () => clearInterval(id);
-  }, [targetTime]);
-  const pad = (n) => String(n).padStart(2, "0");
-  return (
-    <div className="flex items-center gap-1">
-      {[timeLeft.hours, timeLeft.minutes, timeLeft.seconds].map((val, i) => (
-        <span key={i} className="flex items-center gap-1">
-          <span className="bg-white/20 text-white font-bold px-2.5 py-1.5 rounded-lg min-w-[2.5rem] text-center">
-            {pad(val)}
-          </span>
-          {i < 2 && <span className="text-white font-bold">:</span>}
-        </span>
-      ))}
-    </div>
-  );
-}
+// const bannerSlides = [
+//   {
+//     id: 1,
+//     title: "Sản phẩm chăm sóc sức khỏe",
+//     subtitle: "Tìm thuốc và sản phẩm phù hợp với nhu cầu của bạn",
+//     cta: "Xem sản phẩm",
+//     href: "/products",
+//     bg: "linear-gradient(135deg, #1250dc 0%, #0a3a9e 100%)",
+//     image:
+//       "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=600&h=300&fit=crop&auto=format",
+//   },
+//   // {
+//   //   id: 2,
+//   //   title: "T\u01B0 v\u1EA5n s\u1EE9c kh\u1ECFe mi\u1EC5n ph\xED",
+//   //   subtitle:
+//   //     "\u0110\u1ED9i ng\u0169 d\u01B0\u1EE3c s\u0129 chuy\xEAn nghi\u1EC7p s\u1EB5n s\xE0ng 24/7",
+//   //   cta: "T\u01B0 v\u1EA5n ngay",
+//   //   href: "/blog",
+//   //   bg: "linear-gradient(135deg, #00897b 0%, #00695c 100%)",
+//   //   image:
+//   //     "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=600&h=300&fit=crop&auto=format",
+//   // },
+//   {
+//     id: 3,
+//     title: "Giao h\xE0ng si\xEAu t\u1ED1c 2H",
+//     subtitle: "Nh\u1EADn thu\u1ED1c ngay t\u1EA1i nh\xE0, to\xE0n qu\u1ED1c",
+//     cta: "Xem s\u1EA3n ph\u1EA9m",
+//     href: "/products",
+//     bg: "linear-gradient(135deg, #e65100 0%, #bf360c 100%)",
+//     image:
+//       "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&h=300&fit=crop&auto=format",
+//   },
+// ];
+// const quickServices = [
+//   {
+//     title: "\u0110\u1EB7t thu\u1ED1c theo \u0111\u01A1n",
+//     icon: <FileText size={24} />,
+//     href: "/account",
+//     color: "#1250dc",
+//   },
+//   {
+//     title: "T\xECm nh\xE0 thu\u1ED1c",
+//     icon: <MapPin size={24} />,
+//     href: "/pharmacies",
+//     color: "#00897b",
+//   },
+//   // {
+//   //   title: "T\u01B0 v\u1EA5n d\u01B0\u1EE3c s\u0129",
+//   //   icon: <Stethoscope size={24} />,
+//   //   href: "/blog",
+//   //   color: "#e65100",
+//   // },
+//   // {
+//   //   title: "Ki\u1EC3m tra s\u1EE9c kh\u1ECFe",
+//   //   icon: <TestTube size={24} />,
+//   //   href: "/blog",
+//   //   color: "#7b1fa2",
+//   // },
+// ];
+// function CountdownTimer({ targetTime }) {
+//   const [timeLeft, setTimeLeft] = useState({
+//     hours: 0,
+//     minutes: 0,
+//     seconds: 0,
+//   });
+//   useEffect(() => {
+//     const calc = () => {
+//       const diff = Math.max(0, Math.floor((targetTime - Date.now()) / 1e3));
+//       setTimeLeft({
+//         hours: Math.floor(diff / 3600),
+//         minutes: Math.floor((diff % 3600) / 60),
+//         seconds: diff % 60,
+//       });
+//     };
+//     calc();
+//     const id = setInterval(calc, 1e3);
+//     return () => clearInterval(id);
+//   }, [targetTime]);
+//   const pad = (n) => String(n).padStart(2, "0");
+//   return (
+//     <div className="flex items-center gap-1">
+//       {[timeLeft.hours, timeLeft.minutes, timeLeft.seconds].map((val, i) => (
+//         <span key={i} className="flex items-center gap-1">
+//           <span className="bg-white/20 text-white font-bold px-2.5 py-1.5 rounded-lg min-w-[2.5rem] text-center">
+//             {pad(val)}
+//           </span>
+//           {i < 2 && <span className="text-white font-bold">:</span>}
+//         </span>
+//       ))}
+//     </div>
+//   );
+// }
 function HomePage() {
   const [slide, setSlide] = useState(0);
   // const flashSaleEnd =
   //   Date.now() + 2 * 60 * 60 * 1e3 + 34 * 60 * 1e3 + 15 * 1e3;
-  useEffect(() => {
-    const id = setInterval(
-      () => setSlide((s) => (s + 1) % bannerSlides.length),
-      4500,
-    );
-    return () => clearInterval(id);
-  }, []);
+  // useEffect(() => {
+  //   const id = setInterval(
+  //     () => setSlide((s) => (s + 1) % bannerSlides.length),
+  //     4500,
+  //   );
+  //   return () => clearInterval(id);
+  // }, []);
 
   const { data: productsData, isLoading: isLoadingProducts } = useProducts({
     limit: 12,

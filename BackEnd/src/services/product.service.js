@@ -166,6 +166,7 @@ export const getProductBySlug = async (slug) => {
 export const invalidateProductCache = async (slug = null) => {
   await deletePattern("products:list:*");
   await deletePattern("cache:/api/products*");
+  await deletePattern("cache:/api/categories*");
   if (slug) {
     await deletePattern(`products:detail:${slug}`);
   }

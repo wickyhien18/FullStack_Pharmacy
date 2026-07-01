@@ -4,6 +4,8 @@ import { deletePattern } from '../config/redis.js';
 
 const invalidateManufacturerCache = async () => {
   await deletePattern("cache:/api/manufacturers*");
+  await deletePattern("products:list:*");
+  await deletePattern("cache:/api/products*");
   console.log("[Cache] Invalidated manufacturer cache");
 };
 

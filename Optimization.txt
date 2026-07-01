@@ -77,6 +77,7 @@ BEFORE
 /api/products?categoryId=9&page=1&limit=12&sort=bestseller - 1421.23ms
 /api/products?categoryId=9&page=1&limit=12&sort=price-asc - 1416.90ms
 /api/products?categoryId=9&page=1&limit=12&sort=price-desc - 1415.36ms
+/api/products/friso-gold-3-1782486276520 -  1563.36ms
 /api/categories - 2047.08ms
 /api/categories/count - 2775.65ms
 
@@ -88,6 +89,7 @@ AFTER
 /api/products?categoryId=9&page=1&limit=12&sort=bestseller - 218.53ms
 /api/products?categoryId=9&page=1&limit=12&sort=price-asc - 218.51ms
 /api/products?categoryId=9&page=1&limit=12&sort=price-desc - 218.71ms
+/api/products/friso-gold-3-1782486276520 - 218.39ms
 /api/categories - 222.59ms
 /api/categories/count - 222.45ms
 

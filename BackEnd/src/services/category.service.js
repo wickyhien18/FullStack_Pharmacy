@@ -5,6 +5,8 @@ import slugify from "slugify";
 
 const invalidateCategoryCache = async () => {
   await deletePattern("cache:/api/categories*");
+  await deletePattern("products:list:*");
+  await deletePattern("cache:/api/products*");
   console.log("[Cache] Invalidated category cache");
 };
 
