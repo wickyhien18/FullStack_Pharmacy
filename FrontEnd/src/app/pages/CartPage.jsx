@@ -36,12 +36,18 @@ function CartPage() {
     totalItems,
     totalPrice,
     isLoading,
+    isFetching,
+    isAdding,
+    isUpdating,
+    isRemoving,
     formatPrice,
   } = useCart();
 
-  // FIX: Chỉ hiện "trống" khi đã load xong VÀ thực sự không có items
-  // Không hiện "trống" trong lúc đang loading
-  const isEmpty = !isLoading && items.length === 0;
+  const [deleteItemId, setDeleteItemId] = useState(null);
+
+  // loading state includes query loading, background fetching (when empty), or any ongoing mutation
+  const isPageLoading = isLoading || isAdding || isUpdating || isRemoving || (isFetching && items.length === 0);
+  const isEmpty = !isPageLoading && items.length === 0;
 
   if (isEmpty) {
     return (
@@ -75,7 +81,7 @@ function CartPage() {
         </Link>
         <ChevronRight size={14} />
         <span className="text-gray-800">
-          Giỏ hàng {!isLoading && `(${totalItems} sản phẩm)`}
+          Giỏ hàng {!isPageLoading && `(${totalItems} sản phẩm)`}
         </span>
       </nav>
 
@@ -85,7 +91,7 @@ function CartPage() {
           <div className="bg-white rounded-2xl overflow-hidden">
             <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
               <h2 className="font-semibold text-gray-800">
-                {isLoading ? (
+                {isPageLoading ? (
                   <span className="inline-block h-5 bg-gray-100 rounded w-40 animate-pulse" />
                 ) : (
                   `Sản phẩm trong giỏ (${totalItems})`
@@ -101,7 +107,7 @@ function CartPage() {
             </div>
 
             <div className="divide-y divide-gray-100">
-              {isLoading
+              {isPageLoading
                 ? // Skeleton 3 items trong lúc loading
                   Array(3)
                     .fill(0)
@@ -126,13 +132,13 @@ function CartPage() {
                           {item.unit}
                         </div>
                         <div className="flex items-center justify-between mt-2">
-                          <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
+                          <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white">
                             <button
                               onClick={() =>
                                 updateItem(item.cartItemId, item.quantity - 1)
                               }
-                              disabled={item.quantity <= 1}
-                              className="px-2.5 py-1.5 hover:bg-gray-50 transition-colors disabled:opacity-40"
+                              disabled={item.quantity <= 1 || isUpdating || isRemoving}
+                              className="px-2.5 py-1.5 hover:bg-gray-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                             >
                               <Minus size={14} />
                             </button>
@@ -143,7 +149,8 @@ function CartPage() {
                               onClick={() =>
                                 updateItem(item.cartItemId, item.quantity + 1)
                               }
-                              className="px-2.5 py-1.5 hover:bg-gray-50 transition-colors"
+                              disabled={isUpdating || isRemoving}
+                              className="px-2.5 py-1.5 hover:bg-gray-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                             >
                               <Plus size={14} />
                             </button>
@@ -154,8 +161,9 @@ function CartPage() {
                         </div>
                       </div>
                       <button
-                        onClick={() => removeItem(item.cartItemId)}
-                        className="shrink-0 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors self-start"
+                        onClick={() => setDeleteItemId(item.cartItemId)}
+                        disabled={isUpdating || isRemoving}
+                        className="shrink-0 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors self-start disabled:opacity-40 disabled:cursor-not-allowed"
                       >
                         <Trash2 size={16} />
                       </button>
@@ -171,7 +179,7 @@ function CartPage() {
             <h3 className="font-semibold text-gray-800 mb-4">
               Tóm tắt đơn hàng
             </h3>
-            {isLoading ? (
+            {isPageLoading ? (
               <div className="space-y-3 animate-pulse">
                 <div className="flex justify-between">
                   <div className="h-4 bg-gray-100 rounded w-1/2" />
@@ -231,6 +239,35 @@ function CartPage() {
           </div>
         </div>
       </div>
+
+      {/* Custom Deletion Confirmation Modal */}
+      {deleteItemId && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-xs">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full mx-4 shadow-xl border border-gray-100 animate-in fade-in zoom-in duration-200">
+            <h3 className="text-lg font-bold text-gray-900 mb-2">Xác nhận xóa sản phẩm</h3>
+            <p className="text-sm text-gray-500 mb-6">
+              Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng không?
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setDeleteItemId(null)}
+                className="px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors"
+              >
+                Hủy bỏ
+              </button>
+              <button
+                onClick={() => {
+                  removeItem(deleteItemId);
+                  setDeleteItemId(null);
+                }}
+                className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors"
+              >
+                Xác nhận xóa
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

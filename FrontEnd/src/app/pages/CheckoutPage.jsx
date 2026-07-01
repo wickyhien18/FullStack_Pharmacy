@@ -39,6 +39,23 @@ const ORDER_PROCESSING_STEPS = [
   },
 ];
 
+const LOCATION_DATA = {
+  "Hà Nội": {
+    "Cầu Giấy": ["Dịch Vọng", "Quan Hoa", "Mai Dịch", "Nghĩa Đô", "Dịch Vọng Hậu"],
+    "Đống Đa": ["Láng Hạ", "Láng Thượng", "Quang Trung", "Ô Chợ Dừa", "Khương Thượng"],
+    "Hai Bà Trưng": ["Bách Khoa", "Đồng Tâm", "Trương Định", "Minh Khai", "Quỳnh Lôi"],
+    "Hoàn Kiếm": ["Hàng Bạc", "Hàng Đào", "Hàng Trống", "Tràng Tiền", "Đồng Xuân"],
+    "Ba Đình": ["Trúc Bạch", "Kim Mã", "Giảng Võ", "Cống Vị", "Ngọc Khánh"]
+  },
+  "Bắc Ninh": {
+    "TP. Bắc Ninh": ["Đại Phúc", "Ninh Xá", "Suối Hoa", "Võ Cường", "Kinh Bắc"],
+    "Từ Sơn": ["Đồng Kỵ", "Trang Hạ", "Đình Bảng", "Tân Hồng", "Đồng Nguyên"],
+    "Quế Võ": ["Phố Mới", "Bằng An", "Phương Liễu", "Nhân Hòa", "Việt Hùng"],
+    "Yên Phong": ["Chờ", "Đông Phong", "Long Châu", "Tam Đa", "Trung Nghĩa"],
+    "Thuận Thành": ["Hồ", "An Bình", "Song Hồ", "Trạm Lộ", "Gia Đông"]
+  }
+};
+
 const validateShippingForm = (values) => {
   const errors = {};
   const phone = values.phone.trim();
@@ -49,7 +66,10 @@ const validateShippingForm = (values) => {
   } else if (!/^(0|\+84)\d{9,10}$/.test(phone.replace(/\s/g, ""))) {
     errors.phone = "Số điện thoại không hợp lệ";
   }
-  if (!values.address.trim()) errors.address = "Vui lòng nhập địa chỉ cụ thể";
+  if (!values.province) errors.province = "Vui lòng chọn Tỉnh / Thành phố";
+  if (!values.district) errors.district = "Vui lòng chọn Quận / Huyện";
+  if (!values.ward) errors.ward = "Vui lòng chọn Phường / Xã";
+  if (!values.address?.trim()) errors.address = "Vui lòng nhập địa chỉ cụ thể";
 
   return errors;
 };
@@ -67,9 +87,9 @@ function CheckoutPage() {
     name: "",
     phone: "",
     email: "",
-    province: "Hà Nội",
-    district: "Cầu Giấy",
-    ward: "Dịch Vọng",
+    province: "",
+    district: "",
+    ward: "",
     address: "",
     note: "",
   });
@@ -90,7 +110,19 @@ function CheckoutPage() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    const nextForm = { ...form, [name]: value };
+    let nextForm = { ...form, [name]: value };
+
+    if (name === "province") {
+      nextForm.district = "";
+      nextForm.ward = "";
+      nextForm.address = "";
+    } else if (name === "district") {
+      nextForm.ward = "";
+      nextForm.address = "";
+    } else if (name === "ward") {
+      nextForm.address = "";
+    }
+
     setForm(nextForm);
 
     if (touched[name]) {
@@ -104,7 +136,15 @@ function CheckoutPage() {
   };
   const validateBeforeLeavingShipping = () => {
     const nextErrors = validateShippingForm(form);
-    setTouched({ ...touched, name: true, phone: true, address: true });
+    setTouched({
+      ...touched,
+      name: true,
+      phone: true,
+      province: true,
+      district: true,
+      ward: true,
+      address: true,
+    });
     setErrors(nextErrors);
 
     if (Object.keys(nextErrors).length > 0) {
@@ -351,14 +391,17 @@ function CheckoutPage() {
                     name="province"
                     value={form.province}
                     onChange={handleChange}
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-400 bg-white"
+                    onBlur={handleBlur}
+                    className={`w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-400 bg-white ${errors.province ? "border-red-400" : "border-gray-200"}`}
                   >
-                    <option>Hà Nội</option>
-                    <option>TP. Hồ Chí Minh</option>
-                    <option>Đà Nẵng</option>
-                    <option>Cần Thơ</option>
-                    <option>Hải Phòng</option>
+                    <option value="">-- Chọn Tỉnh / Thành phố --</option>
+                    {Object.keys(LOCATION_DATA).map((prov) => (
+                      <option key={prov} value={prov}>{prov}</option>
+                    ))}
                   </select>
+                  {errors.province && (
+                    <p className="mt-1 text-xs text-red-500">{errors.province}</p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">
@@ -368,14 +411,19 @@ function CheckoutPage() {
                     name="district"
                     value={form.district}
                     onChange={handleChange}
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-400 bg-white"
+                    onBlur={handleBlur}
+                    disabled={!form.province}
+                    className={`w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-400 bg-white disabled:bg-gray-50 disabled:text-gray-400 ${errors.district ? "border-red-400" : "border-gray-200"}`}
                   >
-                    <option>Cầu Giấy</option>
-                    <option>Đống Đa</option>
-                    <option>Hai Bà Trưng</option>
-                    <option>Hoàn Kiếm</option>
-                    <option>Ba Đình</option>
+                    <option value="">-- Chọn Quận / Huyện --</option>
+                    {form.province &&
+                      Object.keys(LOCATION_DATA[form.province]).map((dist) => (
+                        <option key={dist} value={dist}>{dist}</option>
+                      ))}
                   </select>
+                  {errors.district && (
+                    <p className="mt-1 text-xs text-red-500">{errors.district}</p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">
@@ -385,13 +433,20 @@ function CheckoutPage() {
                     name="ward"
                     value={form.ward}
                     onChange={handleChange}
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-400 bg-white"
+                    onBlur={handleBlur}
+                    disabled={!form.district}
+                    className={`w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-400 bg-white disabled:bg-gray-50 disabled:text-gray-400 ${errors.ward ? "border-red-400" : "border-gray-200"}`}
                   >
-                    <option>Dịch Vọng</option>
-                    <option>Quan Hoa</option>
-                    <option>Mai Dịch</option>
-                    <option>Nghĩa Đô</option>
+                    <option value="">-- Chọn Phường / Xã --</option>
+                    {form.province &&
+                      form.district &&
+                      LOCATION_DATA[form.province][form.district].map((w) => (
+                        <option key={w} value={w}>{w}</option>
+                      ))}
                   </select>
+                  {errors.ward && (
+                    <p className="mt-1 text-xs text-red-500">{errors.ward}</p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">
@@ -402,8 +457,9 @@ function CheckoutPage() {
                     value={form.address}
                     onChange={handleChange}
                     onBlur={handleBlur}
+                    disabled={!form.ward}
                     placeholder="Số nhà, tên đường..."
-                    className={`w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-400 ${errors.address ? "border-red-400" : "border-gray-200"}`}
+                    className={`w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-400 disabled:bg-gray-50 disabled:text-gray-400 ${errors.address ? "border-red-400" : "border-gray-200"}`}
                   />
                   {errors.address && (
                     <p className="mt-1 text-xs text-red-500">

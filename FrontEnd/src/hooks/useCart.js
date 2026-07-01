@@ -12,7 +12,7 @@ export const useCart = () => {
   const queryClient = useQueryClient();
 
   // Fetch cart từ API — chỉ khi đã đăng nhập
-  const { data: cart, isLoading } = useQuery({
+  const { data: cart, isLoading, isFetching } = useQuery({
     queryKey: ["cart"],
     queryFn: () => api.get("/cart").then((r) => r.data.data),
     enabled: isAuthenticated, // không fetch khi chưa login
@@ -155,6 +155,7 @@ export const useCart = () => {
   return {
     cart,
     isLoading,
+    isFetching,
     items: cart?.items || [],
     totalItems: cart?.totalItems || 0,
     totalPrice: cart?.totalPrice || 0,
