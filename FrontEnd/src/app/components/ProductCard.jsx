@@ -42,8 +42,15 @@ function ProductCard({ product, showDiscount = true }) {
           width={400}
           height={176}
           loading="lazy"
-          className="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-300"
+          className={`w-full h-44 object-cover group-hover:scale-105 transition-transform duration-300 ${product.status === "OUT_OF_STOCK" ? "opacity-60 grayscale-[50%]" : ""}`}
         />
+        {product.status === "OUT_OF_STOCK" && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+            <span className="text-white text-xs font-semibold px-3 py-1 rounded-full bg-red-600/95 shadow-md">
+              Hết hàng
+            </span>
+          </div>
+        )}
         {/* {showDiscount && product.discount && (
           <span
             className="absolute top-2 left-2 text-white text-xs font-semibold px-2 py-1 rounded-lg"
@@ -99,10 +106,19 @@ function ProductCard({ product, showDiscount = true }) {
 
         <button
           onClick={handleAddToCart}
-          className={`w-full py-2 rounded-lg text-sm font-medium transition-all ${added ? "bg-green-500 text-white" : "border text-blue-700 hover:text-white hover:bg-blue-700"}`}
-          style={added ? {} : { borderColor: "#1250dc" }}
+          disabled={product.status === "OUT_OF_STOCK"}
+          className={`w-full py-2 rounded-lg text-sm font-medium transition-all ${
+            product.status === "OUT_OF_STOCK"
+              ? "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
+              : added
+              ? "bg-green-500 text-white"
+              : "border text-blue-700 hover:text-white hover:bg-blue-700"
+          }`}
+          style={added || product.status === "OUT_OF_STOCK" ? {} : { borderColor: "#1250dc" }}
         >
-          {added ? (
+          {product.status === "OUT_OF_STOCK" ? (
+            "Hết hàng"
+          ) : added ? (
             <span className="flex items-center justify-center gap-1.5">
               ✓ Đã thêm vào giỏ
             </span>

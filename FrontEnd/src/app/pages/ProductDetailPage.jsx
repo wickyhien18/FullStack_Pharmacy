@@ -93,6 +93,7 @@ function ProductDetailPage() {
     // ingredients: "Dược chất hoạt tính",
     // usage: "Theo chỉ định của bác sĩ",
     unit: m.unit || "Hộp",
+    status: m.status,
   };
 
   const related =
@@ -189,28 +190,39 @@ function ProductDetailPage() {
             <div className="text-xs text-gray-500">{product.unit}</div>
           </div>
 
+          {/* Status badge */}
+          {product.status === "OUT_OF_STOCK" && (
+            <div className="mb-4">
+              <span className="bg-red-50 text-red-600 text-xs font-semibold px-2.5 py-1.5 rounded-lg inline-block">
+                ❌ Hết hàng (Out of Stock)
+              </span>
+            </div>
+          )}
+
           {/* Quantity */}
           <div className="flex items-center gap-4 mb-5">
             <span className="text-sm text-gray-600">Số lượng:</span>
-            <div className="flex items-center border border-gray-200 rounded-xl overflow-hidden">
+            <div className="flex items-center border border-gray-200 rounded-xl overflow-hidden bg-white">
               <button
                 onClick={() => setQty(Math.max(1, qty - 1))}
-                className="px-3 py-2 hover:bg-gray-50"
+                disabled={product.status === "OUT_OF_STOCK"}
+                className="px-3 py-2 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Minus size={16} />
               </button>
               <span className="px-4 py-2 text-sm font-medium border-x border-gray-200 min-w-[3rem] text-center">
-                {qty}
+                {product.status === "OUT_OF_STOCK" ? 0 : qty}
               </span>
               <button
                 onClick={() => setQty(Math.min(product.stock, qty + 1))}
-                className="px-3 py-2 hover:bg-gray-50"
+                disabled={product.status === "OUT_OF_STOCK"}
+                className="px-3 py-2 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Plus size={16} />
               </button>
             </div>
             <span className="text-xs text-gray-400">
-              Còn {product.stock} sản phẩm
+              {product.status === "OUT_OF_STOCK" ? "Sản phẩm tạm thời hết hàng" : `Còn ${product.stock} sản phẩm`}
             </span>
           </div>
 
@@ -218,13 +230,16 @@ function ProductDetailPage() {
           <div className="flex gap-3 mb-4">
             <button
               onClick={handleAddToCart}
-              className="flex-1 py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all"
-              style={{
+              disabled={product.status === "OUT_OF_STOCK"}
+              className="flex-1 py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all disabled:bg-gray-100 disabled:text-gray-400 disabled:border-gray-200 disabled:cursor-not-allowed"
+              style={product.status === "OUT_OF_STOCK" ? {} : {
                 backgroundColor: added ? "#16a34a" : "#1250dc",
                 color: "white",
               }}
             >
-              {added ? (
+              {product.status === "OUT_OF_STOCK" ? (
+                "Hết hàng"
+              ) : added ? (
                 <>
                   <Check size={18} /> Đã thêm vào giỏ
                 </>
