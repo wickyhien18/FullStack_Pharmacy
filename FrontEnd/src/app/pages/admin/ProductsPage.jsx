@@ -128,10 +128,16 @@ export default function ProductsPage() {
                         className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                           m.status === "ACTIVE"
                             ? "bg-green-100 text-green-700"
+                            : m.status === "OUT_OF_STOCK"
+                            ? "bg-amber-100 text-amber-700"
                             : "bg-gray-100 text-gray-500"
                         }`}
                       >
-                        {m.status}
+                        {m.status === "ACTIVE"
+                          ? "Đang bán"
+                          : m.status === "OUT_OF_STOCK"
+                          ? "Hết hàng"
+                          : "Ngừng bán"}
                       </span>
                     </td>
                     <td className="px-4 py-3">
