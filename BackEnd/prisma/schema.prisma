@@ -80,7 +80,7 @@ model Product {
   unit           String?        @default("Hộp") @db.VarChar(50)
   categoryId     BigInt?        @map("category_id")
   manufacturerId BigInt?        @map("manufacturer_id")
-  status         String?        @default("ACTIVE") @db.VarChar(255)
+  status         ProductStatus? @default(ACTIVE)
   expireDate     DateTime?      @map("expire_date") @db.Date
   createdAt      DateTime?      @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt      DateTime?      @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
@@ -169,8 +169,8 @@ model Order {
   userId          BigInt?     @map("user_id")
   orderCode       String      @unique @map("order_code") @db.VarChar(100)
   totalPrice      Decimal     @map("total_price") @db.Decimal(15, 2)
-  orderStatus     String?     @default("PENDING") @map("order_status") @db.VarChar(255)
-  paymentStatus   String?     @default("PENDING") @map("payment_status") @db.VarChar(255)
+  orderStatus     OrderStatusEnum?     @default(PENDING) @map("order_status")
+  paymentStatus   PaymentStatusEnum?   @default(PENDING) @map("payment_status")
   shippingAddress String?     @map("shipping_address") @db.VarChar(500)
   note            String?
   cancelledBy     String?     @map("cancelled_by") @db.VarChar(20)
@@ -206,10 +206,10 @@ model OrderItem {
 model Payment {
   paymentId       BigInt    @id @default(autoincrement()) @map("payment_id")
   orderId         BigInt    @map("order_id")
-  paymentMethod   String    @map("payment_method") @db.VarChar(255)
+  paymentMethod   PaymentMethodEnum @map("payment_method")
   amount          Decimal   @db.Decimal(15, 2)
   transactionCode String?   @map("transaction_code") @db.VarChar(255)
-  status          String?   @default("PENDING") @db.VarChar(255)
+  status          TxnStatusEnum?    @default(PENDING)
   paidAt          DateTime? @map("paid_at") @db.Timestamp(6)
   expiredAt       DateTime? @map("expired_at") @db.Timestamp(6)
   rawCallback     Json?     @map("raw_callback") @db.Json
@@ -228,7 +228,7 @@ model Shipment {
   orderId      BigInt    @map("order_id")
   trackingCode String?   @map("tracking_code") @db.VarChar(100)
   carrier      String?   @db.VarChar(100)
-  status       String?   @db.VarChar(255)
+  status       ShipmentStatusEnum?
   shippedAt    DateTime? @map("shipped_at") @db.Timestamp(6)
   deliveredAt  DateTime? @map("delivered_at") @db.Timestamp(6)
   order        Order     @relation(fields: [orderId], references: [orderId], onDelete: Cascade, onUpdate: NoAction)
