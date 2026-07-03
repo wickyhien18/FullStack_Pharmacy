@@ -18,6 +18,9 @@ import {
 import { useAuth } from "../../hooks/useAuth.js";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "../../lib/axios.js";
+
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[_@$!%*?&])[A-Za-z\d_@$!%*?&]{8,}$/;
+const PASSWORD_ERROR_MSG = "Password must have at least 8 characters, including at least 1 uppercase letter, 1 lowercase letter, 1 number, 1 special characer such as: _, @, $, !, %, *, ?, & ";
 import toast from "react-hot-toast";
 import CancelOrderModal from "../components/CancelOrderModal.jsx";
 
@@ -194,8 +197,8 @@ function ChangePasswordModal({ onClose, logout }) {
       return toast.error("Vui lòng nhập đầy đủ thông tin");
     if (form.newPassword !== form.confirmPassword)
       return toast.error("Mật khẩu mới không khớp");
-    if (form.newPassword.length < 6)
-      return toast.error("Mật khẩu mới phải có ít nhất 6 ký tự");
+    if (!PASSWORD_REGEX.test(form.newPassword))
+      return toast.error(PASSWORD_ERROR_MSG);
     mutation.mutate();
   };
 
@@ -316,8 +319,8 @@ function ForgotPasswordModal({ onClose }) {
 
   const handleReset = () => {
     if (newPwd !== confirmPwd) return toast.error("Mật khẩu không khớp");
-    if (newPwd.length < 6)
-      return toast.error("Mật khẩu phải có ít nhất 6 ký tự");
+    if (!PASSWORD_REGEX.test(newPwd))
+      return toast.error(PASSWORD_ERROR_MSG);
     resetMutation.mutate();
   };
 
@@ -501,6 +504,8 @@ function AccountPage() {
       return toast.error("Vui lòng điền đầy đủ các thông tin bắt buộc");
     if (regForm.password !== regForm.confirm)
       return toast.error("Xác nhận mật khẩu không khớp");
+    if (!PASSWORD_REGEX.test(regForm.password))
+      return toast.error(PASSWORD_ERROR_MSG);
     register(
       {
         fullName: regForm.fullName,

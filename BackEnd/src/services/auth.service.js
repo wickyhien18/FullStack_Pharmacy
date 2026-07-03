@@ -238,8 +238,13 @@ export const changePassword = async (
     throw { status: 400, message: "Vui lòng nhập đầy đủ mật khẩu cũ và mới" };
   if (currentPassword === newPassword)
     throw { status: 400, message: "Mật khẩu mới phải khác mật khẩu cũ" };
-  if (newPassword.length < 8)
-    throw { status: 400, message: "Mật khẩu mới phải có ít nhất 8 ký tự" };
+  const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[_@$!%*?&])[A-Za-z\d_@$!%*?&]{8,}$/;
+  if (!PASSWORD_REGEX.test(newPassword)) {
+    throw {
+      status: 400,
+      message: "Password must have at least 8 characters, including at least 1 uppercase letter, 1 lowercase letter, 1 number, 1 special characer such as: _, @, $, !, %, *, ?, & ",
+    };
+  }
 
   const user = await authRepository.findUserPasswordById(userId);
   if (!user) throw { status: 404, message: "Không tìm thấy người dùng" };
@@ -330,8 +335,13 @@ export const forgotPassword = async (email) => {
 export const resetPassword = async (email, otp, newPassword) => {
   if (!email || !otp || !newPassword)
     throw { status: 400, message: "Vui lòng nhập đầy đủ thông tin" };
-  if (newPassword.length < 8)
-    throw { status: 400, message: "Mật khẩu mới phải có ít nhất 8 ký tự" };
+  const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[_@$!%*?&])[A-Za-z\d_@$!%*?&]{8,}$/;
+  if (!PASSWORD_REGEX.test(newPassword)) {
+    throw {
+      status: 400,
+      message: "Password must have at least 8 characters, including at least 1 uppercase letter, 1 lowercase letter, 1 number, 1 special characer such as: _, @, $, !, %, *, ?, & ",
+    };
+  }
 
   const user = await authRepository.findUserByEmail(email);
   if (!user) throw { status: 404, message: "Email không tồn tại" };

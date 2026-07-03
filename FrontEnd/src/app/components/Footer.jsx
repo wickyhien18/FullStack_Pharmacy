@@ -46,7 +46,7 @@ function Footer() {
     ],
 
     DevOps: [
-      { name: "Docker", icon: FaDocker },
+      // { name: "Docker", icon: FaDocker },
       { name: "Render", icon: SiRender },
       { name: "Vercel", icon: SiVercel },
     ],
