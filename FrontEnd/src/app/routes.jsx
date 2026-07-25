@@ -16,6 +16,7 @@ const CartPage = lazy(() => import("./pages/CartPage"));
 const CheckoutPage = lazy(() => import("./pages/CheckoutPage"));
 const AccountPage = lazy(() => import("./pages/AccountPage"));
 const SearchPage = lazy(() => import("./pages/SearchPage"));
+const GoogleCallback = lazy(() => import("./pages/GoogleCallback"));
 
 // Admin — lazy load toàn bộ vì user thường không vào
 const AdminLayout = lazy(() => import("./components/AdminLayout"));
@@ -54,6 +55,7 @@ const router = createBrowserRouter([
       { path: "account", element: S(AccountPage) },
       { path: "search", element: S(SearchPage) },
       { path: "*", element: <NotFoundPage /> },
+      { path: "auth/callback", element: S(GoogleCallback) },
     ],
   },
   {
