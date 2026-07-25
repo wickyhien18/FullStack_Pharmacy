@@ -26,6 +26,8 @@ const app = express();
 
 // Render/Vercel dùng reverse proxy — cần trust proxy để rate-limit hoạt động đúng
 app.set("trust proxy", 1);
+configurePassport();
+app.use(passport.initialize());
 // ── Security ─────────────────────────────────────────────────────
 app.use(helmet());
 app.use(
