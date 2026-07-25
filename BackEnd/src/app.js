@@ -6,7 +6,9 @@ import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import rateLimit from "express-rate-limit";
 import swaggerUi from "swagger-ui-express";
+import passport from "passport";
 import { swaggerSpec } from "./config/swagger.js";
+import { configurePassport } from "./config/passport.config.js";
 
 import { env } from "./config/env.js";
 import { errorHandler, notFound } from "./middlewares/error.middleware.js";
@@ -30,7 +32,7 @@ app.use(
   cors({
     origin: (origin, callback) => {
       const allowed = [
-        ...env.CLIENT_URL.split(","), // URL Vercel (production)
+        env.CLIENT_URL, // URL Vercel (production)
         "http://localhost:5173", // local dev
         "http://localhost:4173", // vite preview
       ].filter(Boolean);

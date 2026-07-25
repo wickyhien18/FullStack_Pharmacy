@@ -238,11 +238,13 @@ export const changePassword = async (
     throw { status: 400, message: "Vui lòng nhập đầy đủ mật khẩu cũ và mới" };
   if (currentPassword === newPassword)
     throw { status: 400, message: "Mật khẩu mới phải khác mật khẩu cũ" };
-  const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[_@$!%*?&])[A-Za-z\d_@$!%*?&]{8,}$/;
+  const PASSWORD_REGEX =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[_@$!%*?&])[A-Za-z\d_@$!%*?&]{8,}$/;
   if (!PASSWORD_REGEX.test(newPassword)) {
     throw {
       status: 400,
-      message: "Password must have at least 8 characters, including at least 1 uppercase letter, 1 lowercase letter, 1 number, 1 special characer such as: _, @, $, !, %, *, ?, & ",
+      message:
+        "Password must have at least 8 characters, including at least 1 uppercase letter, 1 lowercase letter, 1 number, 1 special characer such as: _, @, $, !, %, *, ?, & ",
     };
   }
 
@@ -335,11 +337,13 @@ export const forgotPassword = async (email) => {
 export const resetPassword = async (email, otp, newPassword) => {
   if (!email || !otp || !newPassword)
     throw { status: 400, message: "Vui lòng nhập đầy đủ thông tin" };
-  const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[_@$!%*?&])[A-Za-z\d_@$!%*?&]{8,}$/;
+  const PASSWORD_REGEX =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[_@$!%*?&])[A-Za-z\d_@$!%*?&]{8,}$/;
   if (!PASSWORD_REGEX.test(newPassword)) {
     throw {
       status: 400,
-      message: "Password must have at least 8 characters, including at least 1 uppercase letter, 1 lowercase letter, 1 number, 1 special characer such as: _, @, $, !, %, *, ?, & ",
+      message:
+        "Password must have at least 8 characters, including at least 1 uppercase letter, 1 lowercase letter, 1 number, 1 special characer such as: _, @, $, !, %, *, ?, & ",
     };
   }
 
@@ -370,4 +374,36 @@ export const resetPassword = async (email, otp, newPassword) => {
   await authRepository.revokeAllRefreshTokensByUser(user.userId);
 
   return { message: "Đặt lại mật khẩu thành công. Vui lòng đăng nhập lại." };
+};
+
+// ── GOOGLE_CALL_BACK ──────────────────
+export const loginWithGoogle = async (user, req) => {
+  const deviceInfo = getDeviceInfo(req);
+  const accessToken = jwt.generateAccessTokens(buildTokenPayload(user));
+  const refreshToken = jwt.generateRefreshToken();
+  const expireAt = getRefreshTokenExpiry(); // dùng lại hàm có sẵn thay vì tính tay
+
+  const existingToken = await authRepository.findTokenByDevice(
+    user.userId,
+    deviceInfo,
+  );
+
+  if (existingToken) {
+    await authRepository.updateRefreshTokenById(
+      existingToken.id,
+      refreshToken,
+      expireAt,
+    );
+  } else {
+    await authRepository.saveRefreshToken(
+      user.userId,
+      refreshToken,
+      expireAt,
+      deviceInfo,
+    );
+  }
+
+  await authRepository.updateLastActivity(user.userId);
+
+  return { accessToken, refreshToken, user: formatUser(user) };
 };

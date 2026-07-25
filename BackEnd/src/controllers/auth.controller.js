@@ -158,3 +158,30 @@ export const resetPassword = async (req, res) => {
     return sendError(res, err.message, err.status || 500);
   }
 };
+
+export const googleCallback = async (req, res) => {
+  try {
+    const user = req.user; // passport set sẵn
+
+    const {
+      accessToken,
+      refreshToken,
+      user: formatted,
+    } = await authService.loginWithGoogle(user, req);
+
+    res.cookie(REFRESH_TOKEN_COOKIE, refreshToken, cookieOptions);
+
+    const redirectUrl = new URL(`${env.CLIENT_URL}/auth/callback`);
+    redirectUrl.searchParams.set("token", accessToken);
+    redirectUrl.searchParams.set("userId", formatted.userId);
+    redirectUrl.searchParams.set("userName", formatted.userName);
+    redirectUrl.searchParams.set("fullName", formatted.fullName || "");
+    redirectUrl.searchParams.set("email", formatted.email);
+    redirectUrl.searchParams.set("role", formatted.role || "ROLE_CUSTOMER");
+
+    res.redirect(redirectUrl.toString());
+  } catch (err) {
+    console.error("[Google OAuth] Callback error:", err);
+    res.redirect(`${env.CLIENT_URL}/account?error=server_error`);
+  }
+};
