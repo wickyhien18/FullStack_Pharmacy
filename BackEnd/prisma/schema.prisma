@@ -24,6 +24,7 @@ model User {
   email            String           @unique @db.VarChar(255)
   phone            String           @unique @db.VarChar(20)
   roleId           BigInt?          @map("role_id")
+  googleId         String?          @unique @map("google_id") @db.VarChar(255)
   isActive         Boolean?         @default(true) @map("is_active")
   createdAt        DateTime?        @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt        DateTime?        @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
