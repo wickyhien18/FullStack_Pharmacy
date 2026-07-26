@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import {
   ChevronRight,
   Check,
@@ -103,6 +103,7 @@ const validateShippingForm = (values) => {
 };
 
 function CheckoutPage() {
+  const [searchParams] = useSearchParams();
   const { items, totalPrice, totalItems, clearCart, formatPrice } = useCart();
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
@@ -124,6 +125,18 @@ function CheckoutPage() {
   const [errors, setErrors] = useState({});
   const shipping = totalPrice >= 15e4 ? 0 : 3e4;
   const total = totalPrice + shipping;
+
+  useEffect(() => {
+    const payment = searchParams.get("payment");
+    const orderFromUrl = searchParams.get("order");
+
+    if (payment === "success") {
+      setOrderCode(orderFromUrl || "");
+      setPlaced(true);
+    } else if (payment === "failed" || payment === "error") {
+      toast.error(`Thanh toán thất bại cho đơn hàng #${orderFromUrl || ""}`);
+    }
+  }, []); // chỉ chạy 1 lần lúc mount
 
   useEffect(() => {
     if (!user) return;

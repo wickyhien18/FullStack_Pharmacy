@@ -122,8 +122,8 @@ export const handleVNPayCallback = async (vnpParams) => {
     amount,
     responseCode,
     redirectUrl: isSuccess
-      ? `${env.CLIENT_URL}/account?tab=orders&payment=success&order=${orderCode}`
-      : `${env.CLIENT_URL}/account?tab=orders&payment=failed&order=${orderCode}`,
+      ? `${env.CLIENT_URL}/checkout?payment=success&order=${orderCode}`
+      : `${env.CLIENT_URL}/checkout?payment=failed&order=${orderCode}`,
   };
 };
 
