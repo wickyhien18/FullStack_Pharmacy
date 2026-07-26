@@ -9,7 +9,7 @@ export const findProducts = async ({ skip, limit, where, orderBy }) => {
   const conditions = [Prisma.sql`p.deleted_at IS NULL`];
 
   if (where.status) {
-    conditions.push(Prisma.sql`p.status = ${where.status}`);
+    conditions.push(Prisma.sql`p.status = ${where.status}::product_status`);
   }
   if (where.name?.contains) {
     conditions.push(

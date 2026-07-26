@@ -58,9 +58,6 @@ export const createOrder = async (userId, { shippingAddress, note }) => {
     totalPrice,
   });
 
-  // Xoá cart sau khi đặt hàng thành công
-  await cartRepo.clearCart(cart.cartId);
-
   return {
     orderId: order.orderId.toString(),
     orderCode: order.orderCode,

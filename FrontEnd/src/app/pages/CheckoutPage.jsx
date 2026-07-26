@@ -229,7 +229,6 @@ function CheckoutPage() {
 
       if (paymentMethod === "vnpay") {
         const { payUrl } = await vnpayMutation.mutateAsync(orderId);
-        clearCart();
         window.location.href = payUrl; // redirect sang cổng VNPAY
         return;
       }
@@ -757,38 +756,6 @@ function CheckoutPage() {
               </span>
             </div>
           </div>
-          {/* Phương thức đã chọn */}
-          <div className="bg-gray-50 rounded-xl p-3 mb-4 text-xs text-gray-600 flex items-center gap-2">
-            <CheckCircle size={14} className="text-green-500 shrink-0" />
-            {paymentMethod === "vnpay"
-              ? "Bạn sẽ được chuyển sang cổng VNPAY để thanh toán"
-              : "Thanh toán tiền mặt khi nhận hàng"}
-          </div>
-
-          <button
-            onClick={handlePlaceOrder}
-            disabled={isSubmitting}
-            className="w-full py-3.5 rounded-xl text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-60 flex items-center justify-center gap-2"
-            style={{ backgroundColor: "#1250dc" }}
-          >
-            {isSubmitting ? (
-              <>
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Đang xử lý...
-              </>
-            ) : paymentMethod === "vnpay" ? (
-              "Thanh toán VNPAY →"
-            ) : (
-              "Đặt hàng ngay →"
-            )}
-          </button>
-
-          <Link
-            to="/cart"
-            className="mt-3 block w-full text-center py-2.5 text-sm text-gray-500 hover:text-gray-700"
-          >
-            ← Quay lại giỏ hàng
-          </Link>
         </div>
       </div>
     </div>
