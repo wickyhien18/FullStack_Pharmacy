@@ -3,6 +3,7 @@ import {
   Outlet,
   NavLink,
   useNavigate,
+  useLocation,
   ScrollRestoration,
 } from "react-router-dom";
 import { useAuthStore } from "../../stores/auth.store.js";
@@ -28,14 +29,52 @@ export default function AdminLayout() {
   const { user, isAuthenticated } = useAuthStore();
   const navigate = useNavigate();
 
+  const location = useLocation();
+
+  const isAdmin = user?.role === "ROLE_ADMIN";
+  const isStaff = user?.role === "ROLE_STAFF";
+
   useEffect(() => {
-    if (!isAuthenticated || user?.role !== "ROLE_ADMIN") {
+    if (!isAuthenticated || (!isAdmin && !isStaff)) {
       toast.error("Bạn không có quyền truy cập trang quản trị");
       navigate("/");
+      return;
     }
-  }, [isAuthenticated, user, navigate]);
+    // Staff không có quyền Dashboard/Users — tự điều hướng nếu cố vào bằng URL
+    const restricted = ["/admin", "/admin/users"];
+    if (isStaff && restricted.includes(location.pathname)) {
+      navigate("/admin/orders");
+    }
+  }, [isAuthenticated, user, navigate, location.pathname]);
 
-  if (!isAuthenticated || user?.role !== "ROLE_ADMIN") return null;
+  if (!isAuthenticated || (!isAdmin && !isStaff)) return null;
+
+  const navItems = isAdmin
+    ? [
+        { to: "/admin", label: "Dashboard", icon: LayoutDashboard, end: true },
+        { to: "/admin/products", label: "Sản phẩm", icon: Package },
+        { to: "/admin/orders", label: "Đơn hàng", icon: ShoppingCart },
+        { to: "/admin/users", label: "Người dùng", icon: Users },
+        {
+          to: "/admin/cancel-requests",
+          label: "Yêu cầu huỷ",
+          icon: AlertCircle,
+        },
+      ]
+    : [
+        {
+          to: "/admin/orders",
+          label: "Đơn hàng",
+          icon: ShoppingCart,
+          end: true,
+        },
+        { to: "/admin/products", label: "Sản phẩm & Kho", icon: Package },
+        {
+          to: "/admin/cancel-requests",
+          label: "Yêu cầu huỷ",
+          icon: AlertCircle,
+        },
+      ];
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -43,7 +82,7 @@ export default function AdminLayout() {
       <aside className="w-64 bg-white shadow-sm flex flex-col shrink-0">
         <div className="p-6 border-b">
           <h1 className="text-lg font-bold text-blue-700">
-            Quản trị Nhà thuốc
+            {isAdmin ? "Quản trị Nhà thuốc" : "Khu vực Nhân viên"}
           </h1>
         </div>
         <nav className="flex-1 p-4 space-y-1">

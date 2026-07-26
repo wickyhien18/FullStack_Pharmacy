@@ -9,30 +9,45 @@ const router = Router();
 
 // Áp dụng authenticate + authorize cho toàn bộ admin routes
 router.use(authenticate);
-router.use(authorize("ROLE_ADMIN"));
+
+const staffAccess = authorize("ROLE_ADMIN", "ROLE_STAFF"); // đơn hàng, tồn kho — cả 2 role
+const adminOnly = authorize("ROLE_ADMIN"); // người dùng, phân quyền, tạo/xoá sản phẩm
 
 // Dashboard
-router.get("/stats", adminController.getDashboardStats);
+router.get("/stats", staffAccess, adminController.getDashboardStats);
 
 // Orders
-router.get("/orders", adminController.getAllOrders);
-router.patch("/orders/:orderId/status", adminController.updateOrderStatus);
+router.get("/orders", staffAccess, adminController.getAllOrders);
+router.patch(
+  "/orders/:orderId/status",
+  staffAccess,
+  adminController.updateOrderStatus,
+);
 router.patch(
   "/orders/:orderId/cancel-request",
+  staffAccess,
   adminController.handleCancelRequest,
 );
 
 // Users
-router.get("/users", adminController.getAllUsers);
-router.patch("/users/:userId/status", adminController.updateUserStatus);
-router.patch("/users/:userId/role", adminController.updateUserRole);
-router.get("/roles", adminController.getRoles);
+router.get("/users", adminOnly, adminController.getAllUsers);
+router.patch(
+  "/users/:userId/status",
+  adminOnly,
+  adminController.updateUserStatus,
+);
+router.patch("/users/:userId/role", adminOnly, adminController.updateUserRole);
+router.get("/roles", adminOnly, adminController.getRoles);
 
 // products
-router.get("/products", adminController.getAllproducts);
-router.get("/products/:productId", adminController.getproductDetail); // ← THÊM
-router.post("/products", adminController.createproduct);
-router.put("/products/:productId", adminController.updateproduct);
-router.delete("/products/:productId", adminController.deleteproduct);
+router.get("/products", staffAccess, adminController.getAllproducts);
+router.get(
+  "/products/:productId",
+  staffAccess,
+  adminController.getproductDetail,
+); // ← THÊM
+router.post("/products", adminOnly, adminController.createproduct);
+router.put("/products/:productId", staffAccess, adminController.updateproduct);
+router.delete("/products/:productId", adminOnly, adminController.deleteproduct);
 
 export default router;

@@ -19,6 +19,7 @@ import {
 import { useCart } from "@/hooks/useCart.js";
 import { useCategories } from "../../hooks/useProducts.js";
 import { useAuth } from "../../hooks/useAuth.js";
+import { useNotifications } from "../../hooks/useNotifications.js";
 
 function Header() {
   const { totalItems } = useCart();
@@ -27,6 +28,9 @@ function Header() {
   const navigate = useNavigate();
 
   const { user, isAuthenticated } = useAuth();
+
+  const [notifOpen, setNotifOpen] = useState(false);
+  const { items: notifications, unreadCount, markAllRead } = useNotifications();
 
   const { data: categoriesData } = useCategories();
   const categoryIconMap = {
@@ -164,6 +168,50 @@ function Header() {
               {menuOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
           </div>
+
+          {isAuthenticated && (
+            <div className="relative">
+              <button
+                onClick={() => {
+                  setNotifOpen(!notifOpen);
+                  if (!notifOpen && unreadCount > 0) markAllRead();
+                }}
+                className="relative flex flex-col items-center gap-0.5 text-xs text-gray-600 hover:text-blue-700 cursor-pointer px-2 py-1 rounded-lg hover:bg-blue-50"
+              >
+                <div className="relative">
+                  <Bell size={20} />
+                  {unreadCount > 0 && (
+                    <span
+                      className="absolute -top-1.5 -right-1.5 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center"
+                      style={{ backgroundColor: "#f05a22", fontSize: "9px" }}
+                    >
+                      {unreadCount}
+                    </span>
+                  )}
+                </div>
+                <span>Thông báo</span>
+              </button>
+
+              {notifOpen && (
+                <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg border border-gray-100 max-h-96 overflow-y-auto z-50">
+                  {notifications.length === 0 ? (
+                    <p className="p-4 text-sm text-gray-400 text-center">
+                      Chưa có thông báo
+                    </p>
+                  ) : (
+                    notifications.map((n, i) => (
+                      <div
+                        key={n.notificationId || i}
+                        className="p-3 border-b border-gray-50 text-sm text-gray-700"
+                      >
+                        {n.message}
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 

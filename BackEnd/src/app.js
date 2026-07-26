@@ -22,6 +22,7 @@ import categoryRoutes from "./routes/category.routes.js";
 import manufacturerRoutes from "./routes/manufacturer.routes.js";
 import cartRoutes from "./routes/cart.routes.js";
 import paymentRoutes from "./routes/payment.routes.js";
+import notificationRoutes from "./routes/notification.routes.js";
 
 const app = express();
 
@@ -86,6 +87,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/manufacturers", manufacturerRoutes);
 app.use("/api/payment", paymentRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 // ── Error handling ────────────────────────────────────────────────
 app.use(notFound);

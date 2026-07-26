@@ -47,3 +47,25 @@ export const notifyOrderStatusChange = async (order) => {
     }
   }
 };
+
+export const getMyNotifications = async (userId) => {
+  const items = await prisma.notification.findMany({
+    where: { userId: BigInt(userId) },
+    orderBy: { createdAt: "desc" },
+    take: 20,
+  });
+  return items.map((n) => ({
+    notificationId: n.notificationId.toString(),
+    orderId: n.orderId?.toString() || null,
+    message: n.message,
+    isRead: n.isRead,
+    createdAt: n.createdAt,
+  }));
+};
+
+export const markAllRead = async (userId) => {
+  await prisma.notification.updateMany({
+    where: { userId: BigInt(userId), isRead: false },
+    data: { isRead: true },
+  });
+};
