@@ -17,14 +17,6 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 
-const navItems = [
-  { to: "/admin", label: "Dashboard", icon: LayoutDashboard, end: true },
-  { to: "/admin/products", label: "Sản phẩm", icon: Package },
-  { to: "/admin/orders", label: "Đơn hàng", icon: ShoppingCart },
-  { to: "/admin/users", label: "Người dùng", icon: Users },
-  { to: "/admin/cancel-requests", label: "Yêu cầu huỷ", icon: AlertCircle },
-];
-
 export default function AdminLayout() {
   const { user, isAuthenticated } = useAuthStore();
   const navigate = useNavigate();
