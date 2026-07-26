@@ -7,6 +7,8 @@ import { buildPaginatedResponse } from "../utils/pagination.js";
 import { sendError } from "../utils/response.js";
 import { uploadImage, deleteImage } from "./upload.service.js";
 import { invalidateProductCache } from "./product.service.js";
+import { prisma } from "../config/prisma.js";
+import { notifyOrderStatusChange } from "./notification.service.js";
 import slugify from "slugify";
 
 const MAX_IMAGES = 3;
@@ -67,6 +69,17 @@ export const updateOrderStatus = async (orderId, orderStatus) => {
     throw { status: 400, message: "Trạng thái đơn hàng không hợp lệ" };
   }
   const order = await adminRepo.updateOrderStatus(BigInt(orderId), orderStatus);
+
+  // Lấy kèm thông tin user để có email/fullName cho bước thông báo
+  const fullOrder = await prisma.order.findUnique({
+    where: { orderId: order.orderId },
+    include: {
+      user: { select: { userId: true, email: true, fullName: true } },
+    },
+  });
+
+  await notifyOrderStatusChange(fullOrder);
+
   return { orderId: order.orderId.toString(), orderStatus: order.orderStatus };
 };
 

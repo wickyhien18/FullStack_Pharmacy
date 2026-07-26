@@ -95,3 +95,38 @@ export const sendResetPasswordEmail = async (toEmail, fullName, otp) => {
   if (error)
     throw { status: 500, message: `Gửi email thất bại: ${error.message}` };
 };
+
+export const sendOrderStatusEmail = async (
+  toEmail,
+  fullName,
+  orderCode,
+  statusMessage,
+) => {
+  const { error } = await resend.emails.send({
+    from: `Nhà Thuốc Wicky Hien <${FROM}>`,
+    to: toEmail,
+    subject: `Cập nhật đơn hàng #${orderCode}`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 24px; background: #f8fafc; border-radius: 12px;">
+        <div style="text-align: center; margin-bottom: 24px;">
+          <span style="font-size: 36px;">💊</span>
+          <h1 style="color: #1250dc; font-size: 20px; margin: 8px 0;">Nhà Thuốc Wicky Hien</h1>
+        </div>
+        <div style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+          <h2 style="color: #1e293b; font-size: 18px; margin: 0 0 12px;">Đơn hàng #${orderCode}</h2>
+          <p style="color: #64748b; font-size: 14px; line-height: 1.6; margin: 0 0 8px;">
+            Xin chào <strong>${fullName || "bạn"}</strong>,
+          </p>
+          <p style="color: #64748b; font-size: 14px; line-height: 1.6;">
+            ${statusMessage}.
+          </p>
+        </div>
+        <p style="color: #94a3b8; font-size: 11px; text-align: center; margin-top: 16px;">
+          © 2026 Nhà Thuốc Wicky Hien. Không trả lời email này.
+        </p>
+      </div>
+    `,
+  });
+  if (error)
+    throw { status: 500, message: `Gửi email thất bại: ${error.message}` };
+};
