@@ -26,6 +26,12 @@ export const useNotifications = () => {
         { ...data, isRead: false, createdAt: new Date() },
         ...prev,
       ]);
+
+      // THÊM: báo React Query rằng dữ liệu đơn hàng đã cũ, cần fetch lại
+      queryClient.invalidateQueries({ queryKey: ["my-orders"] });
+      queryClient.invalidateQueries({
+        queryKey: ["order-detail", data.orderId],
+      });
     });
 
     return () => {
