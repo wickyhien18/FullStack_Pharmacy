@@ -9,7 +9,11 @@ import {
   Package,
   PhoneCall,
   Truck,
+  CheckCircle,
+  ShoppingCart,
+  ArrowLeft,
 } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
 import { useCart } from "@/hooks/useCart.js";
 import api from "../../lib/axios.js";
 import { useAuth } from "../../hooks/useAuth.js";
@@ -41,19 +45,43 @@ const ORDER_PROCESSING_STEPS = [
 
 const LOCATION_DATA = {
   "Hà Nội": {
-    "Cầu Giấy": ["Dịch Vọng", "Quan Hoa", "Mai Dịch", "Nghĩa Đô", "Dịch Vọng Hậu"],
-    "Đống Đa": ["Láng Hạ", "Láng Thượng", "Quang Trung", "Ô Chợ Dừa", "Khương Thượng"],
-    "Hai Bà Trưng": ["Bách Khoa", "Đồng Tâm", "Trương Định", "Minh Khai", "Quỳnh Lôi"],
-    "Hoàn Kiếm": ["Hàng Bạc", "Hàng Đào", "Hàng Trống", "Tràng Tiền", "Đồng Xuân"],
-    "Ba Đình": ["Trúc Bạch", "Kim Mã", "Giảng Võ", "Cống Vị", "Ngọc Khánh"]
+    "Cầu Giấy": [
+      "Dịch Vọng",
+      "Quan Hoa",
+      "Mai Dịch",
+      "Nghĩa Đô",
+      "Dịch Vọng Hậu",
+    ],
+    "Đống Đa": [
+      "Láng Hạ",
+      "Láng Thượng",
+      "Quang Trung",
+      "Ô Chợ Dừa",
+      "Khương Thượng",
+    ],
+    "Hai Bà Trưng": [
+      "Bách Khoa",
+      "Đồng Tâm",
+      "Trương Định",
+      "Minh Khai",
+      "Quỳnh Lôi",
+    ],
+    "Hoàn Kiếm": [
+      "Hàng Bạc",
+      "Hàng Đào",
+      "Hàng Trống",
+      "Tràng Tiền",
+      "Đồng Xuân",
+    ],
+    "Ba Đình": ["Trúc Bạch", "Kim Mã", "Giảng Võ", "Cống Vị", "Ngọc Khánh"],
   },
   "Bắc Ninh": {
     "TP. Bắc Ninh": ["Đại Phúc", "Ninh Xá", "Suối Hoa", "Võ Cường", "Kinh Bắc"],
     "Từ Sơn": ["Đồng Kỵ", "Trang Hạ", "Đình Bảng", "Tân Hồng", "Đồng Nguyên"],
     "Quế Võ": ["Phố Mới", "Bằng An", "Phương Liễu", "Nhân Hòa", "Việt Hùng"],
     "Yên Phong": ["Chờ", "Đông Phong", "Long Châu", "Tam Đa", "Trung Nghĩa"],
-    "Thuận Thành": ["Hồ", "An Bình", "Song Hồ", "Trạm Lộ", "Gia Đông"]
-  }
+    "Thuận Thành": ["Hồ", "An Bình", "Song Hồ", "Trạm Lộ", "Gia Đông"],
+  },
 };
 
 const validateShippingForm = (values) => {
@@ -80,7 +108,6 @@ function CheckoutPage() {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState("cod");
-  const [isOrdered, setOrdered] = useState(false);
   const [placed, setPlaced] = useState(false);
   const [orderCode, setOrderCode] = useState("");
   const [form, setForm] = useState({
@@ -107,6 +134,29 @@ function CheckoutPage() {
       email: current.email || user.email || "",
     }));
   }, [user]);
+
+  // ── Tạo đơn hàng ─────────────────────────────────────────────
+  const createOrderMutation = useMutation({
+    mutationFn: (payload) =>
+      api.post("/orders", payload).then((r) => r.data.data),
+  });
+
+  // ── Lấy URL thanh toán VNPAY ─────────────────────────────────
+  const vnpayMutation = useMutation({
+    mutationFn: (orderId) =>
+      api.post("/payment/vnpay/create", { orderId }).then((r) => r.data.data),
+  });
+
+  // ── Xác nhận đơn COD ─────────────────────────────────────────
+  const codMutation = useMutation({
+    mutationFn: (orderId) =>
+      api.post("/payment/cod", { orderId }).then((r) => r.data.data),
+  });
+
+  const isSubmitting =
+    createOrderMutation.isPending ||
+    vnpayMutation.isPending ||
+    codMutation.isPending;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -158,13 +208,15 @@ function CheckoutPage() {
     if (step === 0 && !validateBeforeLeavingShipping()) return;
     if (step < 2) setStep(step + 1);
   };
+
+  // ── Đặt hàng: tạo đơn rồi xử lý theo phương thức thanh toán ──
   const handlePlaceOrder = async () => {
     if (!validateBeforeLeavingShipping()) {
       setStep(0);
       return;
     }
 
-    setOrdered(true);
+    let createdOrder = null;
 
     try {
       const payload = {
@@ -172,17 +224,38 @@ function CheckoutPage() {
         note: form.note || "",
       };
 
-      const response = await api.post("/orders", payload);
-      setOrderCode(response.data.data.orderCode);
+      createdOrder = await createOrderMutation.mutateAsync(payload);
+      const orderId = createdOrder.orderId;
+
+      if (paymentMethod === "vnpay") {
+        const { payUrl } = await vnpayMutation.mutateAsync(orderId);
+        clearCart();
+        window.location.href = payUrl; // redirect sang cổng VNPAY
+        return;
+      }
+
+      // COD — xác nhận ngay, không cần redirect
+      await codMutation.mutateAsync(orderId);
+      setOrderCode(createdOrder.orderCode);
       setPlaced(true);
       toast.success(
         "Đơn hàng đang được xử lý. Vui lòng chờ xác nhận trong 5-10 phút.",
       );
       clearCart();
     } catch (error) {
+      // Nếu đơn đã tạo (bước a) nhưng bước xử lý thanh toán (b) thất bại
+      // → huỷ đơn mồ côi thay vì để nó nằm PENDING không ai biết
+      if (createdOrder?.orderId) {
+        try {
+          await api.post(`/orders/${createdOrder.orderId}/cancel`, {
+            reason: "Tạo thanh toán thất bại, tự động huỷ",
+          });
+        } catch (cancelErr) {
+          console.error("Không thể tự động huỷ đơn mồ côi:", cancelErr);
+        }
+      }
       console.error("Order error:", error.response?.data);
       toast.error(error.response?.data?.message || "Đặt hàng thất bại");
-      setOrdered(false);
     }
   };
 
@@ -278,9 +351,22 @@ function CheckoutPage() {
   if (items.length === 0) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-16 text-center">
-        <h2 className="font-bold text-gray-800 mb-4">Giỏ hàng trống</h2>
-        <Link to="/products" className="text-blue-700 hover:underline">
-          ← Quay lại mua sắm
+        <ShoppingCart size={64} className="mx-auto text-gray-300 mb-4" />
+        <h2
+          className="font-bold text-gray-800 mb-2"
+          style={{ fontSize: "1.25rem" }}
+        >
+          Giỏ hàng trống
+        </h2>
+        <p className="text-gray-500 mb-6">
+          Thêm sản phẩm vào giỏ để tiến hành đặt hàng
+        </p>
+        <Link
+          to="/products"
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-white font-semibold transition-colors"
+          style={{ backgroundColor: "#1250dc" }}
+        >
+          <ArrowLeft size={18} /> Tiếp tục mua sắm
         </Link>
       </div>
     );
@@ -396,11 +482,15 @@ function CheckoutPage() {
                   >
                     <option value="">-- Chọn Tỉnh / Thành phố --</option>
                     {Object.keys(LOCATION_DATA).map((prov) => (
-                      <option key={prov} value={prov}>{prov}</option>
+                      <option key={prov} value={prov}>
+                        {prov}
+                      </option>
                     ))}
                   </select>
                   {errors.province && (
-                    <p className="mt-1 text-xs text-red-500">{errors.province}</p>
+                    <p className="mt-1 text-xs text-red-500">
+                      {errors.province}
+                    </p>
                   )}
                 </div>
                 <div>
@@ -418,11 +508,15 @@ function CheckoutPage() {
                     <option value="">-- Chọn Quận / Huyện --</option>
                     {form.province &&
                       Object.keys(LOCATION_DATA[form.province]).map((dist) => (
-                        <option key={dist} value={dist}>{dist}</option>
+                        <option key={dist} value={dist}>
+                          {dist}
+                        </option>
                       ))}
                   </select>
                   {errors.district && (
-                    <p className="mt-1 text-xs text-red-500">{errors.district}</p>
+                    <p className="mt-1 text-xs text-red-500">
+                      {errors.district}
+                    </p>
                   )}
                 </div>
                 <div>
@@ -441,7 +535,9 @@ function CheckoutPage() {
                     {form.province &&
                       form.district &&
                       LOCATION_DATA[form.province][form.district].map((w) => (
-                        <option key={w} value={w}>{w}</option>
+                        <option key={w} value={w}>
+                          {w}
+                        </option>
                       ))}
                   </select>
                   {errors.ward && (
@@ -598,11 +694,12 @@ function CheckoutPage() {
                 </button>
                 <button
                   onClick={handlePlaceOrder}
-                  className="flex-1 py-3 rounded-xl text-white font-semibold text-sm hover:opacity-90 flex items-center justify-center gap-2"
+                  disabled={isSubmitting}
+                  className="flex-1 py-3 rounded-xl text-white font-semibold text-sm hover:opacity-90 disabled:opacity-60 flex items-center justify-center gap-2"
                   style={{ backgroundColor: "#1250dc" }}
                 >
                   Xác nhận đặt hàng ({formatPrice(totalPrice)})
-                  {isOrdered && (
+                  {isSubmitting && (
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   )}
                 </button>
@@ -660,6 +757,38 @@ function CheckoutPage() {
               </span>
             </div>
           </div>
+          {/* Phương thức đã chọn */}
+          <div className="bg-gray-50 rounded-xl p-3 mb-4 text-xs text-gray-600 flex items-center gap-2">
+            <CheckCircle size={14} className="text-green-500 shrink-0" />
+            {paymentMethod === "vnpay"
+              ? "Bạn sẽ được chuyển sang cổng VNPAY để thanh toán"
+              : "Thanh toán tiền mặt khi nhận hàng"}
+          </div>
+
+          <button
+            onClick={handlePlaceOrder}
+            disabled={isSubmitting}
+            className="w-full py-3.5 rounded-xl text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-60 flex items-center justify-center gap-2"
+            style={{ backgroundColor: "#1250dc" }}
+          >
+            {isSubmitting ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Đang xử lý...
+              </>
+            ) : paymentMethod === "vnpay" ? (
+              "Thanh toán VNPAY →"
+            ) : (
+              "Đặt hàng ngay →"
+            )}
+          </button>
+
+          <Link
+            to="/cart"
+            className="mt-3 block w-full text-center py-2.5 text-sm text-gray-500 hover:text-gray-700"
+          >
+            ← Quay lại giỏ hàng
+          </Link>
         </div>
       </div>
     </div>

@@ -28,6 +28,11 @@ export const env = {
   GOOGLE_CALLBACK_URL:
     process.env.GOOGLE_CALLBACK_URL ||
     "http://localhost:3000/api/auth/google/callback",
+  VNP_TMN_CODE: process.env.VNP_TMN_CODE || "",
+  VNP_HASH_SECRET: process.env.VNP_HASH_SECRET || "",
+  VNP_URL:
+    process.env.VNP_URL || "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html",
+  BACKEND_URL: process.env.BACKEND_URL || "http://localhost:3000",
   isDev: process.env.NODE_ENV !== "production",
   isProd: process.env.NODE_ENV === "production",
 };
