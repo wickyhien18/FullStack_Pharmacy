@@ -1,12 +1,45 @@
 import "dotenv/config";
+import { createServer } from "http";
+import { Server } from "socket.io";
 import app from "./app.js";
 import { env } from "./config/env.js";
 import { prisma } from "./config/prisma.js";
 import { startTokenCleanupJob } from "./utils/cleanup-tokens.js";
+import { verifyAccessToken } from "./utils/jwt.js";
+import { setIO } from "./config/socket.js"; // file mới, xem bên dưới
 
 BigInt.prototype.toJSON = function () {
   return this.toString();
 };
+
+const httpServer = createServer(app); // thay app.listen bằng server thủ công
+
+const io = new Server(httpServer, {
+  cors: {
+    origin: [env.CLIENT_URL, "http://localhost:5173", "http://localhost:4173"],
+    credentials: true,
+  },
+});
+
+// Xác thực JWT lúc client connect — dùng lại đúng hàm verify đã có
+io.use((socket, next) => {
+  try {
+    const token = socket.handshake.auth?.token;
+    if (!token) return next(new Error("Unauthorized"));
+    const payload = verifyAccessToken(token);
+    socket.userId = payload.userId;
+    next();
+  } catch (err) {
+    next(new Error("Unauthorized"));
+  }
+});
+
+io.on("connection", (socket) => {
+  socket.join(`user:${socket.userId}`); // room riêng cho từng user
+  console.log(`[Socket] User ${socket.userId} connected`);
+});
+
+setIO(io); // lưu instance để service khác dùng được (xem file config/socket.js)
 
 const start = async () => {
   // Try connecting to the database with 3 retries
@@ -43,7 +76,8 @@ const start = async () => {
     4 * 60 * 1000,
   ); // 4 phút
 
-  app.listen(env.PORT, () => {
+  httpServer.listen(env.PORT, () => {
+    // đổi app.listen → httpServer.listen
     console.log(`[Server] Running on http://localhost:${env.PORT}`);
     console.log(`[Server] Environment: ${env.NODE_ENV}`);
   });
