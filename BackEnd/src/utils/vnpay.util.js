@@ -39,15 +39,19 @@ export const createVNPayUrl = ({
   const vnpUrl =
     env.VNP_URL || "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
 
+  // Format thời gian theo giờ Việt Nam (GMT+7) đúng chuẩn VNPAY yêu cầu
+  // toISOString() luôn trả UTC nên phải cộng bù 7 tiếng trước khi format
+  const formatVNPayDate = (date) => {
+    const vnTime = new Date(date.getTime() + 7 * 60 * 60 * 1000);
+    return vnTime
+      .toISOString()
+      .replace(/[-:T.Z]/g, "")
+      .slice(0, 14);
+  };
+
   const date = new Date();
-  const createDate = date
-    .toISOString()
-    .replace(/[-:T.Z]/g, "")
-    .slice(0, 14);
-  const expireDate = new Date(date.getTime() + 15 * 60 * 1000)
-    .toISOString()
-    .replace(/[-:T.Z]/g, "")
-    .slice(0, 14);
+  const createDate = formatVNPayDate(date);
+  const expireDate = formatVNPayDate(new Date(date.getTime() + 15 * 60 * 1000));
 
   const vnpParams = {
     vnp_Version: "2.1.0",
