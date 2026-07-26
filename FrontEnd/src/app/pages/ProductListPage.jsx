@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import {
   Filter,
@@ -42,6 +42,10 @@ function ProductListPage() {
   const { data: categoriesData, isLoading: isLoadingCategories } =
     useCategoriesWithCount();
   const categorySlug = searchParams.get("category") || "";
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [categorySlug, sort, priceRange, page]);
 
   const categoriesArray = Array.isArray(categoriesData)
     ? categoriesData
