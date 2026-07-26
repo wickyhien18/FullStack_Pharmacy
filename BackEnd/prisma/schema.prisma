@@ -34,6 +34,7 @@ model User {
   orders           Order[]
   otpVerifications OtpVerification?
   refreshTokens    RefreshToken[]
+  notifications    Notification[]
   role             Role?            @relation(fields: [roleId], references: [roleId], onUpdate: NoAction, map: "fk_user_role")
 
   @@map("users")
@@ -248,6 +249,19 @@ model OtpVerification {
 
   @@index([userId], map: "idx_otp_user")
   @@map("otp_verifications")
+}
+
+model Notification {
+  notificationId BigInt    @id @default(autoincrement()) @map("notification_id")
+  userId         BigInt    @map("user_id")
+  orderId        BigInt?   @map("order_id")
+  message        String    @db.VarChar(500)
+  isRead         Boolean   @default(false) @map("is_read")
+  createdAt      DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
+  user           User      @relation(fields: [userId], references: [userId], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([userId, isRead], map: "idx_notifications_user_unread")
+  @@map("notifications")
 }
 
 enum ProductStatus {
