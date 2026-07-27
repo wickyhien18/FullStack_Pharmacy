@@ -11,9 +11,7 @@ import {
   Mail,
   X,
   Check,
-  // Heart,
-  // MapPin,
-  // Bell,
+  AlertTriangle,
 } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth.js";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -21,8 +19,8 @@ import api from "../../lib/axios.js";
 
 const PASSWORD_REGEX =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[_@$!%*?&])[A-Za-z\d_@$!%*?&]{8,}$/;
-const PASSWORD_ERROR_MSG =
-  "Mật khẩu cần có tối thiểu 8 ký tự, phải chứa ít nhất 1 chữ in hoa, 1 chữ thường, 1 số và 1 ký tự đặc biệt (ví dụ: _, @, $, !, %, , ?, &).";
+const PHONE_REGEX = /^(0[35789])[0-9]{8}$/;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 import toast from "react-hot-toast";
 import CancelOrderModal from "../components/CancelOrderModal.jsx";
 
@@ -105,7 +103,9 @@ function ChangeEmailModal({ onClose }) {
               className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-400 mb-3"
             />
             <p className="text-xs text-amber-600 bg-amber-50 p-2.5 rounded-lg border border-amber-100 leading-relaxed mb-4">
-              ⚠️ <strong>Lưu ý:</strong> Hãy chắc chắn đây là một email có thật mà bạn đang sở hữu. Bạn cần truy cập hộp thư này để nhận mã OTP xác nhận thay đổi.
+              ⚠️ <strong>Lưu ý:</strong> Hãy chắc chắn đây là một email có thật
+              mà bạn đang sở hữu. Bạn cần truy cập hộp thư này để nhận mã OTP
+              xác nhận thay đổi.
             </p>
             <div className="flex gap-3">
               <button
@@ -203,7 +203,9 @@ function ChangePasswordModal({ onClose, logout }) {
     if (form.newPassword !== form.confirmPassword)
       return toast.error("Mật khẩu mới không khớp");
     if (!PASSWORD_REGEX.test(form.newPassword))
-      return toast.error(PASSWORD_ERROR_MSG);
+      return toast.error(
+        "Mật khẩu cần có tối thiểu 8 ký tự, phải chứa ít nhất 1 chữ in hoa, 1 chữ thường, 1 số và 1 ký tự đặc biệt (ví dụ: _, @, $, !, %, , ?, &).",
+      );
     mutation.mutate();
   };
 
@@ -324,7 +326,10 @@ function ForgotPasswordModal({ onClose }) {
 
   const handleReset = () => {
     if (newPwd !== confirmPwd) return toast.error("Mật khẩu không khớp");
-    if (!PASSWORD_REGEX.test(newPwd)) return toast.error(PASSWORD_ERROR_MSG);
+    if (!PASSWORD_REGEX.test(newPwd))
+      return toast.error(
+        "Mật khẩu cần có tối thiểu 8 ký tự, phải chứa ít nhất 1 chữ in hoa, 1 chữ thường, 1 số và 1 ký tự đặc biệt (ví dụ: _, @, $, !, %, , ?, &).",
+      );
     resetMutation.mutate();
   };
 
@@ -354,7 +359,9 @@ function ForgotPasswordModal({ onClose }) {
               className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-400 mb-3"
             />
             <p className="text-xs text-amber-600 bg-amber-50 p-2.5 rounded-lg border border-amber-100 leading-relaxed mb-4">
-              ⚠️ <strong>Lưu ý:</strong> OTP chỉ gửi được nếu bạn nhập đúng Email thật đã đăng ký trước đó. Nếu email không tồn tại hoặc chưa đăng ký, hệ thống sẽ không thể gửi thư xác thực.
+              ⚠️ <strong>Lưu ý:</strong> OTP chỉ gửi được nếu bạn nhập đúng
+              Email thật đã đăng ký trước đó. Nếu email không tồn tại hoặc chưa
+              đăng ký, hệ thống sẽ không thể gửi thư xác thực.
             </p>
             <div className="flex gap-3">
               <button
@@ -518,12 +525,16 @@ function AccountPage() {
     e.preventDefault();
 
     if (googleSignupToken) {
-      if (!regForm.userName || !regForm.password)
-        return toast.error("Vui lòng nhập tên đăng nhập và mật khẩu");
+      if (!regForm.userName || !regForm.password || !regForm.phone)
+        return toast.error("Vui lòng nhập đầy đủ thông tin");
+      if (!PHONE_REGEX.test(regForm.phone))
+        return toast.error("Số điện thoại chưa đúng chuẩn Việt Nam");
       if (regForm.password !== regForm.confirm)
         return toast.error("Xác nhận mật khẩu không khớp");
       if (!PASSWORD_REGEX.test(regForm.password))
-        return toast.error(PASSWORD_ERROR_MSG);
+        return toast.error(
+          "Mật khẩu cần có tối thiểu 8 ký tự, phải chứa ít nhất 1 chữ in hoa, 1 chữ thường, 1 số và 1 ký tự đặc biệt (ví dụ: _, @, $, !, %, , ?, &).",
+        );
 
       return completeGoogleSignup({
         token: googleSignupToken,
@@ -542,10 +553,17 @@ function AccountPage() {
       !regForm.password
     )
       return toast.error("Vui lòng điền đầy đủ các thông tin bắt buộc");
+    if (!EMAIL_REGEX.test(regForm.email))
+      return toast.error("Định dạng email không hợp lệ");
+    if (!PHONE_REGEX.test(regForm.phone))
+      return toast.error("Số điện thoại chưa đúng chuẩn Việt Nam");
     if (regForm.password !== regForm.confirm)
       return toast.error("Xác nhận mật khẩu không khớp");
     if (!PASSWORD_REGEX.test(regForm.password))
-      return toast.error(PASSWORD_ERROR_MSG);
+      return toast.error(
+        "Mật khẩu cần có tối thiểu 8 ký tự, phải chứa ít nhất 1 chữ in hoa, 1 chữ thường, 1 số và 1 ký tự đặc biệt (ví dụ: _, @, $, !, %, , ?, &).",
+      );
+
     register(
       {
         fullName: regForm.fullName,
@@ -669,18 +687,6 @@ function AccountPage() {
                   )}
                 </div>
 
-                <div className="mb-5 bg-amber-50 border border-amber-250 rounded-xl p-4 flex items-start gap-3 text-sm text-amber-800 leading-relaxed shadow-sm">
-                  <span className="shrink-0 text-lg mt-0.5">⚠️</span>
-                  <div>
-                    <h4 className="font-bold text-amber-900 mb-1.5 flex items-center gap-1.5">
-                      CẢNH BÁO QUAN TRỌNG
-                    </h4>
-                    <p className="text-xs text-amber-800">
-                      Để thực hiện các chức năng như đổi email, đổi mật khẩu hoặc khôi phục tài khoản thành công, địa chỉ <strong>Email ({user.email})</strong> liên kết phải là email có thật và đang hoạt động. Nếu bạn đang sử dụng email giả hoặc chưa đăng ký sở hữu, vui lòng chọn <strong>"Đổi email"</strong> bên dưới để cập nhật kịp thời.
-                    </p>
-                  </div>
-                </div>
-
                 {isEditing ? (
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -705,8 +711,14 @@ function AccountPage() {
                         </label>
                         <input
                           value={editForm.phone}
+                          maxLength={10}
                           onChange={(e) =>
-                            setEditForm({ ...editForm, phone: e.target.value })
+                            setEditForm({
+                              ...editForm,
+                              phone: e.target.value
+                                .replace(/\D/g, "")
+                                .slice(0, 10),
+                            })
                           }
                           className="w-full border border-blue-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-400"
                         />
@@ -748,6 +760,21 @@ function AccountPage() {
                           value={value || ""}
                           className="w-full border border-gray-150 bg-gray-50 rounded-xl px-3 py-2.5 text-sm focus:outline-none"
                         />
+
+                        {/* Hộp cảnh báo — chỉ hiện dưới ô Email */}
+                        {label === "Email" && (
+                          <div className="mt-2 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2">
+                            <AlertTriangle
+                              size={14}
+                              className="mt-0.5 shrink-0 text-amber-500"
+                            />
+                            <p className="text-xs text-amber-700 leading-relaxed">
+                              Email này cần là email thật đang hoạt động để nhận
+                              được mã OTP đổi mật khẩu, email xác nhận đơn hàng
+                              và các thông báo quan trọng.
+                            </p>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -1056,7 +1083,8 @@ function AccountPage() {
                   field: "phone",
                   type: "tel",
                   placeholder: "0912345678",
-                }, // ← luôn hiện, bỏ điều kiện
+                  maxLength: 10,
+                },
                 {
                   label: "Email *",
                   field: "email",
@@ -1067,8 +1095,7 @@ function AccountPage() {
                   label: "Mật khẩu *",
                   field: "password",
                   type: "password",
-                  placeholder:
-                    "Mật khẩu cần có tối thiểu 8 ký tự, phải chứa ít nhất 1 chữ in hoa, 1 chữ thường, 1 số và 1 ký tự đặc biệt (ví dụ: _, @, $, !, %, , ?, &).",
+                  placeholder: "...",
                 },
                 {
                   label: "Xác nhận mật khẩu *",
@@ -1076,7 +1103,7 @@ function AccountPage() {
                   type: "password",
                   placeholder: "Nhập lại mật khẩu",
                 },
-              ].map(({ label, field, type, placeholder }) => (
+              ].map(({ label, field, type, placeholder, maxLength }) => (
                 <div key={field}>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">
                     {label}
@@ -1084,17 +1111,63 @@ function AccountPage() {
                   <input
                     type={type}
                     value={regForm[field]}
+                    maxLength={maxLength}
                     disabled={googleSignupToken && field === "email"}
-                    onChange={(e) =>
-                      setRegForm({ ...regForm, [field]: e.target.value })
-                    }
+                    onChange={(e) => {
+                      let val = e.target.value;
+                      if (field === "phone")
+                        val = val.replace(/\D/g, "").slice(0, 10);
+                      if (field === "userName")
+                        val = val.replace(/[^a-zA-Z0-9_]/g, "");
+                      setRegForm({ ...regForm, [field]: val });
+                    }}
                     placeholder={placeholder}
                     className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-400 disabled:bg-gray-50 disabled:text-gray-400"
                   />
+
+                  {/* Báo lỗi định dạng số điện thoại — chỉ hiện khi đã gõ và sai */}
+                  {field === "phone" &&
+                    regForm.phone &&
+                    !PHONE_REGEX.test(regForm.phone) && (
+                      <p className="mt-1 text-xs text-red-500">
+                        Chưa đúng chuẩn số Việt Nam (10 số, đầu số
+                        03/05/07/08/09)
+                      </p>
+                    )}
+
+                  {/* Báo lỗi định dạng email — chỉ hiện khi đã gõ và sai */}
+                  {field === "email" &&
+                    regForm.email &&
+                    !EMAIL_REGEX.test(regForm.email) && (
+                      <p className="mt-1 text-xs text-red-500">
+                        Định dạng email không hợp lệ
+                      </p>
+                    )}
+                  {/* Báo lỗi định dạng mật khẩu — chỉ hiện khi đã gõ và sai */}
+                  {field === "password" &&
+                    regForm.password &&
+                    !PASSWORD_REGEX.test(regForm.password) && (
+                      <p className="mt-1 text-xs text-red-500">
+                        Cần có tối thiểu 8 ký tự, phải chứa ít nhất 1 chữ in
+                        hoa, 1 chữ thường, 1 số và 1 ký tự đặc biệt (ví dụ: _,
+                        @, $, !, %, , ?, &).
+                      </p>
+                    )}
+
+                  {/* Hộp cảnh báo email thật — giữ nguyên như đã thêm trước đó */}
                   {field === "email" && (
-                    <p className="mt-1.5 text-xs text-amber-600 bg-amber-50 p-2.5 rounded-lg border border-amber-100 leading-relaxed">
-                      ⚠️ <strong>Lưu ý:</strong> Vui lòng sử dụng địa chỉ Email có thật. Nếu sử dụng email không tồn tại, bạn sẽ không nhận được mã OTP để xác thực hoặc đặt lại mật khẩu khi cần thiết.
-                    </p>
+                    <div className="mt-2 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2">
+                      <AlertTriangle
+                        size={14}
+                        className="mt-0.5 shrink-0 text-amber-500"
+                      />
+                      <p className="text-xs text-amber-700 leading-relaxed">
+                        Vui lòng dùng email thật đang hoạt động (Gmail, Outlook,
+                        Yahoo... đều được). Email giả hoặc chưa từng đăng ký sẽ{" "}
+                        <strong>không nhận được</strong> mã OTP, email xác nhận
+                        đơn hàng hay các thông báo khác từ hệ thống.
+                      </p>
+                    </div>
                   )}
                 </div>
               ))}
