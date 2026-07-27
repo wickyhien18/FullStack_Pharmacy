@@ -210,7 +210,7 @@ export const completeGoogleSignup = async (req, res) => {
 
     const { accessToken, refreshToken, user } =
       await authService.completeGoogleSignup(
-        { token, userName, fullName, password },
+        { token, userName, fullName, phone, password },
         req,
       );
 
