@@ -669,6 +669,13 @@ function AccountPage() {
                   )}
                 </div>
 
+                <div className="mb-5 bg-amber-50 border border-amber-100 rounded-xl p-3.5 flex items-start gap-2.5 text-xs text-amber-700 leading-relaxed">
+                  <span className="shrink-0 mt-0.5">⚠️</span>
+                  <div>
+                    <strong>Lưu ý bảo mật:</strong> Để thực hiện các tính năng đổi email, đổi mật khẩu hoặc khôi phục tài khoản thành công, vui lòng đảm bảo địa chỉ <strong>Email ({user.email})</strong> là email có thật và đang hoạt động.
+                  </div>
+                </div>
+
                 {isEditing ? (
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
