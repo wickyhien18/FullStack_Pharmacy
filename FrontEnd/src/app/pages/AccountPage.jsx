@@ -669,10 +669,15 @@ function AccountPage() {
                   )}
                 </div>
 
-                <div className="mb-5 bg-amber-50 border border-amber-100 rounded-xl p-3.5 flex items-start gap-2.5 text-xs text-amber-700 leading-relaxed">
-                  <span className="shrink-0 mt-0.5">⚠️</span>
+                <div className="mb-5 bg-amber-50 border border-amber-250 rounded-xl p-4 flex items-start gap-3 text-sm text-amber-800 leading-relaxed shadow-sm">
+                  <span className="shrink-0 text-lg mt-0.5">⚠️</span>
                   <div>
-                    <strong>Lưu ý bảo mật:</strong> Để thực hiện các tính năng đổi email, đổi mật khẩu hoặc khôi phục tài khoản thành công, vui lòng đảm bảo địa chỉ <strong>Email ({user.email})</strong> là email có thật và đang hoạt động.
+                    <h4 className="font-bold text-amber-900 mb-1.5 flex items-center gap-1.5">
+                      CẢNH BÁO QUAN TRỌNG
+                    </h4>
+                    <p className="text-xs text-amber-800">
+                      Để thực hiện các chức năng như đổi email, đổi mật khẩu hoặc khôi phục tài khoản thành công, địa chỉ <strong>Email ({user.email})</strong> liên kết phải là email có thật và đang hoạt động. Nếu bạn đang sử dụng email giả hoặc chưa đăng ký sở hữu, vui lòng chọn <strong>"Đổi email"</strong> bên dưới để cập nhật kịp thời.
+                    </p>
                   </div>
                 </div>
 
