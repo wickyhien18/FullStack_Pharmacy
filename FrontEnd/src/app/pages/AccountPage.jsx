@@ -102,8 +102,11 @@ function ChangeEmailModal({ onClose }) {
               value={newEmail}
               onChange={(e) => setNewEmail(e.target.value)}
               placeholder="Email mới..."
-              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-400 mb-4"
+              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-400 mb-3"
             />
+            <p className="text-xs text-amber-600 bg-amber-50 p-2.5 rounded-lg border border-amber-100 leading-relaxed mb-4">
+              ⚠️ <strong>Lưu ý:</strong> Hãy chắc chắn đây là một email có thật mà bạn đang sở hữu. Bạn cần truy cập hộp thư này để nhận mã OTP xác nhận thay đổi.
+            </p>
             <div className="flex gap-3">
               <button
                 onClick={onClose}
@@ -348,8 +351,11 @@ function ForgotPasswordModal({ onClose }) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Email của bạn..."
-              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-400 mb-4"
+              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-400 mb-3"
             />
+            <p className="text-xs text-amber-600 bg-amber-50 p-2.5 rounded-lg border border-amber-100 leading-relaxed mb-4">
+              ⚠️ <strong>Lưu ý:</strong> OTP chỉ gửi được nếu bạn nhập đúng Email thật đã đăng ký trước đó. Nếu email không tồn tại hoặc chưa đăng ký, hệ thống sẽ không thể gửi thư xác thực.
+            </p>
             <div className="flex gap-3">
               <button
                 onClick={onClose}
@@ -1073,6 +1079,11 @@ function AccountPage() {
                     placeholder={placeholder}
                     className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-400 disabled:bg-gray-50 disabled:text-gray-400"
                   />
+                  {field === "email" && (
+                    <p className="mt-1.5 text-xs text-amber-600 bg-amber-50 p-2.5 rounded-lg border border-amber-100 leading-relaxed">
+                      ⚠️ <strong>Lưu ý:</strong> Vui lòng sử dụng địa chỉ Email có thật. Nếu sử dụng email không tồn tại, bạn sẽ không nhận được mã OTP để xác thực hoặc đặt lại mật khẩu khi cần thiết.
+                    </p>
+                  )}
                 </div>
               ))}
               <button
