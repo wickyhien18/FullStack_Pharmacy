@@ -22,7 +22,7 @@ import api from "../../lib/axios.js";
 const PASSWORD_REGEX =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[_@$!%*?&])[A-Za-z\d_@$!%*?&]{8,}$/;
 const PASSWORD_ERROR_MSG =
-  "Password must have at least 8 characters, including at least 1 uppercase letter, 1 lowercase letter, 1 number, 1 special characer such as: _, @, $, !, %, *, ?, & ";
+  "Mật khẩu cần có tối thiểu 8 ký tự, phải chứa ít nhất 1 chữ in hoa, 1 chữ thường, 1 số và 1 ký tự đặc biệt (ví dụ: _, @, $, !, %, , ?, &).";
 import toast from "react-hot-toast";
 import CancelOrderModal from "../components/CancelOrderModal.jsx";
 
@@ -523,6 +523,7 @@ function AccountPage() {
         token: googleSignupToken,
         userName: regForm.userName,
         fullName: regForm.fullName,
+        phone: regForm.phone,
         password: regForm.password,
       });
     }
@@ -1032,16 +1033,12 @@ function AccountPage() {
                   type: "text",
                   placeholder: "Chỉ dùng chữ, số và dấu _",
                 },
-                ...(googleSignupToken
-                  ? []
-                  : [
-                      {
-                        label: "Số điện thoại *",
-                        field: "phone",
-                        type: "tel",
-                        placeholder: "0912345678",
-                      },
-                    ]),
+                {
+                  label: "Số điện thoại *",
+                  field: "phone",
+                  type: "tel",
+                  placeholder: "0912345678",
+                }, // ← luôn hiện, bỏ điều kiện
                 {
                   label: "Email *",
                   field: "email",
@@ -1052,7 +1049,8 @@ function AccountPage() {
                   label: "Mật khẩu *",
                   field: "password",
                   type: "password",
-                  placeholder: "Tối thiểu 6 ký tự",
+                  placeholder:
+                    "Mật khẩu cần có tối thiểu 8 ký tự, phải chứa ít nhất 1 chữ in hoa, 1 chữ thường, 1 số và 1 ký tự đặc biệt (ví dụ: _, @, $, !, %, , ?, &).",
                 },
                 {
                   label: "Xác nhận mật khẩu *",

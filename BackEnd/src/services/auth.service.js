@@ -421,7 +421,7 @@ export const createGoogleSignupToken = ({ email, fullName, googleId }) => {
 
 // ── HOÀN TẤT ĐĂNG KÝ SAU GOOGLE ─────────────────────────────────────
 export const completeGoogleSignup = async (
-  { token, userName, fullName, password },
+  { token, userName, fullName, phone, password },
   req,
 ) => {
   let payload;
@@ -439,7 +439,7 @@ export const completeGoogleSignup = async (
 
   const { email, googleId } = payload;
 
-  const existingUser = await authRepository.existUser(email, userName, null);
+  const existingUser = await authRepository.existUser(email, userName, phone);
   if (existingUser) {
     if (existingUser.email === email) {
       throw {
@@ -449,6 +449,9 @@ export const completeGoogleSignup = async (
     }
     if (existingUser.userName === userName) {
       throw { status: 409, message: "Tên đăng nhập đã được sử dụng" };
+    }
+    if (existingUser.phone === phone) {
+      throw { status: 409, message: "Số điện thoại đã được sử dụng" };
     }
   }
 
@@ -465,6 +468,7 @@ export const completeGoogleSignup = async (
         userName,
         fullName: fullName || null,
         email,
+        phone,
         password: hashedPassword,
         roleId: role.roleId,
         isActive: true,

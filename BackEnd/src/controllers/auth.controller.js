@@ -203,8 +203,8 @@ export const googleCallback = async (req, res) => {
 // ── THÊM MỚI: hoàn tất đăng ký sau Google ───────────────────────────
 export const completeGoogleSignup = async (req, res) => {
   try {
-    const { token, userName, fullName, password } = req.body;
-    if (!token || !userName || !password) {
+    const { token, userName, fullName, phone, password } = req.body;
+    if (!token || !userName || !phone || !password) {
       return sendError(res, "Thiếu thông tin bắt buộc", 400);
     }
 
