@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import {
   ChevronRight,
   Eye,
@@ -430,6 +430,7 @@ function ForgotPasswordModal({ onClose }) {
 
 //Trang chính
 function AccountPage() {
+  const [searchParams] = useSearchParams();
   const {
     user,
     isAuthenticated,
@@ -438,7 +439,21 @@ function AccountPage() {
     logout,
     isLoggingIn,
     isRegistering,
+    completeGoogleSignup,
+    isCompletingGoogleSignup,
   } = useAuth();
+  const googleSignupToken = searchParams.get("googleSignup");
+  useEffect(() => {
+    if (googleSignupToken) {
+      setTab("register");
+      setRegForm((prev) => ({
+        ...prev,
+        email: searchParams.get("email") || "",
+        fullName: searchParams.get("suggestedName") || "",
+      }));
+    }
+  }, [googleSignupToken]);
+
   const queryClient = useQueryClient();
   const [tab, setTab] = useState("login");
   const [showPwd, setShowPwd] = useState(false);
@@ -495,6 +510,23 @@ function AccountPage() {
 
   const handleRegisterSubmit = (e) => {
     e.preventDefault();
+
+    if (googleSignupToken) {
+      if (!regForm.userName || !regForm.password)
+        return toast.error("Vui lòng nhập tên đăng nhập và mật khẩu");
+      if (regForm.password !== regForm.confirm)
+        return toast.error("Xác nhận mật khẩu không khớp");
+      if (!PASSWORD_REGEX.test(regForm.password))
+        return toast.error(PASSWORD_ERROR_MSG);
+
+      return completeGoogleSignup({
+        token: googleSignupToken,
+        userName: regForm.userName,
+        fullName: regForm.fullName,
+        password: regForm.password,
+      });
+    }
+
     if (
       !regForm.fullName ||
       !regForm.userName ||
@@ -981,6 +1013,12 @@ function AccountPage() {
             </form>
           ) : (
             <form onSubmit={handleRegisterSubmit} className="space-y-4">
+              {googleSignupToken && (
+                <div className="bg-blue-50 border border-blue-100 rounded-xl p-3 text-sm text-blue-700">
+                  Đã xác thực email <strong>{regForm.email}</strong> qua Google.
+                  Chọn tên đăng nhập và mật khẩu để hoàn tất.
+                </div>
+              )}
               {[
                 {
                   label: "Họ và tên *",
@@ -994,12 +1032,16 @@ function AccountPage() {
                   type: "text",
                   placeholder: "Chỉ dùng chữ, số và dấu _",
                 },
-                {
-                  label: "Số điện thoại *",
-                  field: "phone",
-                  type: "tel",
-                  placeholder: "0912345678",
-                },
+                ...(googleSignupToken
+                  ? []
+                  : [
+                      {
+                        label: "Số điện thoại *",
+                        field: "phone",
+                        type: "tel",
+                        placeholder: "0912345678",
+                      },
+                    ]),
                 {
                   label: "Email *",
                   field: "email",
@@ -1026,24 +1068,29 @@ function AccountPage() {
                   <input
                     type={type}
                     value={regForm[field]}
+                    disabled={googleSignupToken && field === "email"}
                     onChange={(e) =>
                       setRegForm({ ...regForm, [field]: e.target.value })
                     }
                     placeholder={placeholder}
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-400"
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-400 disabled:bg-gray-50 disabled:text-gray-400"
                   />
                 </div>
               ))}
               <button
                 type="submit"
-                disabled={isRegistering}
+                disabled={
+                  googleSignupToken ? isCompletingGoogleSignup : isRegistering
+                }
                 className="w-full py-3 rounded-xl text-white font-semibold text-sm hover:opacity-90 flex justify-center items-center gap-2"
                 style={{ backgroundColor: "#1250dc" }}
               >
-                {isRegistering && (
+                {(googleSignupToken
+                  ? isCompletingGoogleSignup
+                  : isRegistering) && (
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 )}
-                Đăng ký
+                {googleSignupToken ? "Hoàn tất tạo tài khoản" : "Đăng ký"}
               </button>
             </form>
           )}
@@ -1052,50 +1099,6 @@ function AccountPage() {
         {showForgotPwd && (
           <ForgotPasswordModal onClose={() => setShowForgotPwd(false)} />
         )}
-
-        {/* Benefits panel */}
-        {/* <div className="space-y-4">
-          <div
-            className="rounded-2xl p-6 text-white shadow-sm animate-fade-in"
-            style={{ backgroundColor: "#1250dc" }}
-          >
-            <h3 className="font-bold mb-3" style={{ fontSize: "1.1rem" }}>
-              Lợi ích thành viên Long Châu
-            </h3>
-            <ul className="space-y-3">
-              {[
-                "💰 Tích điểm mỗi đơn hàng, đổi quà hấp dẫn",
-                "🎁 Quản lý thông tin thành viên dễ dàng",
-                "🚀 Miễn phí giao hàng toàn quốc với đơn từ 150k",
-                "📱 Tra cứu lịch sử mua hàng dễ dàng",
-                "💊 Theo dõi trạng thái đơn thuốc nhanh chóng",
-              ].map((b) => (
-                <li key={b} className="text-sm text-white/95">
-                  {b}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
-            <h3
-              className="font-semibold text-gray-800 mb-3"
-              style={{ fontSize: "0.95rem" }}
-            >
-              Cần hỗ trợ?
-            </h3>
-            <p className="text-sm text-gray-600 mb-3">
-              Liên hệ hotline của chúng tôi để được hỗ trợ tận tình
-            </p>
-            <a
-              href="tel:18006928"
-              className="block text-center py-2.5 rounded-xl font-semibold text-sm text-white hover:opacity-90 transition-opacity"
-              style={{ backgroundColor: "#1250dc" }}
-            >
-              📞 1800 6928 (Miễn phí)
-            </a>
-          </div>
-        </div> */}
       </div>
     </div>
   );

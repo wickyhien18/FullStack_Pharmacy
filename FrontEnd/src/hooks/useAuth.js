@@ -67,6 +67,18 @@ export const useAuth = () => {
     }
   };
 
+  const completeGoogleSignupMutation = useMutation({
+    mutationFn: (data) => api.post("/auth/google/complete-signup", data),
+    onSuccess: ({ data }) => {
+      setAuth(data.data.user, data.data.accessToken);
+      toast.success("Tạo tài khoản thành công!");
+      navigate("/");
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || "Tạo tài khoản thất bại");
+    },
+  });
+
   return {
     user,
     isAuthenticated,
@@ -75,5 +87,7 @@ export const useAuth = () => {
     register,
     isRegistering: registerMutation.isPending,
     logout,
+    completeGoogleSignup: completeGoogleSignupMutation.mutate,
+    isCompletingGoogleSignup: completeGoogleSignupMutation.isPending,
   };
 };

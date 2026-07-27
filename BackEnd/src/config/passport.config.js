@@ -11,13 +11,13 @@ export const configurePassport = () => {
   passport.use(
     new GoogleStrategy(
       {
-        clientID:     env.GOOGLE_CLIENT_ID,
+        clientID: env.GOOGLE_CLIENT_ID,
         clientSecret: env.GOOGLE_CLIENT_SECRET,
-        callbackURL:  env.GOOGLE_CALLBACK_URL,
+        callbackURL: env.GOOGLE_CALLBACK_URL,
       },
       async (accessToken, refreshToken, profile, done) => {
         try {
-          const email    = profile.emails?.[0]?.value;
+          const email = profile.emails?.[0]?.value;
           const fullName = profile.displayName;
           const googleId = profile.id;
 
@@ -40,37 +40,12 @@ export const configurePassport = () => {
               // Liên kết Google vào tài khoản hiện có
               user = await prisma.user.update({
                 where: { userId: user.userId },
-                data:  { googleId },
+                data: { googleId },
                 include: { role: true },
               });
-            } else {
-              // Tạo user mới từ Google
-              const role = await prisma.role.findFirst({
-                where: { roleName: "ROLE_CUSTOMER" },
-              });
-
-              user = await prisma.$transaction(async (tx) => {
-                const newUser = await tx.user.create({
-                  data: {
-                    googleId,
-                    fullName,
-                    email,
-                    userName: `google_${googleId.slice(0, 8)}`,
-                    password: "", // không có password khi login Google
-                    roleId:   role.roleId,
-                    isActive: true,
-                  },
-                  include: { role: true },
-                });
-
-                // Tạo cart cho user mới
-                await tx.cart.create({
-                  data: { userId: newUser.userId },
-                });
-
-                return newUser;
-              });
             }
+
+            return done(null, { pending: true, email, fullName, googleId });
           }
 
           if (!user.isActive) {

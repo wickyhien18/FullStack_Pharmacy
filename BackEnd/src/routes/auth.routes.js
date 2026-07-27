@@ -62,4 +62,6 @@ router.get(
   authController.googleCallback,
 );
 
+router.post("/google/complete-signup", authController.completeGoogleSignup);
+
 export default router;

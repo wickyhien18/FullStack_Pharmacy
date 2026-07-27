@@ -163,6 +163,20 @@ export const googleCallback = async (req, res) => {
   try {
     const user = req.user; // passport set sẵn
 
+    // Trường hợp mới: chưa từng có tài khoản — chuyển hướng về form hoàn tất
+    if (user?.pending) {
+      const pendingToken = authService.createGoogleSignupToken({
+        email: user.email,
+        fullName: user.fullName,
+        googleId: user.googleId,
+      });
+      const redirectUrl = new URL(`${env.CLIENT_URL}/account`);
+      redirectUrl.searchParams.set("googleSignup", pendingToken);
+      redirectUrl.searchParams.set("email", user.email);
+      redirectUrl.searchParams.set("suggestedName", user.fullName || "");
+      return res.redirect(redirectUrl.toString());
+    }
+
     const {
       accessToken,
       refreshToken,
@@ -183,5 +197,26 @@ export const googleCallback = async (req, res) => {
   } catch (err) {
     console.error("[Google OAuth] Callback error:", err);
     res.redirect(`${env.CLIENT_URL}/account?error=server_error`);
+  }
+};
+
+// ── THÊM MỚI: hoàn tất đăng ký sau Google ───────────────────────────
+export const completeGoogleSignup = async (req, res) => {
+  try {
+    const { token, userName, fullName, password } = req.body;
+    if (!token || !userName || !password) {
+      return sendError(res, "Thiếu thông tin bắt buộc", 400);
+    }
+
+    const { accessToken, refreshToken, user } =
+      await authService.completeGoogleSignup(
+        { token, userName, fullName, password },
+        req,
+      );
+
+    res.cookie(REFRESH_TOKEN_COOKIE, refreshToken, cookieOptions);
+    return sendSuccess(res, { accessToken, user }, "Tạo tài khoản thành công");
+  } catch (err) {
+    return sendError(res, err.message, err.status || 500);
   }
 };

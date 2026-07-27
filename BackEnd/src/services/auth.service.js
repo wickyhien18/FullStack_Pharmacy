@@ -407,3 +407,74 @@ export const loginWithGoogle = async (user, req) => {
 
   return { accessToken, refreshToken, user: formatUser(user) };
 };
+
+// ── TẠO TOKEN TẠM CHO LUỒNG HOÀN TẤT ĐĂNG KÝ SAU GOOGLE ────────────
+// Dùng lại generateAccessTokens/verifyAccessToken có sẵn — chỉ đổi payload
+export const createGoogleSignupToken = ({ email, fullName, googleId }) => {
+  return jwt.generateAccessTokens({
+    email,
+    fullName,
+    googleId,
+    purpose: "google_signup",
+  });
+};
+
+// ── HOÀN TẤT ĐĂNG KÝ SAU GOOGLE ─────────────────────────────────────
+export const completeGoogleSignup = async (
+  { token, userName, fullName, password },
+  req,
+) => {
+  let payload;
+  try {
+    payload = jwt.verifyAccessToken(token);
+  } catch {
+    throw {
+      status: 401,
+      message: "Liên kết đã hết hạn, vui lòng đăng nhập lại bằng Google",
+    };
+  }
+  if (payload.purpose !== "google_signup") {
+    throw { status: 401, message: "Token không hợp lệ" };
+  }
+
+  const { email, googleId } = payload;
+
+  const existingUser = await authRepository.existUser(email, userName, null);
+  if (existingUser) {
+    if (existingUser.email === email) {
+      throw {
+        status: 409,
+        message: "Email này đã có tài khoản, vui lòng đăng nhập",
+      };
+    }
+    if (existingUser.userName === userName) {
+      throw { status: 409, message: "Tên đăng nhập đã được sử dụng" };
+    }
+  }
+
+  const role = await authRepository.findRoleByName("ROLE_CUSTOMER");
+  if (!role) throw { status: 500, message: "Không tìm thấy role mặc định" };
+
+  const hashedPassword = await bcrypt.hash(password, env.BCRYPT_ROUNDS);
+  const { prisma } = await import("../config/prisma.js");
+
+  const user = await prisma.$transaction(async (tx) => {
+    const newUser = await tx.user.create({
+      data: {
+        googleId,
+        userName,
+        fullName: fullName || null,
+        email,
+        password: hashedPassword,
+        roleId: role.roleId,
+        isActive: true,
+      },
+      include: { role: true },
+    });
+    await tx.cart.create({ data: { userId: newUser.userId } });
+    return newUser;
+  });
+
+  // Đăng nhập luôn sau khi tạo — dùng lại hàm loginWithGoogle có sẵn
+  return loginWithGoogle(user, req);
+};
