@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useAuthStore } from "@/stores/auth.store.js";
 import { useCart } from "@/hooks/useCart.js";
+import { translateApiMessage } from "@/lib/errorMessages.js";
 import api from "@/lib/axios.js";
 
 export const useAuth = () => {
@@ -22,11 +23,13 @@ export const useAuth = () => {
     onSuccess: ({ data }) => {
       setAuth(data.data.user, data.data.accessToken);
       toast.success("Đăng nhập thành công!");
-      // Redirect về trang chủ sau khi login
       navigate("/");
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || "Đăng nhập thất bại");
+      toast.error(
+        translateApiMessage(error.response?.data?.message) ||
+          "Đăng nhập thất bại",
+      );
     },
   });
 
@@ -34,7 +37,10 @@ export const useAuth = () => {
   const registerMutation = useMutation({
     mutationFn: (data) => api.post("/auth/register", data),
     onError: (error) => {
-      toast.error(error.response?.data?.message || "Đăng ký thất bại");
+      toast.error(
+        translateApiMessage(error.response?.data?.message) ||
+          "Đăng ký thất bại",
+      );
     },
   });
 
