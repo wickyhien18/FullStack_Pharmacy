@@ -118,18 +118,18 @@ function Footer() {
                     </h3>
 
                     {/* Chi tiết công nghệ: hàng ngang trên mobile, hàng dọc trên desktop */}
-                    <div className="flex flex-row flex-wrap md:flex-col items-start gap-2.5 sm:gap-3">
+                    <div className="flex flex-row flex-wrap md:flex-col items-center md:items-stretch gap-2 sm:gap-2.5">
                       {(techStack[group] || []).map((item) => {
                         const Icon = item.icon;
                         return (
                           <div
                             key={item.name}
-                            className="group flex items-center gap-2.5 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl border border-slate-200 bg-white shadow-sm hover:border-blue-400 hover:shadow-md transition-all cursor-default w-auto md:w-full max-w-[170px]"
+                            className="group inline-flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl border border-slate-200 bg-white shadow-sm hover:border-blue-400 hover:shadow-md transition-all cursor-default text-slate-700 shrink-0"
                           >
                             {Icon && (
-                              <Icon className="text-xl sm:text-2xl text-slate-700 group-hover:text-blue-600 transition-colors shrink-0" />
+                              <Icon className="text-lg sm:text-xl text-slate-700 group-hover:text-blue-600 transition-colors shrink-0" />
                             )}
-                            <span className="text-xs sm:text-sm font-medium text-slate-700 whitespace-nowrap">
+                            <span className="text-xs sm:text-sm font-medium whitespace-nowrap">
                               {item.name}
                             </span>
                           </div>
