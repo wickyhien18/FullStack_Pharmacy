@@ -492,6 +492,7 @@ function AccountPage() {
   const [showChangeEmail, setShowChangeEmail] = useState(false);
   const [showChangePwd, setShowChangePwd] = useState(false);
   const [showForgotPwd, setShowForgotPwd] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   // Edit profile
   const [isEditing, setIsEditing] = useState(false);
@@ -632,49 +633,56 @@ function AccountPage() {
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-2 md:p-0 overflow-hidden flex md:block overflow-x-auto gap-2 scrollbar-hide">
-              {[
-                {
-                  id: "profile",
-                  icon: <User size={16} />,
-                  label: "Thông tin tài khoản",
-                },
-                {
-                  id: "orders",
-                  icon: <ShoppingBag size={16} />,
-                  label: "Đơn hàng của tôi",
-                },
-              ].map((item) => (
+            <div className="bg-white rounded-2xl p-3 md:p-0 overflow-hidden space-y-2 md:space-y-0">
+              {/* Hàng 1: Thông tin tài khoản & Đơn hàng của tôi */}
+              <div className="grid grid-cols-2 md:block">
+                {[
+                  {
+                    id: "profile",
+                    icon: <User size={16} />,
+                    label: "Thông tin tài khoản",
+                  },
+                  {
+                    id: "orders",
+                    icon: <ShoppingBag size={16} />,
+                    label: "Đơn hàng của tôi",
+                  },
+                ].map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => setActiveSubTab(item.id)}
+                    className={`w-full flex items-center justify-center md:justify-start gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl md:rounded-none transition-colors border-b-0 md:border-b border-gray-50 last:border-0 text-left ${
+                      activeSubTab === item.id
+                        ? "bg-blue-50 text-blue-700 font-semibold"
+                        : "text-gray-700 hover:bg-gray-50 bg-gray-50/50 md:bg-transparent"
+                    }`}
+                  >
+                    <span style={{ color: "#1250dc" }}>{item.icon}</span>
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Hàng 2: Nút Quản trị hệ thống (nếu là staff/admin) & Nút Đăng xuất */}
+              <div className={(user.role === "ROLE_ADMIN" || user.role === "ROLE_STAFF") ? "grid grid-cols-2 gap-2 md:block md:gap-0" : "w-full"}>
+                {(user.role === "ROLE_ADMIN" || user.role === "ROLE_STAFF") && (
+                  <Link
+                    to="/admin"
+                    className="w-full flex items-center justify-center md:justify-start gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl md:rounded-none text-amber-700 bg-amber-50/60 md:bg-transparent hover:bg-amber-50 font-semibold transition-colors border-b-0 md:border-b border-gray-50 text-left"
+                  >
+                    <span className="text-amber-600">🛡️</span>
+                    Quản trị hệ thống
+                  </Link>
+                )}
+
                 <button
-                  key={item.id}
-                  onClick={() => setActiveSubTab(item.id)}
-                  className={`w-auto md:w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl md:rounded-none whitespace-nowrap transition-colors border-b-0 md:border-b border-gray-50 last:border-0 text-left ${
-                    activeSubTab === item.id
-                      ? "bg-blue-50 text-blue-700 font-semibold"
-                      : "text-gray-700 hover:bg-gray-50 bg-gray-50/50 md:bg-transparent"
-                  }`}
+                  onClick={() => setShowLogoutModal(true)}
+                  className="w-full flex items-center justify-center md:justify-start gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl md:rounded-none text-red-600 bg-red-50/60 md:bg-transparent hover:bg-red-50 font-medium transition-colors text-left"
                 >
-                  <span style={{ color: "#1250dc" }}>{item.icon}</span>
-                  {item.label}
+                  <span className="text-red-500">🚪</span>
+                  Đăng xuất
                 </button>
-              ))}
-
-              {(user.role === "ROLE_ADMIN" || user.role === "ROLE_STAFF") && (
-                <Link
-                  to="/admin"
-                  className="w-full flex items-center gap-3 px-4 py-3 text-sm text-amber-700 hover:bg-amber-50 font-semibold transition-colors border-b border-gray-50 text-left"
-                >
-                  <span className="text-amber-600">🛡️</span>
-                  Quản trị hệ thống
-                </Link>
-              )}
-
-              <button
-                onClick={logout}
-                className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-500 hover:bg-red-50 transition-colors text-left"
-              >
-                Đăng xuất
-              </button>
+              </div>
             </div>
           </div>
 
@@ -860,7 +868,7 @@ function AccountPage() {
                             </span>
                           </div>
                           <span
-                            className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${statusMap[order.orderStatus]?.style || "bg-gray-100 text-gray-600"}`}
+                            className={`text-xs font-semibold px-2.5 py-1 rounded-full border whitespace-nowrap inline-block ${statusMap[order.orderStatus]?.style || "bg-gray-100 text-gray-600"}`}
                           >
                             {statusMap[order.orderStatus]?.label ||
                               order.orderStatus}
@@ -1210,6 +1218,40 @@ function AccountPage() {
         {/* Modal quên mật khẩu */}
         {showForgotPwd && (
           <ForgotPasswordModal onClose={() => setShowForgotPwd(false)} />
+        )}
+
+        {/* Modal xác nhận đăng xuất */}
+        {showLogoutModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
+            <div className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-xl text-center">
+              <div className="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto mb-3 text-xl font-bold">
+                🚪
+              </div>
+              <h3 className="font-bold text-gray-800 text-lg mb-2">
+                Xác nhận đăng xuất
+              </h3>
+              <p className="text-sm text-gray-500 mb-6">
+                Bạn có chắc chắn muốn đăng xuất khỏi tài khoản không?
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowLogoutModal(false)}
+                  className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition"
+                >
+                  Hủy
+                </button>
+                <button
+                  onClick={() => {
+                    setShowLogoutModal(false);
+                    logout();
+                  }}
+                  className="flex-1 py-2.5 rounded-xl text-white text-sm font-semibold bg-red-600 hover:bg-red-700 transition"
+                >
+                  Đăng xuất
+                </button>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </div>

@@ -107,30 +107,28 @@ function Footer() {
           </div>
 
           {/* Tech Stack */}
-          <div className="space-y-10 w-full md:col-span-3">
-            {/* Two-column layout: Frontend on left, others on right */}
-
-            <div className="mt-4 flex justify-end">
+          <div className="w-full md:col-span-3">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               {["Frontend", "Backend", "Database & Cache", "DevOps"].map(
                 (group) => (
-                  <div key={group} className="min-h-[120px] text-center">
-                    <h3 className="mb-4 text-lg font-semibold text-slate-800">
+                  <div key={group} className="text-center">
+                    <h3 className="mb-3 text-base sm:text-lg font-semibold text-slate-800">
                       {group}
                     </h3>
 
-                    <div className="flex flex-col gap-6">
+                    <div className="flex flex-col gap-3">
                       {(techStack[group] || []).map((item) => {
                         const Icon = item.icon;
                         return (
                           <div
                             key={item.name}
-                            className="group w-40 mx-auto rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg text-center"
+                            className="group w-full max-w-[160px] mx-auto rounded-2xl border border-slate-200 bg-white p-3 sm:p-4 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg text-center"
                           >
-                            <div className="flex flex-col items-center gap-3">
+                            <div className="flex flex-col items-center gap-2 sm:gap-3">
                               {Icon && (
-                                <Icon className="text-3xl text-slate-700" />
+                                <Icon className="text-2xl sm:text-3xl text-slate-700" />
                               )}
-                              <span className="text-sm font-medium break-words">
+                              <span className="text-xs sm:text-sm font-medium break-words">
                                 {item.name}
                               </span>
                             </div>

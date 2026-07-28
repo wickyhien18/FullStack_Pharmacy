@@ -292,41 +292,75 @@ function ProductListPage() {
 
           {/* Mobile filter */}
           {showFilter && (
-            <div className="md:hidden bg-white rounded-xl p-4 mb-4">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="font-semibold">Danh mục</h3>
-                <button onClick={() => setShowFilter(false)}>
+            <div className="md:hidden bg-white rounded-xl p-4 mb-4 shadow-md border border-gray-100 space-y-4">
+              {/* Header */}
+              <div className="flex items-center justify-between border-b border-gray-100 pb-2">
+                <h3 className="font-semibold text-gray-800 flex items-center gap-2">
+                  <SlidersHorizontal size={16} /> Bộ lọc sản phẩm
+                </h3>
+                <button onClick={() => setShowFilter(false)} className="text-gray-400 hover:text-gray-600">
                   <X size={18} />
                 </button>
               </div>
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  onClick={() => {
-                    handleCategoryChange("");
-                    setShowFilter(false);
-                  }}
-                  className={`text-sm px-3 py-2 rounded-lg text-left ${!categorySlug ? "text-white" : "bg-gray-50 text-gray-700"}`}
-                  style={!categorySlug ? { backgroundColor: "#1250dc" } : {}}
-                >
-                  Tất cả ({totalProductCount})
-                </button>
-                {liveCategories.map((cat) => (
+
+              {/* Danh mục */}
+              <div>
+                <h4 className="font-medium text-xs text-gray-500 uppercase mb-2">Danh mục</h4>
+                <div className="grid grid-cols-2 gap-2">
                   <button
-                    key={cat.id}
                     onClick={() => {
-                      handleCategoryChange(cat.id);
+                      handleCategoryChange("");
                       setShowFilter(false);
                     }}
-                    className={`text-sm px-3 py-2 rounded-lg text-left ${categorySlug === cat.id ? "text-white" : "bg-gray-50 text-gray-700"}`}
-                    style={
-                      categorySlug === cat.id
-                        ? { backgroundColor: "#1250dc" }
-                        : {}
-                    }
+                    className={`text-xs px-3 py-2 rounded-lg text-left ${!categorySlug ? "text-white font-medium" : "bg-gray-50 text-gray-700"}`}
+                    style={!categorySlug ? { backgroundColor: "#1250dc" } : {}}
                   >
-                    {cat.icon} {cat.name}
+                    Tất cả ({totalProductCount})
                   </button>
-                ))}
+                  {liveCategories.map((cat) => (
+                    <button
+                      key={cat.id}
+                      onClick={() => {
+                        handleCategoryChange(cat.id);
+                        setShowFilter(false);
+                      }}
+                      className={`text-xs px-3 py-2 rounded-lg text-left ${categorySlug === cat.id ? "text-white font-medium" : "bg-gray-50 text-gray-700"}`}
+                      style={
+                        categorySlug === cat.id
+                          ? { backgroundColor: "#1250dc" }
+                          : {}
+                      }
+                    >
+                      {cat.icon} {cat.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Khoảng giá */}
+              <div className="border-t border-gray-100 pt-3">
+                <h4 className="font-medium text-xs text-gray-500 uppercase mb-2">Khoảng giá</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                  {priceRanges.map((range) => {
+                    const active =
+                      priceRange?.min === range.min &&
+                      priceRange?.max === range.max;
+                    return (
+                      <button
+                        key={range.label}
+                        onClick={() => {
+                          setPriceRange(active ? null : range);
+                          setPage(1);
+                          setShowFilter(false);
+                        }}
+                        className={`w-full text-left text-xs px-3 py-2 rounded-lg transition-colors ${active ? "text-white font-medium" : "bg-gray-50 text-gray-700"}`}
+                        style={active ? { backgroundColor: "#1250dc" } : {}}
+                      >
+                        {range.label}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           )}

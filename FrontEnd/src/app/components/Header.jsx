@@ -25,6 +25,7 @@ function Header() {
   const { totalItems } = useCart();
   const [query, setQuery] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [catNavOpen, setCatNavOpen] = useState(false);
   const navigate = useNavigate();
 
   const { user, isAuthenticated } = useAuth();
@@ -258,54 +259,69 @@ function Header() {
       {/* Mobile menu */}
       {menuOpen && (
         <div className="md:hidden bg-white border-t border-gray-100 shadow-lg">
-          <form
-            onSubmit={handleSearch}
-            className="p-4 border-b border-gray-100"
-          >
-            <div className="relative flex items-center">
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Tìm kiếm sản phẩm..."
-                className="w-full pl-4 pr-12 py-2.5 border-2 rounded-xl text-sm focus:outline-none"
-                style={{ borderColor: "#1250dc" }}
-              />
-              <button
-                type="submit"
-                className="absolute right-0 top-0 bottom-0 px-4 rounded-r-xl text-white"
-                style={{ backgroundColor: "#1250dc" }}
-              >
-                <Search size={18} />
-              </button>
-            </div>
-          </form>
           <div className="divide-y divide-gray-100">
-            {liveCategories.map((link) => (
-              <Link
-                key={link.name}
-                to={"/products?category=" + link.slug}
-                onClick={() => setMenuOpen(false)}
-                className={`block px-4 py-3 text-sm font-medium ${link.highlight ? "text-red-500" : "text-gray-700"}`}
-              >
-                {link.name}
-              </Link>
-            ))}
+            {/* Top: Thông tin đăng nhập / tài khoản */}
             <Link
               to="/account"
               onClick={() => setMenuOpen(false)}
-              className="block px-4 py-3 text-sm text-gray-700"
+              className="flex items-center gap-3 px-4 py-3.5 text-sm font-semibold text-blue-700 bg-blue-50/60"
             >
-              {" "}
-              {user && isAuthenticated ? user.userName : "Đăng Nhập"}{" "}
+              <User size={18} />
+              <span>
+                {user && isAuthenticated
+                  ? `Tài khoản (${user.userName})`
+                  : "Đăng nhập / Đăng ký"}
+              </span>
             </Link>
+
+            {/* Giỏ hàng */}
             <Link
               to="/cart"
               onClick={() => setMenuOpen(false)}
-              className="block px-4 py-3 text-sm text-gray-700"
+              className="flex items-center justify-between px-4 py-3 text-sm text-gray-700 hover:bg-gray-50"
             >
-              Giỏ hàng ({totalItems})
+              <div className="flex items-center gap-3">
+                <ShoppingCart size={18} className="text-gray-500" />
+                <span>Giỏ hàng</span>
+              </div>
+              {totalItems > 0 && (
+                <span className="bg-orange-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                  {totalItems}
+                </span>
+              )}
             </Link>
+
+            {/* Collapsible Category Accordion */}
+            <div>
+              <button
+                onClick={() => setCatNavOpen(!catNavOpen)}
+                className="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-gray-800 hover:bg-gray-50 text-left"
+              >
+                <div className="flex items-center gap-2">
+                  <span>📋</span>
+                  <span>Danh mục sản phẩm</span>
+                </div>
+                <ChevronDown
+                  size={16}
+                  className={`text-gray-500 transition-transform ${catNavOpen ? "rotate-180" : ""}`}
+                />
+              </button>
+
+              {catNavOpen && (
+                <div className="bg-gray-50/80 divide-y divide-gray-100 pl-4">
+                  {liveCategories.map((link) => (
+                    <Link
+                      key={link.name}
+                      to={"/products?category=" + link.slug}
+                      onClick={() => setMenuOpen(false)}
+                      className="block px-4 py-2.5 text-xs font-medium text-gray-700 hover:text-blue-700"
+                    >
+                      {link.icon} {link.name}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}

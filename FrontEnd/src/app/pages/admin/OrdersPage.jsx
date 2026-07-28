@@ -329,7 +329,7 @@ export default function OrdersPage() {
                   </td>
                   <td className="px-4 py-3">
                     <span
-                      className={`text-xs font-semibold px-2.5 py-1 rounded-full ${STATUS_CONFIG[order.orderStatus]?.color || "bg-gray-100 text-gray-600"}`}
+                      className={`text-xs font-semibold px-2.5 py-1 rounded-full whitespace-nowrap inline-block ${STATUS_CONFIG[order.orderStatus]?.color || "bg-gray-100 text-gray-600"}`}
                     >
                       {STATUS_CONFIG[order.orderStatus]?.label ||
                         order.orderStatus}
