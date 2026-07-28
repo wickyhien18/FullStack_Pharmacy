@@ -107,27 +107,27 @@ function Footer() {
           </div>
 
           {/* Tech Stack */}
-          <div className="w-full md:col-span-3">
-            <div className="flex flex-col md:flex-row md:justify-between gap-6 md:gap-4">
+          <div className="col-span-2 md:col-span-3 w-full">
+            <div className="flex flex-col md:flex-row md:justify-between gap-5 md:gap-4">
               {["Frontend", "Backend", "Database & Cache", "DevOps"].map(
                 (group) => (
                   <div key={group} className="text-left">
-                    <h3 className="mb-3 text-sm sm:text-base font-bold text-slate-800 flex items-center gap-2">
+                    <h3 className="mb-2 text-sm sm:text-base font-bold text-slate-800 flex items-center gap-2">
                       <span className="w-1.5 h-4 bg-blue-600 rounded-full inline-block"></span>
                       {group}
                     </h3>
 
                     {/* Chi tiết công nghệ: hàng ngang trên mobile, hàng dọc trên desktop */}
-                    <div className="flex flex-row flex-wrap md:flex-col items-center md:items-stretch gap-2 sm:gap-2.5">
+                    <div className="flex flex-row flex-wrap md:flex-col items-center md:items-stretch gap-2">
                       {(techStack[group] || []).map((item) => {
                         const Icon = item.icon;
                         return (
                           <div
                             key={item.name}
-                            className="group inline-flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl border border-slate-200 bg-white shadow-sm hover:border-blue-400 hover:shadow-md transition-all cursor-default text-slate-700 shrink-0"
+                            className="group inline-flex items-center gap-1.5 sm:gap-2 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-xl border border-slate-200 bg-white shadow-sm hover:border-blue-400 hover:shadow-md transition-all cursor-default text-slate-700 shrink-0"
                           >
                             {Icon && (
-                              <Icon className="text-lg sm:text-xl text-slate-700 group-hover:text-blue-600 transition-colors shrink-0" />
+                              <Icon className="text-base sm:text-lg text-slate-700 group-hover:text-blue-600 transition-colors shrink-0" />
                             )}
                             <span className="text-xs sm:text-sm font-medium whitespace-nowrap">
                               {item.name}
