@@ -32,14 +32,17 @@ function ProductCard({ product, showDiscount = true }) {
       to={`/products/${product.id}`}
       className="group bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-lg hover:border-blue-200 transition-all duration-200 flex flex-col"
     >
-      <div className="relative overflow-hidden bg-gray-50 aspect-square flex items-center justify-center p-2">
+      <div
+        className="relative overflow-hidden bg-gray-50"
+        style={{ aspectRatio: "400/176" }}
+      >
         <img
           src={productCardImage(product.image)}
           alt={product.name}
           width={400}
           height={176}
           loading="lazy"
-          className={`w-full h-36 sm:h-44 object-contain group-hover:scale-105 transition-transform duration-300 ${product.status === "OUT_OF_STOCK" ? "opacity-60 grayscale-[50%]" : ""}`}
+          className={`w-full h-44 object-cover group-hover:scale-105 transition-transform duration-300 ${product.status === "OUT_OF_STOCK" ? "opacity-60 grayscale-[50%]" : ""}`}
         />
         {product.status === "OUT_OF_STOCK" && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/40">
@@ -108,10 +111,14 @@ function ProductCard({ product, showDiscount = true }) {
             product.status === "OUT_OF_STOCK"
               ? "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
               : added
-              ? "bg-green-500 text-white"
-              : "border text-blue-700 hover:text-white hover:bg-blue-700"
+                ? "bg-green-500 text-white"
+                : "border text-blue-700 hover:text-white hover:bg-blue-700"
           }`}
-          style={added || product.status === "OUT_OF_STOCK" ? {} : { borderColor: "#1250dc" }}
+          style={
+            added || product.status === "OUT_OF_STOCK"
+              ? {}
+              : { borderColor: "#1250dc" }
+          }
         >
           {product.status === "OUT_OF_STOCK" ? (
             "Hết hàng"
