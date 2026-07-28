@@ -6,6 +6,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "@/stores/auth.store.js";
 import api from "@/lib/axios.js";
 import toast from "react-hot-toast";
+import { translateApiMessage } from "@/lib/errorMessages.js";
 
 export const useCart = () => {
   const { isAuthenticated } = useAuthStore();
@@ -81,7 +82,10 @@ export const useCart = () => {
       toast.success("Đã thêm vào giỏ hàng");
     },
     onError: (err) =>
-      toast.error(err.response?.data?.message || "Thêm vào giỏ thất bại"),
+      toast.error(
+        translateApiMessage(err.response?.data?.message) ||
+          "Thêm vào giỏ thất bại",
+      ),
   });
 
   // Cập nhật số lượng
@@ -112,7 +116,9 @@ export const useCart = () => {
 
     onSuccess: invalidateCart,
     onError: (err) =>
-      toast.error(err.response?.data?.message || "Cập nhật thất bại"),
+      toast.error(
+        translateApiMessage(err.response?.data?.message) || "Cập nhật thất bại",
+      ),
   });
 
   // Xoá item
@@ -143,7 +149,9 @@ export const useCart = () => {
       toast.success("Đã xoá khỏi giỏ hàng");
     },
     onError: (err) =>
-      toast.error(err.response?.data?.message || "Xoá thất bại"),
+      toast.error(
+        translateApiMessage(err.response?.data?.message) || "Xoá thất bại",
+      ),
   });
 
   const formatPrice = (price) =>

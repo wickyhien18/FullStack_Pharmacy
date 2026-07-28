@@ -4,6 +4,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import { translateApiMessage } from "../../../lib/errorMessages.js";
 import api from "../../../lib/axios.js";
 
 const STATUS_CONFIG = {
@@ -73,7 +74,10 @@ export default function CancelRequestsPage() {
       queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
       setRejectTarget(null);
     },
-    onError: (err) => toast.error(err.response?.data?.message || "Thất bại"),
+    onError: (err) =>
+      toast.error(
+        translateApiMessage(err.response?.data?.message) || "Thất bại",
+      ),
   });
 
   const handleApprove = (order) => {

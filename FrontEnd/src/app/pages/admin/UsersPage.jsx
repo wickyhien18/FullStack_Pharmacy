@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { UserCheck, UserX, Shield } from "lucide-react";
 import toast from "react-hot-toast";
+import { translateApiMessage } from "../../../lib/errorMessages.js";
 import api from "../../../lib/axios.js";
 
 function RoleModal({ user, onClose }) {
@@ -22,7 +23,10 @@ function RoleModal({ user, onClose }) {
       queryClient.invalidateQueries({ queryKey: ["admin-users"] });
       onClose();
     },
-    onError: (err) => toast.error(err.response?.data?.message || "Thất bại"),
+    onError: (err) =>
+      toast.error(
+        translateApiMessage(err.response?.data?.message) || "Thất bại",
+      ),
   });
 
   return (
@@ -94,7 +98,10 @@ export default function UsersPage() {
       queryClient.invalidateQueries({ queryKey: ["admin-users"] });
       toast.success("Cập nhật trạng thái thành công");
     },
-    onError: (err) => toast.error(err.response?.data?.message || "Thất bại"),
+    onError: (err) =>
+      toast.error(
+        translateApiMessage(err.response?.data?.message) || "Thất bại",
+      ),
   });
 
   return (

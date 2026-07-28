@@ -16,6 +16,7 @@ import {
 import { useAuth } from "../../hooks/useAuth.js";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "../../lib/axios.js";
+import { translateApiMessage } from "../../lib/errorMessages.js";
 
 const PASSWORD_REGEX =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[_@$!%*?&])[A-Za-z\d_@$!%*?&]{8,}$/;
@@ -63,7 +64,10 @@ function ChangeEmailModal({ onClose }) {
       toast.success("Mã OTP đã gửi!");
       setStep(2);
     },
-    onError: (err) => toast.error(err.response?.data?.message || "Thất bại"),
+    onError: (err) =>
+      toast.error(
+        translateApiMessage(err.response?.data?.message) || "Thất bại",
+      ),
   });
 
   const verifyMutation = useMutation({
@@ -74,7 +78,9 @@ function ChangeEmailModal({ onClose }) {
       onClose();
     },
     onError: (err) =>
-      toast.error(err.response?.data?.message || "OTP không đúng"),
+      toast.error(
+        translateApiMessage(err.response?.data?.message) || "OTP không đúng",
+      ),
   });
 
   return (
@@ -194,7 +200,10 @@ function ChangePasswordModal({ onClose, logout }) {
       onClose();
       setTimeout(() => logout(), 1500);
     },
-    onError: (err) => toast.error(err.response?.data?.message || "Thất bại"),
+    onError: (err) =>
+      toast.error(
+        translateApiMessage(err.response?.data?.message) || "Thất bại",
+      ),
   });
 
   const handleSubmit = () => {
@@ -311,7 +320,10 @@ function ForgotPasswordModal({ onClose }) {
       setStep(2);
     },
     onError: (err) =>
-      toast.error(err.response?.data?.message || "Email không tồn tại"),
+      toast.error(
+        translateApiMessage(err.response?.data?.message) ||
+          "Email không tồn tại",
+      ),
   });
 
   const resetMutation = useMutation({
@@ -321,7 +333,10 @@ function ForgotPasswordModal({ onClose }) {
       toast.success("Đặt lại mật khẩu thành công!");
       onClose();
     },
-    onError: (err) => toast.error(err.response?.data?.message || "Thất bại"),
+    onError: (err) =>
+      toast.error(
+        translateApiMessage(err.response?.data?.message) || "Thất bại",
+      ),
   });
 
   const handleReset = () => {
@@ -509,7 +524,10 @@ function AccountPage() {
       // Cập nhật store auth với thông tin mới
       window.location.reload(); // đơn giản nhất — reload để fetch lại profile
     },
-    onError: (err) => toast.error(err.response?.data?.message || "Thất bại"),
+    onError: (err) =>
+      toast.error(
+        translateApiMessage(err.response?.data?.message) || "Thất bại",
+      ),
   });
 
   const handleLoginSubmit = (e) => {

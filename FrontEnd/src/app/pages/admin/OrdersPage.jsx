@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Eye, X } from "lucide-react";
 import toast from "react-hot-toast";
+import { translateApiMessage } from "../../../lib/errorMessages.js";
 import api from "../../../lib/axios.js";
 
 const formatPrice = (p) =>
@@ -53,7 +54,10 @@ function OrderDetailModal({ order, onClose }) {
       queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
       onClose();
     },
-    onError: (err) => toast.error(err.response?.data?.message || "Thất bại"),
+    onError: (err) =>
+      toast.error(
+        translateApiMessage(err.response?.data?.message) || "Thất bại",
+      ),
   });
 
   // Admin xử lý yêu cầu huỷ/hoàn
@@ -68,7 +72,10 @@ function OrderDetailModal({ order, onClose }) {
       queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
       onClose();
     },
-    onError: (err) => toast.error(err.response?.data?.message || "Thất bại"),
+    onError: (err) =>
+      toast.error(
+        translateApiMessage(err.response?.data?.message) || "Thất bại",
+      ),
   });
 
   return (

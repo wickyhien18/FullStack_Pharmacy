@@ -18,6 +18,7 @@ import { useCart } from "@/hooks/useCart.js";
 import api from "../../lib/axios.js";
 import { useAuth } from "../../hooks/useAuth.js";
 import toast from "react-hot-toast";
+import { translateApiMessage } from "../../lib/errorMessages.js";
 import { productThumb } from "../../lib/imageUrl.js";
 
 const steps = ["Địa chỉ giao hàng", "Thanh toán", "Xác nhận"];
@@ -267,7 +268,10 @@ function CheckoutPage() {
         }
       }
       console.error("Order error:", error.response?.data);
-      toast.error(error.response?.data?.message || "Đặt hàng thất bại");
+      toast.error(
+        translateApiMessage(error.response?.data?.message) ||
+          "Đặt hàng thất bại",
+      );
     }
   };
 

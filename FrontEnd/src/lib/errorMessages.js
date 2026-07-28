@@ -17,9 +17,18 @@ const VALIDATION_MESSAGES_VI = {
   "Password must have at least 8 characters, including at least 1 uppercase letter, 1 lowercase letter, 1 number, 1 special characer such as: _, @, $, !, %, *, ?, & ":
     "Mật khẩu cần tối thiểu 8 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt (_, @, $, !, %, *, ?, &)",
   "Password is required": "Vui lòng nhập mật khẩu",
+  "Validation failed": "Dữ liệu nhập vào không hợp lệ",
+  "Too many requests": "Quá nhiều yêu cầu. Vui lòng thử lại sau.",
+  "Internal server error": "Lỗi máy chủ hệ thống",
+  "Route not found": "Không tìm thấy đường dẫn",
+  "Unauthorized": "Phiên đăng nhập hết hạn hoặc chưa được xác thực",
+  "Forbidden": "Bạn không có quyền thực hiện thao tác này",
+  "Network Error": "Kết nối mạng thất bại",
 };
 
-// Dùng ở mọi nơi có toast.error(error.response?.data?.message)
-// Không có trong bảng → trả nguyên message gốc (fallback an toàn)
-export const translateApiMessage = (message) =>
-  VALIDATION_MESSAGES_VI[message] || message;
+// Dùng ở mọi nơi có toast.error(translateApiMessage(error.response?.data?.message))
+export const translateApiMessage = (message) => {
+  if (!message) return "";
+  if (typeof message !== "string") return String(message);
+  return VALIDATION_MESSAGES_VI[message.trim()] || message;
+};

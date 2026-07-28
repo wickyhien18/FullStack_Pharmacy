@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Upload, X } from "lucide-react";
 import toast from "react-hot-toast";
+import { translateApiMessage } from "../../../lib/errorMessages.js";
 import api from "../../../lib/axios.js";
 
 const MAX_IMAGES = 3;
@@ -118,7 +119,9 @@ export default function ProductFormModal({ productId, onClose }) {
       onClose();
     },
     onError: (err) =>
-      toast.error(err.response?.data?.message || "Thao tác thất bại"),
+      toast.error(
+        translateApiMessage(err.response?.data?.message) || "Thao tác thất bại",
+      ),
   });
 
   const handleSubmit = (e) => {

@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
+import { translateApiMessage } from "../../../lib/errorMessages.js";
 import api from "../../../lib/axios.js";
 import ProductFormModal from "./ProductFormModal.jsx";
 import { adminTableImage } from "../../../lib/imageUrl.js";
@@ -34,7 +35,9 @@ export default function ProductsPage() {
       toast.success("Đã xoá sản phẩm");
     },
     onError: (err) =>
-      toast.error(err.response?.data?.message || "Xoá thất bại"),
+      toast.error(
+        translateApiMessage(err.response?.data?.message) || "Xoá thất bại",
+      ),
   });
 
   const handleDelete = (id, name) => {

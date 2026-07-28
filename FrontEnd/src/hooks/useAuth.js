@@ -36,12 +36,6 @@ export const useAuth = () => {
   // ── Register mutation ─────────────────────────────────────────
   const registerMutation = useMutation({
     mutationFn: (data) => api.post("/auth/register", data),
-    onError: (error) => {
-      toast.error(
-        translateApiMessage(error.response?.data?.message) ||
-          "Đăng ký thất bại",
-      );
-    },
   });
 
   // Wrap mutate để nhận callback từ bên ngoài
@@ -52,7 +46,10 @@ export const useAuth = () => {
         options.onSuccess?.(); // gọi callback nếu có
       },
       onError: (error) => {
-        toast.error(error.response?.data?.message || "Đăng ký thất bại");
+        toast.error(
+          translateApiMessage(error.response?.data?.message) ||
+            "Đăng ký thất bại",
+        );
       },
     });
   };
@@ -81,7 +78,10 @@ export const useAuth = () => {
       navigate("/");
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || "Tạo tài khoản thất bại");
+      toast.error(
+        translateApiMessage(error.response?.data?.message) ||
+          "Tạo tài khoản thất bại",
+      );
     },
   });
 
