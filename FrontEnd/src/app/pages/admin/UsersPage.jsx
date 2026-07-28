@@ -110,8 +110,8 @@ export default function UsersPage() {
         Quản lý người dùng
       </h1>
 
-      <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
-        <table className="w-full text-sm">
+      <div className="bg-white rounded-2xl border border-gray-100 overflow-x-auto shadow-sm">
+        <table className="w-full text-sm min-w-[650px]">
           <thead className="bg-gray-50 border-b border-gray-100">
             <tr>
               {[
