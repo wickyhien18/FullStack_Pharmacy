@@ -274,23 +274,6 @@ function Header() {
               </span>
             </Link>
 
-            {/* Giỏ hàng */}
-            <Link
-              to="/cart"
-              onClick={() => setMenuOpen(false)}
-              className="flex items-center justify-between px-4 py-3 text-sm text-gray-700 hover:bg-gray-50"
-            >
-              <div className="flex items-center gap-3">
-                <ShoppingCart size={18} className="text-gray-500" />
-                <span>Giỏ hàng</span>
-              </div>
-              {totalItems > 0 && (
-                <span className="bg-orange-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                  {totalItems}
-                </span>
-              )}
-            </Link>
-
             {/* Collapsible Category Accordion */}
             <div>
               <button

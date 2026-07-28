@@ -107,39 +107,36 @@ function Footer() {
           </div>
 
           {/* Tech Stack */}
-          <div className="w-full md:col-span-3">
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-              {["Frontend", "Backend", "Database & Cache", "DevOps"].map(
-                (group) => (
-                  <div key={group} className="text-center">
-                    <h3 className="mb-3 text-base sm:text-lg font-semibold text-slate-800">
-                      {group}
-                    </h3>
+          <div className="w-full md:col-span-3 space-y-5">
+            {["Frontend", "Backend", "Database & Cache", "DevOps"].map(
+              (group) => (
+                <div key={group} className="text-left">
+                  <h3 className="mb-2 text-sm sm:text-base font-bold text-slate-800 flex items-center gap-2">
+                    <span className="w-1.5 h-4 bg-blue-600 rounded-full inline-block"></span>
+                    {group}
+                  </h3>
 
-                    <div className="flex flex-col gap-3">
-                      {(techStack[group] || []).map((item) => {
-                        const Icon = item.icon;
-                        return (
-                          <div
-                            key={item.name}
-                            className="group w-full max-w-[160px] mx-auto rounded-2xl border border-slate-200 bg-white p-3 sm:p-4 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg text-center"
-                          >
-                            <div className="flex flex-col items-center gap-2 sm:gap-3">
-                              {Icon && (
-                                <Icon className="text-2xl sm:text-3xl text-slate-700" />
-                              )}
-                              <span className="text-xs sm:text-sm font-medium break-words">
-                                {item.name}
-                              </span>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
+                  <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
+                    {(techStack[group] || []).map((item) => {
+                      const Icon = item.icon;
+                      return (
+                        <div
+                          key={item.name}
+                          className="group flex items-center gap-2.5 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl border border-slate-200 bg-white shadow-sm hover:border-blue-400 hover:shadow-md transition-all cursor-default"
+                        >
+                          {Icon && (
+                            <Icon className="text-xl sm:text-2xl text-slate-700 group-hover:text-blue-600 transition-colors" />
+                          )}
+                          <span className="text-xs sm:text-sm font-medium text-slate-700 whitespace-nowrap">
+                            {item.name}
+                          </span>
+                        </div>
+                      );
+                    })}
                   </div>
-                ),
-              )}
-            </div>
+                </div>
+              ),
+            )}
           </div>
         </div>
       </div>
