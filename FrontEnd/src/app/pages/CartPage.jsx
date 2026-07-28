@@ -111,38 +111,37 @@ function CartPage() {
                 ? // Skeleton 3 items trong lúc loading
                   Array(3)
                     .fill(0)
-                    .map((_, i) => <CartItemSkeleton key={i} />)
-                : items.map((item) => (
-                    <div key={item.cartItemId} className="p-5 flex gap-4">
+                                 : items.map((item) => (
+                    <div key={item.cartItemId} className="p-3 sm:p-5 flex gap-3 sm:gap-4 items-start">
                       <Link to={`/products/${item.slug}`} className="shrink-0">
                         <img
                           src={productThumb(item.image)}
                           alt={item.name}
-                          className="w-20 h-20 object-cover rounded-xl border border-gray-100"
+                          className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-xl border border-gray-100"
                         />
                       </Link>
                       <div className="flex-1 min-w-0">
                         <Link
                           to={`/products/${item.slug}`}
-                          className="font-medium text-sm text-gray-800 hover:text-blue-700 line-clamp-2 block mb-1"
+                          className="font-medium text-xs sm:text-sm text-gray-800 hover:text-blue-700 line-clamp-2 block mb-1"
                         >
                           {item.name}
                         </Link>
-                        <div className="text-xs text-gray-500 mb-1">
+                        <div className="text-[11px] sm:text-xs text-gray-500 mb-1">
                           {item.unit}
                         </div>
-                        <div className="flex items-center justify-between mt-2">
+                        <div className="flex flex-wrap items-center justify-between gap-2 mt-2">
                           <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white">
                             <button
                               onClick={() =>
                                 updateItem(item.cartItemId, item.quantity - 1)
                               }
                               disabled={item.quantity <= 1 || isUpdating || isRemoving}
-                              className="px-2.5 py-1.5 hover:bg-gray-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                              className="px-2 py-1 sm:px-2.5 sm:py-1.5 hover:bg-gray-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                             >
                               <Minus size={14} />
                             </button>
-                            <span className="px-3 py-1.5 text-sm font-medium border-x border-gray-200">
+                            <span className="px-2.5 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm font-medium border-x border-gray-200">
                               {item.quantity}
                             </span>
                             <button
@@ -150,12 +149,12 @@ function CartPage() {
                                 updateItem(item.cartItemId, item.quantity + 1)
                               }
                               disabled={isUpdating || isRemoving}
-                              className="px-2.5 py-1.5 hover:bg-gray-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                              className="px-2 py-1 sm:px-2.5 sm:py-1.5 hover:bg-gray-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                             >
                               <Plus size={14} />
                             </button>
                           </div>
-                          <div className="font-semibold text-sm">
+                          <div className="font-semibold text-xs sm:text-sm">
                             {formatPrice(item.price * item.quantity)}
                           </div>
                         </div>
@@ -163,7 +162,7 @@ function CartPage() {
                       <button
                         onClick={() => setDeleteItemId(item.cartItemId)}
                         disabled={isUpdating || isRemoving}
-                        className="shrink-0 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors self-start disabled:opacity-40 disabled:cursor-not-allowed"
+                        className="shrink-0 p-1.5 sm:p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors self-start disabled:opacity-40 disabled:cursor-not-allowed"
                       >
                         <Trash2 size={16} />
                       </button>

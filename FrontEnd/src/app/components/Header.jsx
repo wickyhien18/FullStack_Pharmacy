@@ -89,7 +89,7 @@ function Header() {
 
       {/* Main header */}
       <div className="bg-white border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center gap-4">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-2 md:gap-4">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 shrink-0">
             <div
@@ -101,18 +101,18 @@ function Header() {
             <div>
               <div
                 style={{ color: "#1250dc" }}
-                className="font-bold text-lg leading-tight"
+                className="font-bold text-base md:text-lg leading-tight"
               >
                 WICKY HIEN
               </div>
-              <div className="text-xs text-gray-500 leading-tight">
+              <div className="text-[10px] md:text-xs text-gray-500 leading-tight">
                 Dự án Sản phẩm
               </div>
             </div>
           </Link>
 
-          {/* Search */}
-          <form onSubmit={handleSearch} className="flex-1 max-w-5xl">
+          {/* Search — Desktop */}
+          <form onSubmit={handleSearch} className="hidden md:block flex-1 max-w-5xl">
             <div className="relative flex items-center">
               <input
                 type="text"
@@ -133,15 +133,14 @@ function Header() {
           </form>
 
           {/* Action icons */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 md:gap-2 shrink-0">
             <Link
               to="/account"
               className="flex flex-col items-center gap-0.5 text-xs text-gray-600 hover:text-blue-700 cursor-pointer px-2 py-1 rounded-lg hover:bg-blue-50 hidden md:flex"
             >
               <User size={20} />
               <span>
-                {" "}
-                {user && isAuthenticated ? user.userName : "Đăng Nhập"}{" "}
+                {user && isAuthenticated ? user.userName : "Đăng Nhập"}
               </span>
             </Link>
             <Link
@@ -159,59 +158,83 @@ function Header() {
                   </span>
                 )}
               </div>
-              <span>Giỏ hàng</span>
+              <span className="text-[11px] sm:text-xs">Giỏ hàng</span>
             </Link>
+
+            {isAuthenticated && (
+              <div className="relative">
+                <button
+                  onClick={() => {
+                    setNotifOpen(!notifOpen);
+                    if (!notifOpen && unreadCount > 0) markAllRead();
+                  }}
+                  className="relative flex flex-col items-center gap-0.5 text-xs text-gray-600 hover:text-blue-700 cursor-pointer px-2 py-1 rounded-lg hover:bg-blue-50"
+                >
+                  <div className="relative">
+                    <Bell size={20} />
+                    {unreadCount > 0 && (
+                      <span
+                        className="absolute -top-1.5 -right-1.5 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center"
+                        style={{ backgroundColor: "#f05a22", fontSize: "9px" }}
+                      >
+                        {unreadCount}
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-[11px] sm:text-xs">Thông báo</span>
+                </button>
+
+                {notifOpen && (
+                  <div className="absolute right-0 mt-2 w-72 sm:w-80 bg-white rounded-xl shadow-lg border border-gray-100 max-h-96 overflow-y-auto z-50">
+                    {notifications.length === 0 ? (
+                      <p className="p-4 text-sm text-gray-400 text-center">
+                        Chưa có thông báo
+                      </p>
+                    ) : (
+                      notifications.map((n, i) => (
+                        <div
+                          key={n.notificationId || i}
+                          className="p-3 border-b border-gray-50 text-sm text-gray-700"
+                        >
+                          {n.message}
+                        </div>
+                      ))
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
             <button
-              className="md:hidden p-2 rounded-lg hover:bg-gray-100"
+              className="md:hidden p-2 rounded-lg hover:bg-gray-100 text-gray-700"
               onClick={() => setMenuOpen(!menuOpen)}
             >
               {menuOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
           </div>
+        </div>
 
-          {isAuthenticated && (
-            <div className="relative">
+        {/* Mobile Search Bar Row */}
+        <div className="block md:hidden px-4 pb-2.5">
+          <form onSubmit={handleSearch} className="w-full">
+            <div className="relative flex items-center">
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Tìm kiếm sản phẩm..."
+                className="w-full pl-3 pr-10 py-2 border-2 rounded-xl text-xs focus:outline-none"
+                style={{ borderColor: "#1250dc" }}
+              />
               <button
-                onClick={() => {
-                  setNotifOpen(!notifOpen);
-                  if (!notifOpen && unreadCount > 0) markAllRead();
-                }}
-                className="relative flex flex-col items-center gap-0.5 text-xs text-gray-600 hover:text-blue-700 cursor-pointer px-2 py-1 rounded-lg hover:bg-blue-50"
+                type="submit"
+                className="absolute right-0 top-0 bottom-0 px-3 rounded-r-xl text-white flex items-center justify-center"
+                style={{ backgroundColor: "#1250dc" }}
               >
-                <div className="relative">
-                  <Bell size={20} />
-                  {unreadCount > 0 && (
-                    <span
-                      className="absolute -top-1.5 -right-1.5 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center"
-                      style={{ backgroundColor: "#f05a22", fontSize: "9px" }}
-                    >
-                      {unreadCount}
-                    </span>
-                  )}
-                </div>
-                <span>Thông báo</span>
+                <Search size={16} />
               </button>
-
-              {notifOpen && (
-                <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg border border-gray-100 max-h-96 overflow-y-auto z-50">
-                  {notifications.length === 0 ? (
-                    <p className="p-4 text-sm text-gray-400 text-center">
-                      Chưa có thông báo
-                    </p>
-                  ) : (
-                    notifications.map((n, i) => (
-                      <div
-                        key={n.notificationId || i}
-                        className="p-3 border-b border-gray-50 text-sm text-gray-700"
-                      >
-                        {n.message}
-                      </div>
-                    ))
-                  )}
-                </div>
-              )}
             </div>
-          )}
+          </form>
         </div>
       </div>
 

@@ -342,34 +342,33 @@ function HomePage() {
         ))}
       </div> */}
       {/* Categories */}
-      <section className="bg-white rounded-2xl p-6">
-        <div className="flex items-center justify-between mb-5">
+      <section className="bg-white rounded-2xl p-4 sm:p-6">
+        <div className="flex items-center justify-between mb-4 sm:mb-5">
           <h2
-            className="font-bold text-gray-800"
-            style={{ fontSize: "1.125rem" }}
+            className="font-bold text-gray-800 text-base sm:text-lg"
           >
             Danh mục sản phẩm
           </h2>
           <Link
             to="/products"
-            className="text-sm font-medium flex items-center gap-1 hover:gap-2 transition-all"
+            className="text-xs sm:text-sm font-medium flex items-center gap-1 hover:gap-2 transition-all"
             style={{ color: "#1250dc" }}
           >
             Xem tất cả <ArrowRight size={15} />
           </Link>
         </div>
-        <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2.5 sm:gap-3">
           {liveCategories.map((cat) => (
             <Link
               key={cat.id}
               to={`/products?category=${cat.id}`}
-              className="group flex flex-col items-center p-3 rounded-xl border-2 border-gray-100 hover:border-blue-200 hover:bg-blue-50 transition-all cursor-pointer text-center"
+              className="group flex flex-col items-center p-2.5 sm:p-3 rounded-xl border-2 border-gray-100 hover:border-blue-200 hover:bg-blue-50 transition-all cursor-pointer text-center"
             >
-              <div className="text-3xl mb-2">{cat.icon}</div>
-              <div className="text-xs font-semibold text-gray-700 group-hover:text-blue-700 leading-tight">
+              <div className="text-2xl sm:text-3xl mb-1.5">{cat.icon}</div>
+              <div className="text-[11px] sm:text-xs font-semibold text-gray-700 group-hover:text-blue-700 leading-tight">
                 {cat.name}
               </div>
-              <div className="text-xs text-gray-400 mt-0.5">
+              <div className="text-[10px] sm:text-xs text-gray-400 mt-0.5">
                 {cat.count.toLocaleString()}
               </div>
             </Link>
@@ -377,47 +376,23 @@ function HomePage() {
         </div>
       </section>
 
-      {/* Best Sellers */}
-      {/* <section className="bg-white rounded-2xl p-6">
-        <div className="flex items-center justify-between mb-5">
-          <h2
-            className="font-bold text-gray-800"
-            style={{ fontSize: "1.125rem" }}
-          >
-            🏆 Sản phẩm bán chạy
-          </h2>
-          <Link
-            to="/products?sort=bestseller"
-            className="text-sm font-medium flex items-center gap-1 hover:gap-2 transition-all"
-            style={{ color: "#1250dc" }}
-          >
-            Xem tất cả <ArrowRight size={15} />
-          </Link>
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {bestSellers.slice(0, 4).map((p) => (
-            <ProductCard key={p.id} product={p} />
-          ))}
-        </div>
-      </section> */}
       {/* Featured */}
-      <section className="bg-white rounded-2xl p-6">
-        <div className="flex items-center justify-between mb-5">
+      <section className="bg-white rounded-2xl p-4 sm:p-6">
+        <div className="flex items-center justify-between mb-4 sm:mb-5">
           <h2
-            className="font-bold text-gray-800"
-            style={{ fontSize: "1.125rem" }}
+            className="font-bold text-gray-800 text-base sm:text-lg"
           >
             ⭐ Sản phẩm nổi bật
           </h2>
           <Link
             to="/products?sort=featured"
-            className="text-sm font-medium flex items-center gap-1 hover:gap-2 transition-all"
+            className="text-xs sm:text-sm font-medium flex items-center gap-1 hover:gap-2 transition-all"
             style={{ color: "#1250dc" }}
           >
             Xem tất cả <ArrowRight size={15} />
           </Link>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
           {featured.slice(0, 4).map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}

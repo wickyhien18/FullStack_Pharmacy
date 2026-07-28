@@ -379,11 +379,11 @@ function ProductListPage() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex justify-center items-center gap-2 mt-8">
+            <div className="flex flex-wrap justify-center items-center gap-1.5 sm:gap-2 mt-8">
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="px-4 py-2 text-sm rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="px-3 sm:px-4 py-2 text-xs sm:text-sm rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Trước
               </button>
@@ -391,7 +391,7 @@ function ProductListPage() {
                 <button
                   key={p}
                   onClick={() => setPage(p)}
-                  className={`w-9 h-9 text-sm rounded-lg font-medium transition-colors ${page === p ? "text-white" : "border border-gray-200 hover:bg-gray-50 text-gray-700"}`}
+                  className={`w-8 h-8 sm:w-9 sm:h-9 text-xs sm:text-sm rounded-lg font-medium transition-colors ${page === p ? "text-white" : "border border-gray-200 hover:bg-gray-50 text-gray-700"}`}
                   style={page === p ? { backgroundColor: "#1250dc" } : {}}
                 >
                   {p}
@@ -400,7 +400,7 @@ function ProductListPage() {
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
-                className="px-4 py-2 text-sm rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="px-3 sm:px-4 py-2 text-xs sm:text-sm rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Sau
               </button>

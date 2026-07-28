@@ -403,18 +403,18 @@ function CheckoutPage() {
       </nav>
 
       {/* Steps */}
-      <div className="flex items-center justify-center gap-0 mb-8">
+      <div className="flex items-center justify-center gap-0 mb-6 sm:mb-8 overflow-x-auto py-1">
         {steps.map((s, i) => (
           <div key={s} className="flex items-center">
             <div className="flex flex-col items-center">
               <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-colors ${i <= step ? "text-white" : "bg-gray-200 text-gray-500"}`}
+                className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold transition-colors ${i <= step ? "text-white" : "bg-gray-200 text-gray-500"}`}
                 style={i <= step ? { backgroundColor: "#1250dc" } : {}}
               >
-                {i < step ? <Check size={16} /> : i + 1}
+                {i < step ? <Check size={14} /> : i + 1}
               </div>
               <span
-                className={`text-xs mt-1 ${i <= step ? "font-medium" : "text-gray-500"}`}
+                className={`text-[11px] sm:text-xs mt-1 text-center whitespace-nowrap ${i <= step ? "font-medium" : "text-gray-500"}`}
                 style={i === step ? { color: "#1250dc" } : {}}
               >
                 {s}
@@ -422,7 +422,7 @@ function CheckoutPage() {
             </div>
             {i < steps.length - 1 && (
               <div
-                className={`w-20 h-0.5 mb-4 mx-2 ${i < step ? "" : "bg-gray-200"}`}
+                className={`w-8 sm:w-16 md:w-20 h-0.5 mb-4 mx-1 sm:mx-2 ${i < step ? "" : "bg-gray-200"}`}
                 style={i < step ? { backgroundColor: "#1250dc" } : {}}
               />
             )}

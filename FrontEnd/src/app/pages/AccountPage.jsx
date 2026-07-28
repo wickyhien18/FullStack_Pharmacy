@@ -632,7 +632,7 @@ function AccountPage() {
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl overflow-hidden">
+            <div className="bg-white rounded-2xl p-2 md:p-0 overflow-hidden flex md:block overflow-x-auto gap-2 scrollbar-hide">
               {[
                 {
                   id: "profile",
@@ -648,10 +648,10 @@ function AccountPage() {
                 <button
                   key={item.id}
                   onClick={() => setActiveSubTab(item.id)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 text-sm transition-colors border-b border-gray-50 last:border-0 text-left ${
+                  className={`w-auto md:w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-xl md:rounded-none whitespace-nowrap transition-colors border-b-0 md:border-b border-gray-50 last:border-0 text-left ${
                     activeSubTab === item.id
                       ? "bg-blue-50 text-blue-700 font-semibold"
-                      : "text-gray-700 hover:bg-gray-50"
+                      : "text-gray-700 hover:bg-gray-50 bg-gray-50/50 md:bg-transparent"
                   }`}
                 >
                   <span style={{ color: "#1250dc" }}>{item.icon}</span>

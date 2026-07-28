@@ -32,17 +32,14 @@ function ProductCard({ product, showDiscount = true }) {
       to={`/products/${product.id}`}
       className="group bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-lg hover:border-blue-200 transition-all duration-200 flex flex-col"
     >
-      <div
-        className="relative overflow-hidden bg-gray-50"
-        style={{ aspectRatio: "400/176" }}
-      >
+      <div className="relative overflow-hidden bg-gray-50 aspect-square flex items-center justify-center p-2">
         <img
           src={productCardImage(product.image)}
           alt={product.name}
           width={400}
           height={176}
           loading="lazy"
-          className={`w-full h-44 object-cover group-hover:scale-105 transition-transform duration-300 ${product.status === "OUT_OF_STOCK" ? "opacity-60 grayscale-[50%]" : ""}`}
+          className={`w-full h-36 sm:h-44 object-contain group-hover:scale-105 transition-transform duration-300 ${product.status === "OUT_OF_STOCK" ? "opacity-60 grayscale-[50%]" : ""}`}
         />
         {product.status === "OUT_OF_STOCK" && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/40">

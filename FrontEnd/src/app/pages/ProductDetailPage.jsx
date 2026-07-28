@@ -141,7 +141,7 @@ function ProductDetailPage() {
             <img
               src={productDetailMain(product.images[activeImg])}
               alt={product.name}
-              className="w-full h-80 object-contain p-4"
+              className="w-full h-64 sm:h-80 object-contain p-3 sm:p-4"
             />
           </div>
 
