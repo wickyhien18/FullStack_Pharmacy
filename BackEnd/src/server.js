@@ -6,7 +6,7 @@ import { env } from "./config/env.config.js";
 import { prisma } from "./config/prisma.config.js";
 import { startTokenCleanupJob } from "./utils/cleanup-tokens.js";
 import { verifyAccessToken } from "./utils/jwt.js";
-import { setIO } from "./config/socket.js"; // file mới, xem bên dưới
+import { setIO } from "./config/socket.config.js"; // file mới, xem bên dưới
 
 BigInt.prototype.toJSON = function () {
   return this.toString();
@@ -39,7 +39,7 @@ io.on("connection", (socket) => {
   console.log(`[Socket] User ${socket.userId} connected`);
 });
 
-setIO(io); // lưu instance để service khác dùng được (xem file config/socket.js)
+setIO(io); // lưu instance để service khác dùng được (xem file config/socket.config.js)
 
 const start = async () => {
   // Try connecting to the database with 3 retries

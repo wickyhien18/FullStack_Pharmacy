@@ -1,5 +1,5 @@
 import { prisma } from "../config/prisma.config.js";
-import { getIO } from "../config/socket.js";
+import { getIO } from "../config/socket.config.js";
 import { sendOrderStatusEmail } from "./email.service.js";
 
 // Chỉ những status này mới cần báo khách — PENDING thì khách vừa đặt, không cần báo lại
