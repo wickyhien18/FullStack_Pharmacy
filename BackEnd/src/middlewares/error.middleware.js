@@ -1,12 +1,13 @@
 import { env } from "../config/env.config.js";
 
-// Global error handler — đặt cuối cùng trong app.js
+// Global error handler
 export const errorHandler = (err, _req, res, _next) => {
   console.error("[Error]", err);
   res.status(500).json({
     success: false,
-    message: env.isDev ? err.message : "Internal server error",
-    ...(env.isDev && { stack: err.stack }),
+    message:
+      env.NODE_ENV !== "production" ? err.message : "Internal server error",
+    ...(env.NODE_ENV !== "production" && { stack: err.stack }),
   });
 };
 
