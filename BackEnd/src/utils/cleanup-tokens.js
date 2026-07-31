@@ -1,6 +1,6 @@
 // jobs/cleanup-tokens.job.js
 import cron from "node-cron";
-import { prisma } from "../config/prisma.js";
+import { prisma } from "../config/prisma.config.js";
 
 export const startTokenCleanupJob = () => {
   // Chạy mỗi ngày lúc 2h sáng

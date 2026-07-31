@@ -3,7 +3,7 @@
 // Bỏ: originalPrice, paymentMethod (Order không có)
 // Bỏ: productName, productUnit (OrderItem không có)
 // ================================================================
-import { prisma } from "../config/prisma.js";
+import { prisma } from "../config/prisma.config.js";
 
 // Helper ghi inventory log trong transaction
 const writeInventoryLog = async (

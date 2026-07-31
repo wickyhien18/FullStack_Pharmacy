@@ -1,4 +1,4 @@
-import { prisma } from "../config/prisma.js";
+import { prisma } from "../config/prisma.config.js";
 
 //PRISMA FIND
 export const findUserByEmail = (email) => {

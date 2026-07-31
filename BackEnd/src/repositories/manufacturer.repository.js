@@ -1,8 +1,7 @@
-
-import { prisma } from '../config/prisma.js';
+import { prisma } from "../config/prisma.config.js";
 
 export const findAllManufacturers = () => {
-  return prisma.manufacturer.findMany({ orderBy: { name: 'asc' } });
+  return prisma.manufacturer.findMany({ orderBy: { name: "asc" } });
 };
 
 export const findManufacturerById = (manufacturerId) => {

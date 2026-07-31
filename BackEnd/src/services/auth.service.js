@@ -73,7 +73,7 @@ export const register = async ({
 
   // Dùng transaction để đảm bảo user và cart tạo cùng lúc
   // Nếu 1 trong 2 fail → rollback cả 2
-  const { prisma } = await import("../config/prisma.js");
+  const { prisma } = await import("../config/prisma.config.js");
 
   const user = await prisma.$transaction(
     async (tx) => {
@@ -459,7 +459,7 @@ export const completeGoogleSignup = async (
   if (!role) throw { status: 500, message: "Không tìm thấy role mặc định" };
 
   const hashedPassword = await bcrypt.hash(password, env.BCRYPT_ROUNDS);
-  const { prisma } = await import("../config/prisma.js");
+  const { prisma } = await import("../config/prisma.config.js");
 
   const user = await prisma.$transaction(async (tx) => {
     const newUser = await tx.user.create({

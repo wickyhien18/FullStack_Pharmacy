@@ -1,7 +1,7 @@
 // ================================================================
 // admin.repository.js — Queries dành riêng cho admin
 // ================================================================
-import { prisma } from "../config/prisma.js";
+import { prisma } from "../config/prisma.config.js";
 
 // Thống kê tổng quan dashboard
 export const getDashboardStats = async () => {

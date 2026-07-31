@@ -13,7 +13,7 @@
 // ================================================================
 import request from "supertest";
 import app from "../app.js";
-import { prisma } from "../config/prisma.js";
+import { prisma } from "../config/prisma.config.js";
 
 // Chạy trước tất cả test / Run before all tests
 beforeAll(async () => {

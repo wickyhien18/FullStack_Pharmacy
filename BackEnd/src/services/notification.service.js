@@ -1,4 +1,4 @@
-import { prisma } from "../config/prisma.js";
+import { prisma } from "../config/prisma.config.js";
 import { getIO } from "../config/socket.js";
 import { sendOrderStatusEmail } from "./email.service.js";
 

@@ -1,7 +1,7 @@
 // ================================================================
 // Product.repository.js — Truy vấn DB cho Products
 // ================================================================
-import { prisma, Prisma } from "../config/prisma.js";
+import { prisma, Prisma } from "../config/prisma.config.js";
 
 // Lấy danh sách Products có filter + phân trang
 // params = { skip, limit, search, categoryId, sort }

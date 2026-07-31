@@ -8,7 +8,7 @@
 // ================================================================
 import request from "supertest";
 import app from "../app.js";
-import { prisma } from "../config/prisma.js";
+import { prisma } from "../config/prisma.config.js";
 
 let adminToken = "";
 let customerToken = "";

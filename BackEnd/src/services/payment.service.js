@@ -2,7 +2,7 @@
 // payment.service.js — Business logic thanh toán
 // Đặt tại: src/services/payment.service.js
 // ================================================================
-import { prisma } from "../config/prisma.js";
+import { prisma } from "../config/prisma.config.js";
 import * as orderRepo from "../repositories/order.repository.js";
 import * as cartRepo from "../repositories/cart.repository.js"; // thêm import
 import { createVNPayUrl, verifyVNPayReturn } from "../utils/vnpay.util.js";

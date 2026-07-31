@@ -1,4 +1,4 @@
-import { prisma } from "../config/prisma.js";
+import { prisma } from "../config/prisma.config.js";
 
 export const findAllCategories = () => {
   return prisma.category.findMany({ orderBy: { name: "asc" } });

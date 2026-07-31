@@ -7,7 +7,7 @@ import { buildPaginatedResponse } from "../utils/pagination.js";
 import { sendError } from "../utils/response.js";
 import { uploadImage, deleteImage } from "./upload.service.js";
 import { invalidateProductCache } from "./product.service.js";
-import { prisma } from "../config/prisma.js";
+import { prisma } from "../config/prisma.config.js";
 import { notifyOrderStatusChange } from "./notification.service.js";
 import slugify from "slugify";
 

@@ -1,7 +1,7 @@
 // ================================================================
 // cart.repository.js
 // ================================================================
-import { prisma } from "../config/prisma.js";
+import { prisma } from "../config/prisma.config.js";
 
 // Lấy cart của user — mỗi user chỉ có 1 cart
 export const findCartByUserId = async (userId) => {
