@@ -1,6 +1,6 @@
 import * as authService from "../services/auth.service.js";
 import { sendSuccess, sendError } from "../utils/response.js";
-import { env } from "../config/env.js";
+import { env } from "../config/env.config.js";
 
 const REFRESH_TOKEN_COOKIE = "refreshToken"; //cookie name
 

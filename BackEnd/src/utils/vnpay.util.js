@@ -4,7 +4,7 @@
 // Docs: https://sandbox.vnpayment.vn/apis/docs/thanh-toan-pay/pay.html
 // ================================================================
 import crypto from "crypto";
-import { env } from "../config/env.js";
+import { env } from "../config/env.config.js";
 
 // Sort object keys và build query string (VNPAY yêu cầu sort alphabetically)
 const sortObject = (obj) => {

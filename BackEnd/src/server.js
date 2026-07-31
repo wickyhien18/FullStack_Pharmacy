@@ -2,7 +2,7 @@ import "dotenv/config";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import app from "./app.js";
-import { env } from "./config/env.js";
+import { env } from "./config/env.config.js";
 import { prisma } from "./config/prisma.js";
 import { startTokenCleanupJob } from "./utils/cleanup-tokens.js";
 import { verifyAccessToken } from "./utils/jwt.js";

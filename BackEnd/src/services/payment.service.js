@@ -6,7 +6,7 @@ import { prisma } from "../config/prisma.js";
 import * as orderRepo from "../repositories/order.repository.js";
 import * as cartRepo from "../repositories/cart.repository.js"; // thêm import
 import { createVNPayUrl, verifyVNPayReturn } from "../utils/vnpay.util.js";
-import { env } from "../config/env.js";
+import { env } from "../config/env.config.js";
 
 // ── Tạo URL thanh toán VNPAY ──────────────────────────────────────
 export const createVNPayPayment = async (orderId, userId, ipAddr) => {

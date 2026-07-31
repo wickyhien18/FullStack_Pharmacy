@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import { env } from "../config/env.js";
+import { env } from "../config/env.config.js";
 import * as jwt from "../utils/jwt.js";
 import { getDeviceInfo } from "../utils/device.js";
 import * as authRepository from "../repositories/auth.repository.js";

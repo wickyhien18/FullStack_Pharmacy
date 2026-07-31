@@ -1,5 +1,5 @@
 import Redis from "ioredis";
-import { env } from "./env.js";
+import { env } from "./env.config.js";
 
 const createRedisClient = () => {
   // Skip connection if no REDIS_URL — app still works, just without cache

@@ -3,7 +3,7 @@ import passport from "passport";
 //Strategy login by Google OAuth
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { prisma } from "./prisma.js";
-import { env } from "./env.js";
+import { env } from "./env.config.js";
 
 export const configurePassport = () => {
   //Register Google OAth strategy for Passport

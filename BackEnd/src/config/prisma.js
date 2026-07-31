@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { PrismaClient, Prisma } from "@prisma/client";
-import { env } from "./env.js";
+import { env } from "./env.config.js";
 
 // Retrieve the global object of Node.js. The purpose is to store the Prisma Client at the global scope.
 const globalForPrisma = globalThis;

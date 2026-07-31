@@ -8,7 +8,7 @@
 // ================================================================
 import { createClient } from "@supabase/supabase-js";
 import { randomUUID } from "node:crypto";
-import { env } from "../config/env.js";
+import { env } from "../config/env.config.js";
 
 const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_KEY);
 const bucket = env.SUPABASE_STORAGE_BUCKET || "product-images";

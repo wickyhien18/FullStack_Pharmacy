@@ -4,7 +4,7 @@
 // Thêm vào .env: RESEND_API_KEY=re_xxx
 // ================================================================
 import { Resend } from "resend";
-import { env } from "../config/env.js";
+import { env } from "../config/env.config.js";
 
 const resend = new Resend(env.RESEND_API_KEY);
 const FROM = env.RESEND_FROM_EMAIL;

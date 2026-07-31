@@ -10,7 +10,7 @@ import passport from "passport";
 import { swaggerSpec } from "./config/swagger.js";
 import { configurePassport } from "./config/passport.config.js";
 
-import { env } from "./config/env.js";
+import { env } from "./config/env.config.js";
 import { errorHandler, notFound } from "./middlewares/error.middleware.js";
 import { sanitizeInput } from "./middlewares/security.middleware.js";
 

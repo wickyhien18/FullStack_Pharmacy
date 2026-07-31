@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
-import { env } from "../config/env.js";
+import { env } from "../config/env.config.js";
 
 export const generateAccessTokens = (payload) => {
   return jwt.sign(payload, env.JWT_ACCESS_SECRET, {
