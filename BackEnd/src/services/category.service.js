@@ -1,6 +1,6 @@
 import * as categoryRepo from "../repositories/category.repository.js";
 import { countProductsByCategory } from "../repositories/product.repository.js";
-import { deletePattern } from "../config/redis.js";
+import { deletePattern } from "../config/redis.config.js";
 import slugify from "slugify";
 
 const invalidateCategoryCache = async () => {

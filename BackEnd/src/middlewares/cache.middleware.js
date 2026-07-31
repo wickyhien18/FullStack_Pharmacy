@@ -10,7 +10,7 @@
 //     ├── Có cache → Trả về ngay, KHÔNG vào controller / Return immediately
 //     └── Không có → Vào controller → Bắt response → Lưu cache
 // ================================================================
-import { getCache, setCache } from "../config/redis.js";
+import { getCache, setCache } from "../config/redis.config.js";
 
 // ttl: thời gian cache tính bằng giây / cache duration in seconds
 export const cacheResponse =

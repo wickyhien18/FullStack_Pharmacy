@@ -2,7 +2,7 @@
 // product.service.js — Business logic cho products
 // ================================================================
 import * as productRepo from "../repositories/product.repository.js";
-import { getCache, setCache, deletePattern } from "../config/redis.js";
+import { getCache, setCache, deletePattern } from "../config/redis.config.js";
 import { buildPaginatedResponse } from "../utils/pagination.js";
 
 // Xây dựng where clause từ query params
