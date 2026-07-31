@@ -1,20 +1,22 @@
-// ================================================================
-// passport.config.js — Cấu hình Passport Google OAuth
-// Đặt tại: src/config/passport.config.js
-// ================================================================
+//Authentication handling library
 import passport from "passport";
+//Strategy login by Google OAuth
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { prisma } from "./prisma.js";
 import { env } from "./env.js";
 
 export const configurePassport = () => {
+  //Register Google OAth strategy for Passport
   passport.use(
     new GoogleStrategy(
+      //Information Google OAuth
       {
         clientID: env.GOOGLE_CLIENT_ID,
         clientSecret: env.GOOGLE_CLIENT_SECRET,
         callbackURL: env.GOOGLE_CALLBACK_URL,
       },
+
+      //Callback run after Google authentication successfully
       async (accessToken, refreshToken, profile, done) => {
         try {
           const email = profile.emails?.[0]?.value;
@@ -23,21 +25,21 @@ export const configurePassport = () => {
 
           if (!email) return done(new Error("Không lấy được email từ Google"));
 
-          // Tìm user theo googleId trước
+          // Find user by googleId first
           let user = await prisma.user.findFirst({
             where: { googleId },
             include: { role: true },
           });
 
           if (!user) {
-            // Tìm theo email (user đã đăng ký thường)
+            // Find user by email
             user = await prisma.user.findFirst({
               where: { email },
               include: { role: true },
             });
 
             if (user) {
-              // Liên kết Google vào tài khoản hiện có
+              // Add Google ID to this user
               user = await prisma.user.update({
                 where: { userId: user.userId },
                 data: { googleId },
