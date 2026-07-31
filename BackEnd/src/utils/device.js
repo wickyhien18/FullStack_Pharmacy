@@ -4,7 +4,7 @@ import crypto from "crypto";
 export const getDeviceInfo = (req) => {
   const userAgent = req.headers["user-agent"] || "";
   const origin = req.headers["origin"] || req.headers["referer"] || "";
-  const secChUa = req.headers["sec-ch-ua"] || ""; // ← Brave tự khai báo ở đây
+  const secChUa = req.headers["sec-ch-ua"] || "";
   const ip = (
     req.headers["x-forwarded-for"]?.split(",")[0] ||
     req.socket?.remoteAddress ||

@@ -1,8 +1,3 @@
-// ================================================================
-// vnpay.util.js — Tiện ích tạo/verify VNPAY URL
-// Đặt tại: src/utils/vnpay.util.js
-// Docs: https://sandbox.vnpayment.vn/apis/docs/thanh-toan-pay/pay.html
-// ================================================================
 import crypto from "crypto";
 import { env } from "../config/env.config.js";
 
@@ -31,7 +26,7 @@ export const createVNPayUrl = ({
   orderCode,
   amount,
   orderInfo,
-  ipAddr,
+  ipAddr, //User IP
   returnUrl,
 }) => {
   const tmnCode = env.VNP_TMN_CODE;
@@ -39,8 +34,6 @@ export const createVNPayUrl = ({
   const vnpUrl =
     env.VNP_URL || "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
 
-  // Format thời gian theo giờ Việt Nam (GMT+7) đúng chuẩn VNPAY yêu cầu
-  // toISOString() luôn trả UTC nên phải cộng bù 7 tiếng trước khi format
   const formatVNPayDate = (date) => {
     const vnTime = new Date(date.getTime() + 7 * 60 * 60 * 1000);
     return vnTime
@@ -59,7 +52,7 @@ export const createVNPayUrl = ({
     vnp_TmnCode: tmnCode,
     vnp_Locale: "vn",
     vnp_CurrCode: "VND",
-    vnp_TxnRef: orderCode, // mã đơn hàng — dùng orderCode cho dễ tra
+    vnp_TxnRef: orderCode,
     vnp_OrderInfo: orderInfo || `Thanh toan don hang ${orderCode}`,
     vnp_OrderType: "other",
     vnp_Amount: amount * 100, // VNPAY nhân 100
