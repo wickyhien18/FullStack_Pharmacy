@@ -664,7 +664,13 @@ function AccountPage() {
               </div>
 
               {/* Hàng 2: Nút Quản trị hệ thống (nếu là staff/admin) & Nút Đăng xuất */}
-              <div className={(user.role === "ROLE_ADMIN" || user.role === "ROLE_STAFF") ? "grid grid-cols-2 gap-2 md:block md:gap-0" : "w-full"}>
+              <div
+                className={
+                  user.role === "ROLE_ADMIN" || user.role === "ROLE_STAFF"
+                    ? "grid grid-cols-2 gap-2 md:block md:gap-0"
+                    : "w-full"
+                }
+              >
                 {(user.role === "ROLE_ADMIN" || user.role === "ROLE_STAFF") && (
                   <Link
                     to="/admin"
@@ -1210,7 +1216,9 @@ function AccountPage() {
                   : isRegistering) && (
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 )}
-                {googleSignupToken ? "Hoàn tất tạo tài khoản" : "Đăng ký"}
+                {googleSignupToken
+                  ? "Hoàn tất tạo tài khoản"
+                  : "Đăng ký TESTXYZ123"}
               </button>
             </form>
           )}
