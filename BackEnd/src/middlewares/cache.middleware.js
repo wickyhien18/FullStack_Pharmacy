@@ -8,7 +8,7 @@ export const cacheResponse =
     // Cache key = URL + query string
     const key = `cache:${req.originalUrl}`;
 
-    // Check cache trước / Check cache first
+    // Check cache first
     const cached = await getCache(key);
     if (cached) {
       const duration = (performance.now() - startTime).toFixed(2);
@@ -18,8 +18,14 @@ export const cacheResponse =
     }
 
     // Intercept res.json to capture the response before sending
+    // Action 1: Extract res.json and create a NEW COPY with 'this' always bound to res
+    // → The ORIGINAL res.json remains intact, not yet modified at this line
+    // → originalJson is a NEW independent variable, no longer tied to res.json
     const originalJson = res.json.bind(res);
     res.json = (body) => {
+      // Action 2: This is the line that ACTUALLY MODIFIES res.json
+      // → Assigns a completely different function to the res.json property of the res object
+      // → From this line onward, res.json IS NO LONGER THE ORIGINAL FUNCTION
       // Only cache successful responses
       if (body?.success && body?.data) {
         setCache(key, body.data, ttl); // fire and forget
