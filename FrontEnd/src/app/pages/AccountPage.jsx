@@ -458,6 +458,7 @@ function ForgotPasswordModal({ onClose }) {
 
 //Trang chính
 function AccountPage() {
+  console.log("[DEBUG] AccountPage đang render lúc:", new Date().toISOString());
   const [searchParams] = useSearchParams();
   const {
     user,
@@ -959,6 +960,38 @@ function AccountPage() {
             logout={logout}
           />
         )}
+        {showLogoutModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
+            <div className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-xl text-center">
+              <div className="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto mb-3 text-xl font-bold">
+                🚪
+              </div>
+              <h3 className="font-bold text-gray-800 text-lg mb-2">
+                Xác nhận đăng xuất
+              </h3>
+              <p className="text-sm text-gray-500 mb-6">
+                Bạn có chắc chắn muốn đăng xuất khỏi tài khoản không?
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowLogoutModal(false)}
+                  className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition"
+                >
+                  Hủy
+                </button>
+                <button
+                  onClick={() => {
+                    setShowLogoutModal(false); // đóng modal trước
+                    logout(); // rồi mới thực sự đăng xuất
+                  }}
+                  className="flex-1 py-2.5 rounded-xl text-white text-sm font-semibold bg-red-600 hover:bg-red-700 transition"
+                >
+                  Đăng xuất
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -1224,40 +1257,6 @@ function AccountPage() {
         {/* Modal quên mật khẩu */}
         {showForgotPwd && (
           <ForgotPasswordModal onClose={() => setShowForgotPwd(false)} />
-        )}
-
-        {/* Modal xác nhận đăng xuất */}
-        {showLogoutModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
-            <div className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-xl text-center">
-              <div className="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto mb-3 text-xl font-bold">
-                🚪
-              </div>
-              <h3 className="font-bold text-gray-800 text-lg mb-2">
-                Xác nhận đăng xuất
-              </h3>
-              <p className="text-sm text-gray-500 mb-6">
-                Bạn có chắc chắn muốn đăng xuất khỏi tài khoản không?
-              </p>
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setShowLogoutModal(false)}
-                  className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition"
-                >
-                  Hủy
-                </button>
-                <button
-                  onClick={() => {
-                    setShowLogoutModal(false);
-                    logout();
-                  }}
-                  className="flex-1 py-2.5 rounded-xl text-white text-sm font-semibold bg-red-600 hover:bg-red-700 transition"
-                >
-                  Đăng xuất
-                </button>
-              </div>
-            </div>
-          </div>
         )}
       </div>
     </div>
