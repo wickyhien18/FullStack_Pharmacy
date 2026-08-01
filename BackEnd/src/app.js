@@ -5,9 +5,7 @@ import compression from "compression";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import rateLimit from "express-rate-limit";
-import swaggerUi from "swagger-ui-express";
 import passport from "passport";
-import { swaggerSpec } from "./config/swagger.js";
 import { configurePassport } from "./config/passport.config.js";
 
 import { env } from "./config/env.config.js";
@@ -70,9 +68,6 @@ app.use(cookieParser()); //Parse cookies from incoming requests
 app.use(compression()); //Compress response bodies for all requests to improve performance
 // ── Logging ───────────────────────────────────────────────────────
 if (env.isDev) app.use(morgan("dev")); //Log HTTP requests in development mode
-
-// ── Swagger UI ───────────────────────────────────────────────────
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Health check — dùng cho UptimeRobot ping để tránh Render sleep + giữ DB connection
 app.get("/health", (req, res) =>
