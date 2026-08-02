@@ -1,4 +1,5 @@
 import multer from "multer";
+import { promisify } from "util";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5MB / image
@@ -17,10 +18,13 @@ const uploadMultiple = multer({
   },
 }).array("images", MAX_FILES);
 
-export const handleUpload = (req, res) =>
-  new Promise((resolve, reject) => {
-    uploadMultiple(req, res, (err) => {
-      if (err) reject({ status: 400, message: err.message });
-      else resolve();
-    });
-  });
+// Change Promise function to Async/Await function
+const uploadMultipleAsync = promisify(uploadMultiple);
+
+export const handleUpload = async (req, res) => {
+  try {
+    await uploadMultipleAsync(req, res);
+  } catch (err) {
+    throw { status: 400, message: err.message };
+  }
+};

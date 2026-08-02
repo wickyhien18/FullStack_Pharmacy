@@ -1,7 +1,7 @@
 import crypto from "crypto";
 import { env } from "../config/env.config.js";
 
-// Sort object keys và build query string (VNPAY yêu cầu sort alphabetically)
+// Sort object keys và build query string (VNPAY require sort alphabetically)
 const sortObject = (obj) => {
   return Object.keys(obj)
     .sort()
@@ -11,23 +11,13 @@ const sortObject = (obj) => {
     }, {});
 };
 
-/**
- * Tạo URL thanh toán VNPAY
- * @param {object} params
- * @param {string} params.orderId      - ID đơn hàng trong DB
- * @param {string} params.orderCode    - Mã đơn hàng (ORD-xxx)
- * @param {number} params.amount       - Số tiền (VND)
- * @param {string} params.orderInfo    - Thông tin đơn hàng
- * @param {string} params.ipAddr       - IP người dùng
- * @param {string} params.returnUrl    - URL callback sau thanh toán
- */
 export const createVNPayUrl = ({
   orderId,
   orderCode,
-  amount,
+  amount, //Amount money
   orderInfo,
   ipAddr, //User IP
-  returnUrl,
+  returnUrl, //URL callback
 }) => {
   const tmnCode = env.VNP_TMN_CODE;
   const secretKey = env.VNP_HASH_SECRET;
@@ -55,7 +45,7 @@ export const createVNPayUrl = ({
     vnp_TxnRef: orderCode,
     vnp_OrderInfo: orderInfo || `Thanh toan don hang ${orderCode}`,
     vnp_OrderType: "other",
-    vnp_Amount: amount * 100, // VNPAY nhân 100
+    vnp_Amount: amount * 100, // VNPAY multiple 100
     vnp_ReturnUrl: returnUrl,
     vnp_IpAddr: ipAddr,
     vnp_CreateDate: createDate,
@@ -73,15 +63,15 @@ export const createVNPayUrl = ({
 };
 
 /**
- * Verify callback từ VNPAY
- * @param {object} vnpParams - req.query từ VNPAY callback
+ * Verify callback from VNPAY
+ * @param {object} vnpParams - req.query from VNPAY callback
  * @returns {object} { isValid, responseCode, orderCode, amount, transactionCode }
  */
 export const verifyVNPayReturn = (vnpParams) => {
   const secretKey = env.VNP_HASH_SECRET;
   const secureHash = vnpParams.vnp_SecureHash;
 
-  // Xoá hash khỏi params trước khi verify
+  // Delete hash from params before verify
   const params = { ...vnpParams };
   delete params.vnp_SecureHash;
   delete params.vnp_SecureHashType;
@@ -93,7 +83,7 @@ export const verifyVNPayReturn = (vnpParams) => {
 
   return {
     isValid: signed === secureHash,
-    responseCode: vnpParams.vnp_ResponseCode, // "00" = thành công
+    responseCode: vnpParams.vnp_ResponseCode, // "00" = success
     orderCode: vnpParams.vnp_TxnRef,
     amount: Number(vnpParams.vnp_Amount) / 100,
     transactionCode: vnpParams.vnp_TransactionNo,

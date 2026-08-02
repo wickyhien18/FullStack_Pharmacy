@@ -3,7 +3,7 @@ import cron from "node-cron";
 import { prisma } from "../config/prisma.config.js";
 
 export const startTokenCleanupJob = () => {
-  // Chạy mỗi ngày lúc 2h sáng
+  // Run everyday in 2h morning
   cron.schedule("0 2 * * *", async () => {
     const result = await prisma.refreshToken.deleteMany({
       where: {
