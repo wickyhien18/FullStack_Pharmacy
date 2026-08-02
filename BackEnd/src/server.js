@@ -12,7 +12,8 @@ BigInt.prototype.toJSON = function () {
   return this.toString();
 };
 
-const httpServer = createServer(app); // thay app.listen bằng server thủ công
+//Create HTTP server from Express App
+const httpServer = createServer(app);
 
 const io = new Server(httpServer, {
   cors: {
@@ -21,7 +22,7 @@ const io = new Server(httpServer, {
   },
 });
 
-// Xác thực JWT lúc client connect — dùng lại đúng hàm verify đã có
+// JWT Authentication
 io.use((socket, next) => {
   try {
     const token = socket.handshake.auth?.token;
@@ -35,11 +36,11 @@ io.use((socket, next) => {
 });
 
 io.on("connection", (socket) => {
-  socket.join(`user:${socket.userId}`); // room riêng cho từng user
+  socket.join(`user:${socket.userId}`); // room for each users
   console.log(`[Socket] User ${socket.userId} connected`);
 });
 
-setIO(io); // lưu instance để service khác dùng được (xem file config/socket.config.js)
+setIO(io); // save instance for other service use
 
 const start = async () => {
   // Try connecting to the database with 3 retries
@@ -58,9 +59,7 @@ const start = async () => {
     }
   }
 
-  // ── Keep-alive ping mỗi 4 phút ────────────────────────────────
-  // Giữ Supabase connection sống — free tier đóng idle connection sau ~5 phút
-  // Trên Render free tier: cũng giúp tránh cold start nếu dùng cron ping từ ngoài
+  // ── Keep-alive ping each 4 minutes ────────────────────────────────
   setInterval(
     async () => {
       try {
@@ -77,7 +76,6 @@ const start = async () => {
   ); // 4 phút
 
   httpServer.listen(env.PORT, () => {
-    // đổi app.listen → httpServer.listen
     console.log(`[Server] Running on http://localhost:${env.PORT}`);
     console.log(`[Server] Environment: ${env.NODE_ENV}`);
   });
@@ -90,15 +88,12 @@ process.on("SIGTERM", async () => {
   process.exit(0);
 });
 
-// Bắt lỗi không được xử lý — tránh server crash
 process.on("uncaughtException", (err) => {
   console.error("[Server] Uncaught Exception:", err);
-  // Không exit — để server tiếp tục chạy
 });
 
 process.on("unhandledRejection", (reason) => {
   console.error("[Server] Unhandled Rejection:", reason);
-  // Không exit — để server tiếp tục chạy
 });
 
 start();
