@@ -24,12 +24,17 @@ import notificationRoutes from "./routes/notification.routes.js";
 
 const app = express();
 
-// Render/Vercel dùng reverse proxy — cần trust proxy để rate-limit hoạt động đúng
+// Render/Vercel use reverse proxy — need trust proxy for rate-limit work properly
 app.set("trust proxy", 1);
+
+//Configure Passport for Google OAuth
 configurePassport();
 app.use(passport.initialize());
 // ── Security ─────────────────────────────────────────────────────
+// Add http security header for reduce security risks
 app.use(helmet());
+
+// Configure CORS
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -38,13 +43,13 @@ app.use(
         "http://localhost:5173", // local dev
         "http://localhost:4173", // vite preview
       ].filter(Boolean);
-      // Cho phép request không có origin (Postman, curl, server-to-server)
       if (!origin || allowed.includes(origin)) {
         callback(null, true);
       } else {
         callback(new Error("Not allowed by CORS"));
       }
     },
+    // Allow send cookie, require for refreshToken HttpOnly cookie
     credentials: true,
   }),
 );
@@ -52,8 +57,8 @@ app.use(
 // ── Rate limiting (global) ────────────────────────────────────────
 app.use(
   rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 phút
-    max: 200,
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 200, // 200 requests
     message: { success: false, message: "Too many requests" },
     standardHeaders: true,
     legacyHeaders: false,
@@ -61,15 +66,27 @@ app.use(
 );
 
 // ── Body parsing ──────────────────────────────────────────────────
-app.use(express.json({ limit: "10mb" })); //Parse JSON bodies with a size limit of 10MB
-app.use(sanitizeInput);
-app.use(express.urlencoded({ extended: true })); //Parse URL-encoded bodies (for form submissions)
-app.use(cookieParser()); //Parse cookies from incoming requests
-app.use(compression()); //Compress response bodies for all requests to improve performance
-// ── Logging ───────────────────────────────────────────────────────
-if (env.isDev) app.use(morgan("dev")); //Log HTTP requests in development mode
+// Parse JSON bodies with a size limit of 10MB
+// If client sends JSON body, Express will stores data in req.body
+app.use(express.json({ limit: "10mb" }));
 
-// Health check — dùng cho UptimeRobot ping để tránh Render sleep + giữ DB connection
+// Clean input req.body
+app.use(sanitizeInput);
+
+// Parse URL-encoded bodies (for form submissions)
+app.use(express.urlencoded({ extended: true }));
+
+// Parse cookies from incoming requests, some middleware can read cookies by req.cookies
+app.use(cookieParser());
+
+//Compress response bodies for all requests to improve performance
+app.use(compression());
+
+// ── Logging ───────────────────────────────────────────────────────
+// Log HTTP requests in development mode
+if (env.NODE_ENV !== "production") app.use(morgan("dev"));
+
+// Health check — use for UptimeRobot ping that keep DB connection and prevent Render sleep
 app.get("/health", (req, res) =>
   res.json({ status: "ok", timestamp: new Date().toISOString() }),
 );
