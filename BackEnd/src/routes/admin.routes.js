@@ -36,14 +36,14 @@ router.patch("/users/:userId/role", adminOnly, adminController.updateUserRole);
 router.get("/roles", adminOnly, adminController.getRoles);
 
 // Products
-router.get("/products", staffAccess, adminController.getAllproducts);
+router.get("/products", staffAccess, adminController.getAllProducts);
 router.get(
   "/products/:productId",
   staffAccess,
-  adminController.getproductDetail,
+  adminController.getProductDetail,
 );
-router.post("/products", adminOnly, adminController.createproduct);
-router.put("/products/:productId", staffAccess, adminController.updateproduct);
-router.delete("/products/:productId", adminOnly, adminController.deleteproduct);
+router.post("/products", adminOnly, adminController.createProduct);
+router.put("/products/:productId", staffAccess, adminController.updateProduct);
+router.delete("/products/:productId", adminOnly, adminController.deleteProduct);
 
 export default router;

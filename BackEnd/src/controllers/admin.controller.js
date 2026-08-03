@@ -115,10 +115,10 @@ export const updateUserRole = async (req, res) => {
 };
 
 // GET /api/admin/products?page=?&limit=?
-export const getAllproducts = async (req, res) => {
+export const getAllProducts = async (req, res) => {
   try {
     const { page, limit, skip } = parsePagination(req);
-    const data = await adminService.getAllproducts({ page, limit, skip });
+    const data = await adminService.getAllProducts({ page, limit, skip });
     return sendSuccess(res, data, "Get products list successfully");
   } catch (err) {
     return sendError(res, err.message, err.status || 500);
@@ -126,9 +126,9 @@ export const getAllproducts = async (req, res) => {
 };
 
 // GET /api/admin/products/:productId
-export const getproductDetail = async (req, res) => {
+export const getProductDetail = async (req, res) => {
   try {
-    const data = await adminService.getproductDetail(req.params.productId);
+    const data = await adminService.getProductDetail(req.params.productId);
     return sendSuccess(res, data, "Get product detail successfully");
   } catch (err) {
     return sendError(res, err.message, err.status || 500);
@@ -136,10 +136,10 @@ export const getproductDetail = async (req, res) => {
 };
 
 // POST /api/admin/products
-export const createproduct = async (req, res) => {
+export const createProduct = async (req, res) => {
   try {
     await handleUpload(req, res);
-    const data = await adminService.createproduct(req.body, req.files || []);
+    const data = await adminService.createProduct(req.body, req.files || []);
     return sendSuccess(res, data, "Add new product successfully", 201);
   } catch (err) {
     return sendError(res, err.message, err.status || 500);
@@ -147,13 +147,13 @@ export const createproduct = async (req, res) => {
 };
 
 // PUT /api/admin/products/:productId
-export const updateproduct = async (req, res) => {
+export const updateProduct = async (req, res) => {
   try {
     await handleUpload(req, res);
     const keepImageIds = req.body.keepImageIds
       ? JSON.parse(req.body.keepImageIds)
       : [];
-    const data = await adminService.updateproduct(
+    const data = await adminService.updateProduct(
       req.params.productId,
       req.body,
       req.files || [],
@@ -166,9 +166,9 @@ export const updateproduct = async (req, res) => {
 };
 
 // DELETE /api/admin/products/:productId
-export const deleteproduct = async (req, res) => {
+export const deleteProduct = async (req, res) => {
   try {
-    await adminService.deleteproduct(req.params.productId);
+    await adminService.deleteProduct(req.params.productId);
     return sendSuccess(res, null, "Delete product information successfully");
   } catch (err) {
     return sendError(res, err.message, err.status || 500);

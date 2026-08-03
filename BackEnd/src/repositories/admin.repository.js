@@ -1,6 +1,3 @@
-// ================================================================
-// admin.repository.js — Queries dành riêng cho admin
-// ================================================================
 import { prisma } from "../config/prisma.config.js";
 
 // Thống kê tổng quan dashboard
@@ -11,7 +8,7 @@ export const getDashboardStats = async () => {
       prisma.order.count(),
       prisma.user.count({ where: { deletedAt: null } }),
       prisma.product.count({ where: { deletedAt: null } }),
-      // Tính tổng doanh thu từ đơn hàng đã giao thành công
+      // Total amount from successful delivered orders
       prisma.order.aggregate({
         _sum: { totalPrice: true },
         where: { orderStatus: "DELIVERED" },

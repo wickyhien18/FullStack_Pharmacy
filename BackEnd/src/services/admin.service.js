@@ -1,6 +1,3 @@
-// ================================================================
-// admin.service.js — Business logic cho admin
-// ================================================================
 import * as adminRepo from "../repositories/admin.repository.js";
 import * as productRepo from "../repositories/product.repository.js";
 import { buildPaginatedResponse } from "../utils/pagination.js";
@@ -13,19 +10,20 @@ import slugify from "slugify";
 
 const MAX_IMAGES = 3;
 
-// Dashboard stats
+//── DASHBOARD STATS ────────────────────────────────────────────────
 export const getDashboardStats = () => adminRepo.getDashboardStats();
 
-// Tạo slug từ tên — cài: npm install slugify
+//── GENERATE SLUG ────────────────────────────────────────────────
 const generateSlug = (name) =>
   slugify(name, { lower: true, strict: true, locale: "vi" }) + "-" + Date.now();
 
+//── FORMAT ROLES ────────────────────────────────────────────────
 const format = (r) => ({
   roleId: r.roleId.toString(),
   roleName: r.roleName,
 });
 
-// Danh sách đơn hàng
+//── GET ALL ORDERS ────────────────────────────────────────────────
 export const getAllOrders = async ({ page, limit, skip, status }) => {
   const [orders, total] = await Promise.all([
     adminRepo.findAllOrders({ skip, limit, status }),
@@ -56,7 +54,7 @@ export const getAllOrders = async ({ page, limit, skip, status }) => {
   return buildPaginatedResponse(items, total, page, limit);
 };
 
-// Cập nhật status đơn hàng
+//── UPDATE ORDER STATUS ────────────────────────────────────────────────
 export const updateOrderStatus = async (orderId, orderStatus) => {
   const validStatuses = [
     "PENDING",
@@ -83,12 +81,13 @@ export const updateOrderStatus = async (orderId, orderStatus) => {
   return { orderId: order.orderId.toString(), orderStatus: order.orderStatus };
 };
 
+//── GET ROLES ────────────────────────────────────────────────
 export const getRoles = async () => {
   const roles = await adminRepo.findAllRoles();
   return roles.map(format);
 };
 
-// Danh sách users
+//── GET ALL USERS ────────────────────────────────────────────────
 export const getAllUsers = async ({ page, limit, skip }) => {
   const [users, total] = await Promise.all([
     adminRepo.findAllUsers({ skip, limit }),
@@ -109,12 +108,13 @@ export const getAllUsers = async ({ page, limit, skip }) => {
   return buildPaginatedResponse(items, total, page, limit);
 };
 
-// Khoá/mở khoá user
+//── UPDATE USER STATUS ────────────────────────────────────────────────
 export const updateUserStatus = async (userId, isActive) => {
   const user = await adminRepo.updateUserStatus(BigInt(userId), isActive);
   return { userId: user.userId.toString(), isActive: user.isActive };
 };
 
+//── UPDATE USER ROLE ────────────────────────────────────────────────
 export const updateUserRole = async (userId, roleName) => {
   if (!roleName) throw { status: 400, message: "roleName là bắt buộc" };
 
@@ -125,8 +125,8 @@ export const updateUserRole = async (userId, roleName) => {
   return { userId: user.userId.toString(), role: role.roleName };
 };
 
-// Danh sách products (admin)
-export const getAllproducts = async ({ page, limit, skip }) => {
+//── GET ALL PRODUCTS ────────────────────────────────────────────────
+export const getAllProducts = async ({ page, limit, skip }) => {
   const [products, total] = await Promise.all([
     adminRepo.findAllproducts({ skip, limit }),
     adminRepo.countAllproducts(),
@@ -146,8 +146,8 @@ export const getAllproducts = async ({ page, limit, skip }) => {
   return buildPaginatedResponse(items, total, page, limit);
 };
 
-// THÊM: lấy chi tiết 1 product kèm ảnh — dùng cho form edit
-export const getproductDetail = async (productId) => {
+//── GET PRODUCT DETAIL ────────────────────────────────────────────────
+export const getProductDetail = async (productId) => {
   const product = await productRepo.findProductWithImages(BigInt(productId));
   if (!product) throw { status: 404, message: "Không tìm thấy sản phẩm" };
 
@@ -168,8 +168,8 @@ export const getproductDetail = async (productId) => {
   };
 };
 
-// Tạo product mới
-export const createproduct = async (data, files = []) => {
+//── CREATE PRODUCT ────────────────────────────────────────────────
+export const createProduct = async (data, files = []) => {
   if (files.length > MAX_IMAGES) {
     throw { status: 400, message: `Tối đa ${MAX_IMAGES} ảnh / sản phẩm` };
   }
@@ -178,7 +178,7 @@ export const createproduct = async (data, files = []) => {
     files.map((file) => uploadImage(file.buffer, data.name, file.mimetype)),
   );
 
-  // SỬA: gọi đúng signature createproduct(data) — không bọc { data }
+  // SỬA: gọi đúng signature createProduct(data) — không bọc { data }
   const product = await productRepo.createProduct({
     name: data.name,
     slug: generateSlug(data.name),
@@ -206,9 +206,8 @@ export const createproduct = async (data, files = []) => {
   return { productId: product.productId.toString(), slug: product.slug };
 };
 
-// SỬA TOÀN BỘ: hỗ trợ nhiều ảnh + sửa bug "chỉ update khi có file mới"
-// keepImageIds: mảng imageId (string[]) muốn GIỮ LẠI — ảnh không có trong list này sẽ bị xoá
-export const updateproduct = async (
+//── UPDATE PRODUCT ────────────────────────────────────────────────
+export const updateProduct = async (
   productId,
   data,
   files = [],
@@ -282,8 +281,8 @@ export const updateproduct = async (
   return { productId, message: "Cập nhật thành công" };
 };
 
-// Soft delete product
-export const deleteproduct = async (productId) => {
+//── DELETE PRODUCT  ────────────────────────────────────────────────
+export const deleteProduct = async (productId) => {
   const existing = await adminRepo.existproduct(productId);
   if (!existing) throw { status: 404, message: "Không tìm thấy sản phẩm" };
 
