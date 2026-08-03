@@ -1,8 +1,3 @@
-// ================================================================
-// email.service.js — Gửi email dùng Resend
-// Cài: npm install resend
-// Thêm vào .env: RESEND_API_KEY=re_xxx
-// ================================================================
 import { Resend } from "resend";
 import { env } from "../config/env.config.js";
 
@@ -11,21 +6,21 @@ const FROM = env.RESEND_FROM_EMAIL;
 
 export const sendOTPEmail = async (toEmail, otp) => {
   const { error } = await resend.emails.send({
-    from: `Nhà Thuốc Wicky Hien <${FROM}>`,
+    from: `Wicky Hien Pharmacy <${FROM}>`,
     to: toEmail,
-    subject: "Xác nhận đổi email — Mã OTP của bạn",
+    subject: "Confirm email change - Your OTP code",
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 24px; background: #f8fafc; border-radius: 12px;">
         <div style="text-align: center; margin-bottom: 24px;">
           <span style="font-size: 36px;">💊</span>
-          <h1 style="color: #1250dc; font-size: 20px; margin: 8px 0;">Nhà Thuốc Wicky Hien</h1>
+          <h1 style="color: #1250dc; font-size: 20px; margin: 8px 0;">Wicky Hien Pharmacy</h1>
         </div>
 
         <div style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-          <h2 style="color: #1e293b; font-size: 18px; margin: 0 0 12px;">Xác nhận địa chỉ email mới</h2>
+          <h2 style="color: #1e293b; font-size: 18px; margin: 0 0 12px;">Confirm your new email address</h2>
           <p style="color: #64748b; font-size: 14px; line-height: 1.6; margin: 0 0 20px;">
-            Bạn vừa yêu cầu đổi email. Nhập mã OTP bên dưới để xác nhận.
-            Mã có hiệu lực trong <strong>10 phút</strong>.
+            You requested an email change. Enter the OTP code below to confirm.
+            This code is valid for <strong>10 minutes</strong>.
           </p>
 
           <div style="background: #f1f5f9; border-radius: 8px; padding: 20px; text-align: center; margin-bottom: 20px;">
@@ -35,42 +30,42 @@ export const sendOTPEmail = async (toEmail, otp) => {
           </div>
 
           <p style="color: #94a3b8; font-size: 12px; margin: 0;">
-            Nếu bạn không yêu cầu đổi email, hãy bỏ qua email này.
-            Tài khoản của bạn vẫn an toàn.
+            If you did not request an email change, please ignore this email.
+            Your account remains secure.
           </p>
         </div>
 
         <p style="color: #94a3b8; font-size: 11px; text-align: center; margin-top: 16px;">
-          © 2026 Nhà Thuốc Wicky Hien. Không trả lời email này.
+          © 2026 Wicky Hien Pharmacy. Please do not reply to this email.
         </p>
       </div>
     `,
   });
 
   if (error)
-    throw { status: 500, message: `Gửi email thất bại: ${error.message}` };
+    throw { status: 500, message: `Failed to send email: ${error.message}` };
 };
 
 export const sendResetPasswordEmail = async (toEmail, fullName, otp) => {
   const { error } = await resend.emails.send({
-    from: `Nhà Thuốc Wicky Hien <${FROM}>`,
+    from: `Wicky Hien Pharmacy <${FROM}>`,
     to: toEmail,
-    subject: "Đặt lại mật khẩu — Mã OTP của bạn",
+    subject: "Reset password - Your OTP code",
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 24px; background: #f8fafc; border-radius: 12px;">
         <div style="text-align: center; margin-bottom: 24px;">
           <span style="font-size: 36px;">💊</span>
-          <h1 style="color: #1250dc; font-size: 20px; margin: 8px 0;">Nhà Thuốc Wicky Hien</h1>
+          <h1 style="color: #1250dc; font-size: 20px; margin: 8px 0;">Wicky Hien Pharmacy</h1>
         </div>
  
         <div style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-          <h2 style="color: #1e293b; font-size: 18px; margin: 0 0 12px;">Đặt lại mật khẩu</h2>
+          <h2 style="color: #1e293b; font-size: 18px; margin: 0 0 12px;">Reset password</h2>
           <p style="color: #64748b; font-size: 14px; line-height: 1.6; margin: 0 0 8px;">
-            Xin chào <strong>${fullName}</strong>,
+            Hello <strong>${fullName}</strong>,
           </p>
           <p style="color: #64748b; font-size: 14px; line-height: 1.6; margin: 0 0 20px;">
-            Chúng tôi nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn.
-            Nhập mã OTP bên dưới để tiếp tục. Mã có hiệu lực trong <strong>10 phút</strong>.
+            We received a request to reset the password for your account.
+            Enter the OTP code below to continue. This code is valid for <strong>10 minutes</strong>.
           </p>
  
           <div style="background: #fef3c7; border-radius: 8px; padding: 20px; text-align: center; margin-bottom: 20px;">
@@ -80,20 +75,20 @@ export const sendResetPasswordEmail = async (toEmail, fullName, otp) => {
           </div>
  
           <p style="color: #94a3b8; font-size: 12px; margin: 0;">
-            Nếu bạn không yêu cầu đặt lại mật khẩu, hãy bỏ qua email này.
-            Mật khẩu của bạn sẽ không thay đổi.
+            If you did not request a password reset, please ignore this email.
+            Your password will not be changed.
           </p>
         </div>
  
         <p style="color: #94a3b8; font-size: 11px; text-align: center; margin-top: 16px;">
-          © 2026 Nhà Thuốc Wicky Hien. Không trả lời email này.
+          © 2026 Wicky Hien Pharmacy. Please do not reply to this email.
         </p>
       </div>
     `,
   });
 
   if (error)
-    throw { status: 500, message: `Gửi email thất bại: ${error.message}` };
+    throw { status: 500, message: `Failed to send email: ${error.message}` };
 };
 
 export const sendOrderStatusEmail = async (
@@ -103,30 +98,30 @@ export const sendOrderStatusEmail = async (
   statusMessage,
 ) => {
   const { error } = await resend.emails.send({
-    from: `Nhà Thuốc Wicky Hien <${FROM}>`,
+    from: `Wicky Hien Pharmacy <${FROM}>`,
     to: toEmail,
-    subject: `Cập nhật đơn hàng #${orderCode}`,
+    subject: `Order update #${orderCode}`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 24px; background: #f8fafc; border-radius: 12px;">
         <div style="text-align: center; margin-bottom: 24px;">
           <span style="font-size: 36px;">💊</span>
-          <h1 style="color: #1250dc; font-size: 20px; margin: 8px 0;">Nhà Thuốc Wicky Hien</h1>
+          <h1 style="color: #1250dc; font-size: 20px; margin: 8px 0;">Wicky Hien Pharmacy</h1>
         </div>
         <div style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-          <h2 style="color: #1e293b; font-size: 18px; margin: 0 0 12px;">Đơn hàng #${orderCode}</h2>
+          <h2 style="color: #1e293b; font-size: 18px; margin: 0 0 12px;">Order #${orderCode}</h2>
           <p style="color: #64748b; font-size: 14px; line-height: 1.6; margin: 0 0 8px;">
-            Xin chào <strong>${fullName || "bạn"}</strong>,
+            Hello <strong>${fullName || "there"}</strong>,
           </p>
           <p style="color: #64748b; font-size: 14px; line-height: 1.6;">
             ${statusMessage}.
           </p>
         </div>
         <p style="color: #94a3b8; font-size: 11px; text-align: center; margin-top: 16px;">
-          © 2026 Nhà Thuốc Wicky Hien. Không trả lời email này.
+          © 2026 Wicky Hien Pharmacy. Please do not reply to this email.
         </p>
       </div>
     `,
   });
   if (error)
-    throw { status: 500, message: `Gửi email thất bại: ${error.message}` };
+    throw { status: 500, message: `Failed to send email: ${error.message}` };
 };

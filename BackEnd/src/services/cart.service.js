@@ -1,6 +1,3 @@
-// ================================================================
-// cart.service.js
-// ================================================================
 import * as cartRepo from "../repositories/cart.repository.js";
 
 const formatCartForRaw = (cart) => ({
@@ -24,60 +21,59 @@ const formatCartForRaw = (cart) => ({
   ),
 });
 
-// Lấy cart của user
+//── GET USER CART ────────────────────────────────────────────────
 export const getCart = async (userId) => {
   const cart = await cartRepo.findCartByUserId(BigInt(userId));
-  if (!cart) throw { status: 404, message: "Không tìm thấy giỏ hàng" };
+  if (!cart) throw { status: 404, message: "Cart not found" };
   return formatCartForRaw(cart);
 };
 
-// Thêm hoặc cập nhật item trong cart
+//── ADD OR UPDATE CART ITEM ──────────────────────────────────────
 export const addToCart = async (userId, productId, quantity = 1) => {
   const cart = await cartRepo.findCartByUserId(BigInt(userId));
-  if (!cart) throw { status: 404, message: "Không tìm thấy giỏ hàng" };
+  if (!cart) throw { status: 404, message: "Cart not found" };
 
   const bigProductId = BigInt(productId);
 
   const med = await cartRepo.existProduct(bigProductId);
 
   if (!med || med.deletedAt)
-    throw { status: 404, message: "Sản phẩm không tồn tại" };
+    throw { status: 404, message: "Product does not exist" };
 
   const stock = med.quantity ?? 0;
 
-  /// Lấy số lượng hiện tại trong cart (nếu có) để tính tổng
+  /// Get current quantity in cart, if any, to calculate the new total.
   const existingItem = await cartRepo.findCartItem(cart.cartId, bigProductId);
   const currentQty = existingItem?.quantity ?? 0;
   const newQuantity = currentQty + quantity;
 
   if (newQuantity > stock) {
-    throw { status: 400, message: `Chỉ còn ${stock} sản phẩm trong kho` };
+    throw { status: 400, message: `Only ${stock} products left in stock` };
   }
 
-  // Giờ mới upsert — chắc chắn an toàn vì đã check trước
+  // Upsert only after stock validation has passed.
   await cartRepo.upsertCartItem(cart.cartId, bigProductId, newQuantity);
 
   return getCart(userId);
 };
 
-// Cập nhật số lượng item
+//── UPDATE CART ITEM QUANTITY ────────────────────────────────────
 export const updateCartItem = async (userId, cartItemId, quantity) => {
   const cart = await cartRepo.findCartByUserId(BigInt(userId));
-  if (!cart) throw { status: 404, message: "Không tìm thấy giỏ hàng" };
+  if (!cart) throw { status: 404, message: "Cart not found" };
 
-  // Kiểm tra item có thuộc cart của user không — tránh user sửa cart người khác
+  // Verify the item belongs to this user's cart.
   const item = cart.items.find(
     (i) => BigInt(i.cartItemId) === BigInt(cartItemId),
   );
-  if (!item)
-    throw { status: 404, message: "Không tìm thấy sản phẩm trong giỏ" };
+  if (!item) throw { status: 404, message: "Product not found in cart" };
 
   if (quantity <= 0) {
     await cartRepo.deleteCartItem(BigInt(cartItemId));
   } else {
     const stock = item.inventoryQuantity ?? 0;
     if (quantity > stock) {
-      throw { status: 400, message: `Chỉ còn ${stock} sản phẩm trong kho` };
+      throw { status: 400, message: `Only ${stock} products left in stock` };
     }
     await cartRepo.upsertCartItem(cart.cartId, item.productId, quantity);
   }
@@ -85,16 +81,15 @@ export const updateCartItem = async (userId, cartItemId, quantity) => {
   return getCart(userId);
 };
 
-// Xoá 1 item khỏi cart
+//── REMOVE CART ITEM ─────────────────────────────────────────────
 export const removeFromCart = async (userId, cartItemId) => {
   const cart = await cartRepo.findCartByUserId(BigInt(userId));
-  if (!cart) throw { status: 404, message: "Không tìm thấy giỏ hàng" };
+  if (!cart) throw { status: 404, message: "Cart not found" };
 
   const item = cart.items.find(
     (i) => BigInt(i.cartItemId) === BigInt(cartItemId),
   );
-  if (!item)
-    throw { status: 404, message: "Không tìm thấy sản phẩm trong giỏ" };
+  if (!item) throw { status: 404, message: "Product not found in cart" };
 
   await cartRepo.deleteCartItem(BigInt(cartItemId));
   return getCart(userId);

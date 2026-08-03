@@ -19,11 +19,13 @@ const formatCategory = (c) => ({
   slug: c.slug,
 });
 
+//── GET CATEGORIES ───────────────────────────────────────────────
 export const getCategories = async () => {
   const categories = await categoryRepo.findAllCategories();
   return categories.map((c) => formatCategory(c));
 };
 
+//── GET CATEGORIES WITH PRODUCT COUNT ────────────────────────────
 export const getCategoriesWithCount = async () => {
   const [categories, counts] = await Promise.all([
     categoryRepo.findAllCategories(),
@@ -42,23 +44,25 @@ export const getCategoriesWithCount = async () => {
   }));
 };
 
+//── CREATE CATEGORY ──────────────────────────────────────────────
 export const createCategory = async ({ name }) => {
-  if (!name) throw { status: 400, message: "Tên danh mục là bắt buộc" };
+  if (!name) throw { status: 400, message: "Category name is required" };
 
   const slug = generateSlug(name);
   const existing = await categoryRepo.findCategoryBySlug(slug);
-  if (existing) throw { status: 409, message: "Danh mục đã tồn tại" };
+  if (existing) throw { status: 409, message: "Category already exists" };
 
   const category = await categoryRepo.createCategory({ name, slug });
   await invalidateCategoryCache();
   return formatCategory(category);
 };
 
+//── UPDATE CATEGORY ──────────────────────────────────────────────
 export const updateCategory = async (categoryId, { name }) => {
-  if (!name) throw { status: 400, message: "Tên danh mục là bắt buộc" };
+  if (!name) throw { status: 400, message: "Category name is required" };
 
   const existing = await categoryRepo.findCategoryById(BigInt(categoryId));
-  if (!existing) throw { status: 404, message: "Không tìm thấy danh mục" };
+  if (!existing) throw { status: 404, message: "Category not found" };
 
   const slug = generateSlug(name);
   const category = await categoryRepo.updateCategory(BigInt(categoryId), {
@@ -69,9 +73,10 @@ export const updateCategory = async (categoryId, { name }) => {
   return formatCategory(category);
 };
 
+//── DELETE CATEGORY ──────────────────────────────────────────────
 export const deleteCategory = async (categoryId) => {
   const existing = await categoryRepo.findCategoryById(BigInt(categoryId));
-  if (!existing) throw { status: 404, message: "Không tìm thấy danh mục" };
+  if (!existing) throw { status: 404, message: "Category not found" };
   await categoryRepo.deleteCategory(BigInt(categoryId));
   await invalidateCategoryCache();
 };

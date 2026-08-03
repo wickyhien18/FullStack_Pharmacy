@@ -31,7 +31,7 @@ export const login = async (req, res) => {
       req,
     );
     res.cookie(REFRESH_TOKEN_COOKIE, refreshToken, cookieOptions);
-    return sendSuccess(res, { accessToken, user }, "Login successful");
+    return sendSuccess(res, { accessToken, user }, "Login successfully");
   } catch (error) {
     sendError(res, error.message, error.status || 500);
   }
@@ -169,7 +169,6 @@ export const googleCallback = async (req, res) => {
   try {
     const user = req.user;
 
-    // Haven't had account yet — redirect to register form
     if (user?.pending) {
       const pendingToken = authService.createGoogleSignupToken({
         email: user.email,
@@ -183,6 +182,7 @@ export const googleCallback = async (req, res) => {
       return res.redirect(redirectUrl.toString());
     }
 
+    // Haven't had account yet — redirect to register form
     const {
       accessToken,
       refreshToken,

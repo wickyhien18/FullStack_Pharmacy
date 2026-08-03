@@ -1,8 +1,6 @@
 
 import { Router } from 'express';
 import * as categoryController from '../controllers/category.controller.js';
-import { authenticate } from '../middlewares/auth.middleware.js';
-import { authorize } from '../middlewares/auth.middleware.js';
 import { cacheResponse } from '../middlewares/cache.middleware.js';
 
 const router = Router();

@@ -1,11 +1,3 @@
-// ================================================================
-// upload.service.js — Upload ảnh lên Supabase Storage
-// Cài: npm install @supabase/supabase-js multer
-// Thêm vào .env:
-//   SUPABASE_URL=https://xxx.supabase.co
-//   SUPABASE_SERVICE_KEY=your_service_role_key (không phải anon key)
-//   SUPABASE_STORAGE_BUCKET=product-images
-// ================================================================
 import { createClient } from "@supabase/supabase-js";
 import { randomUUID } from "node:crypto";
 import { env } from "../config/env.config.js";
@@ -21,11 +13,14 @@ const sanitizeName = (name) =>
     .replace(/^-+|-+$/g, "")
     .slice(0, 80) || "product";
 
-// Upload file buffer lên Supabase Storage
-// Trả về public URL của ảnh
+//── UPLOAD IMAGE ────────────────────────────────────────────────
+// Upload a file buffer to Supabase Storage and return its public URL.
 export const uploadImage = async (buffer, filename, mimetype) => {
   if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_KEY) {
-    throw { status: 500, message: "Thiếu cấu hình Supabase upload ảnh" };
+    throw {
+      status: 500,
+      message: "Missing Supabase image upload configuration",
+    };
   }
 
   const ext = mimetype === "image/jpeg" ? "jpg" : mimetype.split("/")[1];
@@ -37,20 +32,20 @@ export const uploadImage = async (buffer, filename, mimetype) => {
     upsert: false,
   });
 
-  if (error)
-    throw { status: 500, message: `Upload thất bại: ${error.message}` };
+  if (error) throw { status: 500, message: `Upload failed: ${error.message}` };
 
-  // Lấy public URL
+  // Get public URL.
   const { data } = supabase.storage.from(bucket).getPublicUrl(path);
 
   return data.publicUrl;
 };
 
-// Xoá ảnh khỏi Supabase Storage theo URL
+//── DELETE IMAGE ────────────────────────────────────────────────
+// Delete an image from Supabase Storage by public URL.
 export const deleteImage = async (url) => {
   try {
-    // Extract path từ URL
-    // URL dạng: https://xxx.supabase.co/storage/v1/object/public/{bucket}/products/xxx.jpg
+    // Extract path from URL.
+    // URL shape: https://xxx.supabase.co/storage/v1/object/public/{bucket}/products/xxx.jpg
     const { pathname } = new URL(url);
     const marker = `/${bucket}/`;
     const path = pathname.includes(marker)
@@ -60,7 +55,7 @@ export const deleteImage = async (url) => {
 
     await supabase.storage.from(bucket).remove([path]);
   } catch {
-    // Không throw nếu xoá ảnh thất bại — không critical
+    // Do not throw if image deletion fails; it is not critical.
     console.error("[Storage] Failed to delete image:", url);
   }
 };

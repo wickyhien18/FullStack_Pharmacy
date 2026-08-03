@@ -3,7 +3,11 @@ import * as notificationController from "../controllers/notification.controller.
 import { authenticate } from "../middlewares/auth.middleware.js";
 
 const router = Router();
+
+// Notifications require an authenticated user.
 router.use(authenticate);
+
+// Notifications
 router.get("/", notificationController.getMyNotifications);
 router.patch("/mark-all-read", notificationController.markAllRead);
 

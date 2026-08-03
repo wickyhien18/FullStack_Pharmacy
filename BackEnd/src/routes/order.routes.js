@@ -1,18 +1,16 @@
-// ================================================================
-// order.route.jsx — Tất cả route đều cần đăng nhập
-// ================================================================
 import { Router } from "express";
 import * as orderController from "../controllers/order.controller.js";
 import { authenticate } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
-// Tất cả route cần authenticate — dùng router.use thay vì thêm vào từng route
+// Apply authentication once for every order route.
 router.use(authenticate);
 
-router.post("/", orderController.createOrder); // Tạo đơn hàng
-router.get("/my", orderController.getMyOrders); // Lịch sử đơn của tôi
-router.get("/:orderId", orderController.getOrderDetail); // Chi tiết 1 đơn
+// Orders
+router.post("/", orderController.createOrder);
+router.get("/my", orderController.getMyOrders);
+router.get("/:orderId", orderController.getOrderDetail);
 router.post("/:orderId/cancel", orderController.cancelOrder);
 
 export default router;

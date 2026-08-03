@@ -1,9 +1,7 @@
-// ================================================================
-// cart.repository.js
-// ================================================================
 import { prisma } from "../config/prisma.config.js";
 
-// Lấy cart của user — mỗi user chỉ có 1 cart
+//── CART ────────────────────────────────────────────────────────
+//== FIND CART BY USER ID =========================================
 export const findCartByUserId = async (userId) => {
   const rows = await prisma.$queryRaw`
     SELECT c.cart_id as "cartId",
@@ -33,7 +31,7 @@ export const findCartByUserId = async (userId) => {
   return rows[0];
 };
 
-// Tìm cart item theo cartId + productId
+//== FIND CART ITEM ===============================================
 export const findCartItem = (cartId, productId) => {
   return prisma.cartItem.findUnique({
     where: { uk_cart_medicine: { cartId, productId } },
@@ -41,7 +39,7 @@ export const findCartItem = (cartId, productId) => {
   });
 };
 
-// cart.repository.js — thêm hàm upsert
+//== UPSERT CART ITEM =============================================
 export const upsertCartItem = (cartId, productId, quantity) => {
   return prisma.cartItem.upsert({
     where: { uk_cart_medicine: { cartId, productId } },
@@ -50,6 +48,7 @@ export const upsertCartItem = (cartId, productId, quantity) => {
   });
 };
 
+//== EXIST PRODUCT ================================================
 export const existProduct = async (productId) => {
   const rows = await prisma.$queryRaw`
     SELECT
@@ -62,12 +61,12 @@ export const existProduct = async (productId) => {
   return rows[0];
 };
 
-// Xoá 1 item khỏi cart
+//== DELETE CART ITEM =============================================
 export const deleteCartItem = (cartItemId) => {
   return prisma.cartItem.delete({ where: { cartItemId } });
 };
 
-// Xoá toàn bộ items sau khi đặt hàng thành công
+//== CLEAR CART ===================================================
 export const clearCart = (cartId) => {
   return prisma.cartItem.deleteMany({ where: { cartId } });
 };

@@ -172,7 +172,7 @@ export const createProduct = async (data, files = []) => {
     slug: generateSlug(data.name),
     description: data.description || null,
     price: parseFloat(data.price),
-    unit: data.unit || "Hộp",
+    unit: data.unit || "Box",
     categoryId: data.categoryId ? BigInt(data.categoryId) : null,
     manufacturerId: data.manufacturerId ? BigInt(data.manufacturerId) : null,
     status: data.status || "ACTIVE",
@@ -255,7 +255,7 @@ export const updateProduct = async (
 
   await Promise.all(imagesToDelete.map((img) => deleteImage(img.imageUrl)));
 
-  // Cập nhật tồn kho nếu có
+  // Update inventory when stock is provided.
   if (data.stock !== undefined) {
     await adminRepo.createOrUpdateInventory(productId, data.stock);
   }

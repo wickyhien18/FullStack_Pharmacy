@@ -1,11 +1,8 @@
-// ================================================================
-// product.service.js — Business logic cho products
-// ================================================================
 import * as productRepo from "../repositories/product.repository.js";
 import { getCache, setCache, deletePattern } from "../config/redis.config.js";
 import { buildPaginatedResponse } from "../utils/pagination.js";
 
-// Xây dựng where clause từ query params
+//── BUILD WHERE CLAUSE ───────────────────────────────────────────
 const buildWhere = ({
   search,
   categoryId,
@@ -14,12 +11,11 @@ const buildWhere = ({
   status = "ACTIVE",
 }) => {
   const where = {
-    deletedAt: null, // không lấy đã xoá
+    deletedAt: null, // Exclude soft-deleted products.
     status,
   };
 
-  // Full-text search theo tên — dùng contains thay vì pg_trgm
-  // pg_trgm cần raw query, contains đủ dùng cho dự án này
+  // Search by name with contains; raw pg_trgm is handled in repository where needed.
   if (search) {
     where.name = { contains: search, mode: "insensitive" };
   }
@@ -37,7 +33,7 @@ const buildWhere = ({
   return where;
 };
 
-// Xây dựng orderBy từ sort param
+//── BUILD ORDER BY ───────────────────────────────────────────────
 const buildOrderBy = (sort) => {
   switch (sort) {
     case "price-asc":
@@ -53,7 +49,7 @@ const buildOrderBy = (sort) => {
   }
 };
 
-// Format product trả về client
+//── FORMAT PRODUCT LIST ITEM ────────────────────────────────────
 const formatProduct = (m) => ({
   productId: m.productId.toString(),
   name: m.name,
@@ -66,7 +62,7 @@ const formatProduct = (m) => ({
   primaryImage: m.image || null,
 });
 
-// Format product trả về client
+//── FORMAT PRODUCT DETAIL ───────────────────────────────────────
 const formatProductForSlug = (m) => ({
   productId: m.productId?.toString(),
   name: m.name,
@@ -86,7 +82,7 @@ const formatProductForSlug = (m) => ({
   expireDate: m.expireDate || null,
 });
 
-// Lấy danh sách products
+//── GET PRODUCTS ────────────────────────────────────────────────
 export const getProducts = async ({
   page,
   limit,
@@ -98,11 +94,10 @@ export const getProducts = async ({
   maxPrice,
 }) => {
   const startTime = performance.now();
-  // Cache key bao gồm tất cả params — params khác = cache khác
-  // Cache key includes all params — different params = different cache
+  // Cache key includes all params; different params produce different cache entries.
   const cacheKey = `products:list:${page}:${limit}:${search || ""}:${categoryId || ""}:${sort || ""}:${minPrice || ""}:${maxPrice || ""}`;
 
-  // Check cache trước / Check cache first
+  // Check cache first.
   const cached = await getCache(cacheKey);
   if (cached) {
     const duration = (performance.now() - startTime).toFixed(2);
@@ -126,7 +121,7 @@ export const getProducts = async ({
     limit,
   );
 
-  // Lưu cache 5 phút / Cache for 5 minutes
+  // Cache for 5 minutes.
   await setCache(cacheKey, result, 300);
 
   const duration = (performance.now() - startTime).toFixed(2);
@@ -135,7 +130,7 @@ export const getProducts = async ({
   return result;
 };
 
-// Lấy chi tiết 1 product
+//── GET PRODUCT BY SLUG ─────────────────────────────────────────
 export const getProductBySlug = async (slug) => {
   const startTime = performance.now();
   const cacheKey = `products:detail:${slug}`;
@@ -147,11 +142,11 @@ export const getProductBySlug = async (slug) => {
     return cached;
   }
   const product = await productRepo.findProductBySlug(slug);
-  if (!product) throw { status: 404, message: "Không tìm thấy sản phẩm" };
+  if (!product) throw { status: 404, message: "Product not found" };
 
   const result = formatProductForSlug(product);
 
-  // Cache 10 phút / Cache for 10 minutes
+  // Cache for 10 minutes.
   await setCache(cacheKey, result, 600);
 
   const duration = (performance.now() - startTime).toFixed(2);
@@ -161,8 +156,7 @@ export const getProductBySlug = async (slug) => {
 };
 
 // ── Invalidate Cache ──────────────────────────────────────────────
-// Gọi khi admin sửa/xoá sản phẩm để xoá cache cũ
-// Call when admin updates/deletes products to clear stale cache
+// Call when admin updates/deletes products to clear stale cache.
 export const invalidateProductCache = async (slug = null) => {
   await deletePattern("products:list:*");
   await deletePattern("cache:/api/products*");

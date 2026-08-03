@@ -5,7 +5,7 @@ import { cacheResponse } from '../middlewares/cache.middleware.js';
 
 const router = Router();
 
-// Public — frontend cần để hiển thị dropdown
+// Public — used to populate manufacturer dropdowns
 router.get('/', cacheResponse(600), manufacturerController.getManufacturers);
 
 // Admin only

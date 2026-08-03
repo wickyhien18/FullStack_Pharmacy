@@ -2,26 +2,27 @@ import { prisma } from "../config/prisma.config.js";
 import { getIO } from "../config/socket.config.js";
 import { sendOrderStatusEmail } from "./email.service.js";
 
-// Chỉ những status này mới cần báo khách — PENDING thì khách vừa đặt, không cần báo lại
+// Only these statuses notify customers; PENDING is created by the customer, so no reminder is needed.
 const STATUS_MESSAGES = {
-  CONFIRMED: "Đơn hàng của bạn đã được xác nhận và đang được đóng gói",
-  SHIPPING: "Đơn hàng của bạn đang được giao đến bạn",
-  DELIVERED: "Đơn hàng của bạn đã giao thành công",
-  CANCELLED: "Đơn hàng của bạn đã bị huỷ",
+  CONFIRMED: "Your order has been confirmed and is being packed",
+  SHIPPING: "Your order is on the way",
+  DELIVERED: "Your order has been delivered successfully",
+  CANCELLED: "Your order has been cancelled",
 };
 
+//── NOTIFY ORDER STATUS CHANGE ──────────────────────────────────
 export const notifyOrderStatusChange = async (order) => {
   const baseMessage = STATUS_MESSAGES[order.orderStatus];
   if (!baseMessage) return;
 
-  const message = `${baseMessage} (Mã đơn: ${order.orderCode})`;
+  const message = `${baseMessage} (Order code: ${order.orderCode})`;
 
-  // 1. Lưu vào DB — để khách xem lại lịch sử thông báo kể cả khi offline lúc xảy ra
+  // 1. Save to DB so customers can review notifications later, even if they were offline.
   await prisma.notification.create({
     data: { userId: order.userId, orderId: order.orderId, message },
   });
 
-  // 2. Đẩy real-time — không throw nếu lỗi, tránh chặn luồng đổi status chính
+  // 2. Push real-time updates without blocking the main status update flow.
   try {
     getIO().to(`user:${order.userId}`).emit("order:status_changed", {
       orderId: order.orderId.toString(),
@@ -30,10 +31,10 @@ export const notifyOrderStatusChange = async (order) => {
       message,
     });
   } catch (err) {
-    console.error("[Socket] Emit thất bại:", err.message);
+    console.error("[Socket] Emit failed:", err.message);
   }
 
-  // 3. Gửi email — cũng không throw, tránh 1 email lỗi làm hỏng cả API đổi status
+  // 3. Send email without failing the main API if email delivery fails.
   if (order.user?.email) {
     try {
       await sendOrderStatusEmail(
@@ -43,11 +44,12 @@ export const notifyOrderStatusChange = async (order) => {
         baseMessage,
       );
     } catch (err) {
-      console.error("[Email] Gửi thông báo status thất bại:", err.message);
+      console.error("[Email] Failed to send status notification:", err.message);
     }
   }
 };
 
+//── GET MY NOTIFICATIONS ────────────────────────────────────────
 export const getMyNotifications = async (userId) => {
   const items = await prisma.notification.findMany({
     where: { userId: BigInt(userId) },
@@ -63,6 +65,7 @@ export const getMyNotifications = async (userId) => {
   }));
 };
 
+//── MARK ALL NOTIFICATIONS AS READ ──────────────────────────────
 export const markAllRead = async (userId) => {
   await prisma.notification.updateMany({
     where: { userId: BigInt(userId), isRead: false },

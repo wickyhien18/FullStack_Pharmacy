@@ -1,10 +1,7 @@
-// ================================================================
-// Product.repository.js — Truy vấn DB cho Products
-// ================================================================
 import { prisma, Prisma } from "../config/prisma.config.js";
 
-// Lấy danh sách Products có filter + phân trang
-// params = { skip, limit, search, categoryId, sort }
+//── PRODUCTS ────────────────────────────────────────────────────
+//== FIND PRODUCTS ================================================
 export const findProducts = async ({ skip, limit, where, orderBy }) => {
   const conditions = [Prisma.sql`p.deleted_at IS NULL`];
 
@@ -67,12 +64,12 @@ export const findProducts = async ({ skip, limit, where, orderBy }) => {
   return rows;
 };
 
-// Đếm tổng số Products (dùng cho phân trang)
+//== COUNT PRODUCTS ===============================================
 export const countProducts = (where) => {
   return prisma.product.count({ where });
 };
 
-// Tìm 1 Product theo slug
+//== FIND PRODUCT BY SLUG =========================================
 export const findProductBySlug = async (slug) => {
   const rows = await prisma.$queryRaw`
     SELECT
@@ -110,7 +107,7 @@ export const findProductBySlug = async (slug) => {
   return rows[0];
 };
 
-// Tìm 1 Product theo id
+//== FIND PRODUCT BY ID ===========================================
 export const findProductById = (productId) => {
   return prisma.product.findUnique({
     where: { productId },
@@ -121,7 +118,8 @@ export const findProductById = (productId) => {
   });
 };
 
-// THÊM: lấy 1 Product kèm đủ ảnh — dùng cho admin edit form
+//== FIND PRODUCT WITH IMAGES =====================================
+// Get one product with all images for the admin edit form.
 export const findProductWithImages = (productId) => {
   return prisma.product.findUnique({
     where: { productId },
@@ -134,6 +132,7 @@ export const findProductWithImages = (productId) => {
   });
 };
 
+//== COUNT PRODUCTS BY CATEGORY ===================================
 export const countProductsByCategory = () => {
   return prisma.product.groupBy({
     by: ["categoryId"],
@@ -146,17 +145,18 @@ export const countProductsByCategory = () => {
   });
 };
 
-// Tạo Product mới
+//== CREATE PRODUCT ===============================================
 export const createProduct = (data) => {
   return prisma.product.create({ data });
 };
 
-// Cập nhật Product
+//== UPDATE PRODUCT ===============================================
 export const updateProduct = ({ where, data }) => {
   return prisma.product.update({ where, data });
 };
 
-// Soft delete — chỉ set deletedAt, không xoá thật
+//== SOFT DELETE PRODUCT ==========================================
+// Set deletedAt instead of permanently deleting the row.
 export const softDeleteProduct = (productId) => {
   return prisma.product.update({
     where: { productId },
@@ -164,8 +164,9 @@ export const softDeleteProduct = (productId) => {
   });
 };
 
-// ── THÊM MỚI: quản lý Product_images ────────────────────────────
+//── PRODUCT IMAGES ──────────────────────────────────────────────
 
+//== CREATE PRODUCT IMAGES ========================================
 export const createProductImages = (productId, imageUrls, startOrder = 0) => {
   if (imageUrls.length === 0) return Promise.resolve();
   return prisma.productImage.createMany({
@@ -177,6 +178,7 @@ export const createProductImages = (productId, imageUrls, startOrder = 0) => {
   });
 };
 
+//== FIND IMAGES BY PRODUCT ID ====================================
 export const findImagesByProductId = (productId) => {
   return prisma.productImage.findMany({
     where: { productId },
@@ -184,14 +186,17 @@ export const findImagesByProductId = (productId) => {
   });
 };
 
+//== DELETE PRODUCT IMAGE BY ID ===================================
 export const deleteProductImageById = (imageId) => {
   return prisma.productImage.delete({ where: { imageId } });
 };
 
+//== DELETE ALL IMAGES BY PRODUCT ID ==============================
 export const deleteAllImagesByProductId = (productId) => {
   return prisma.productImage.deleteMany({ where: { productId } });
 };
 
+//== SYNC PRODUCT IMAGES AND UPDATE PRODUCT =======================
 export const syncProductImagesAndUpdateProduct = ({
   productId,
   keptImageIds,
@@ -232,8 +237,8 @@ export const syncProductImagesAndUpdateProduct = ({
       });
     },
     {
-      timeout: 30000, // tăng lên 30 giây
-      maxWait: 10000, // chờ tối đa 10 giây để lấy connection
+      timeout: 30000, // Increase timeout to 30 seconds.
+      maxWait: 10000, // Wait up to 10 seconds for a connection.
     },
   );
 };

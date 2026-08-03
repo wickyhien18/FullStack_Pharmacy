@@ -1,7 +1,3 @@
-// ================================================================
-// payment.controller.js
-// Đặt tại: src/controllers/payment.controller.js
-// ================================================================
 import * as paymentService from "../services/payment.service.js";
 import { sendSuccess, sendError } from "../utils/response.js";
 
@@ -13,54 +9,60 @@ const getIpAddr = (req) => {
   );
 };
 
-// POST /api/payment/vnpay/create — Tạo URL thanh toán VNPAY
+// POST /api/payment/vnpay/create — create a VNPAY payment URL
 export const createVNPayPayment = async (req, res) => {
   try {
     const { orderId } = req.body;
-    if (!orderId) return sendError(res, "Thiếu orderId", 400);
+    if (!orderId) return sendError(res, "Missing orderId", 400);
     const data = await paymentService.createVNPayPayment(
       orderId,
       req.user.userId,
       getIpAddr(req),
     );
-    return sendSuccess(res, data, "Tạo URL thanh toán thành công");
+    return sendSuccess(res, data, "Payment URL created successfully");
   } catch (err) {
     return sendError(res, err.message, err.status || 500);
   }
 };
 
-// GET /api/payment/vnpay/callback — VNPAY redirect về sau thanh toán
+// GET /api/payment/vnpay/callback — VNPAY redirects here after payment
 export const vnpayCallback = async (req, res) => {
   try {
     const result = await paymentService.handleVNPayCallback(req.query);
-    // Redirect về frontend với kết quả
+    // Redirect to the client app with the payment result
     return res.redirect(result.redirectUrl);
   } catch (err) {
     console.error("[VNPAY Callback] Error:", err);
     return res.redirect(
-      `${process.env.CLIENT_URL}/account?tab=orders&payment=error`
+      `${process.env.CLIENT_URL}/account?tab=orders&payment=error`,
     );
   }
 };
 
-// POST /api/payment/cod — Chọn COD
+// POST /api/payment/cod — select COD payment
 export const createCODPayment = async (req, res) => {
   try {
     const { orderId } = req.body;
-    if (!orderId) return sendError(res, "Thiếu orderId", 400);
-    const data = await paymentService.createCODPayment(orderId, req.user.userId);
-    return sendSuccess(res, data, "Xác nhận thanh toán COD thành công");
+    if (!orderId) return sendError(res, "Missing orderId", 400);
+    const data = await paymentService.createCODPayment(
+      orderId,
+      req.user.userId,
+    );
+    return sendSuccess(res, data, "COD payment confirmed successfully");
   } catch (err) {
     return sendError(res, err.message, err.status || 500);
   }
 };
 
-// GET /api/payment/order/:orderId — Lấy thông tin payment
+// GET /api/payment/order/:orderId — get payment information
 export const getPaymentByOrder = async (req, res) => {
   try {
     const { orderId } = req.params;
-    const data = await paymentService.getPaymentByOrder(orderId, req.user.userId);
-    return sendSuccess(res, data, "Lấy thông tin thanh toán thành công");
+    const data = await paymentService.getPaymentByOrder(
+      orderId,
+      req.user.userId,
+    );
+    return sendSuccess(res, data, "Payment information retrieved successfully");
   } catch (err) {
     return sendError(res, err.message, err.status || 500);
   }

@@ -1,6 +1,3 @@
-// ================================================================
-// order.service.js — v2, khớp 100% với schema hiện tại
-// ================================================================
 import { prisma } from "../config/prisma.config.js";
 import * as orderRepo from "../repositories/order.repository.js";
 import * as cartRepo from "../repositories/cart.repository.js";
@@ -23,8 +20,8 @@ const formatOrder = (order) => ({
   createdAt: order.createdAt,
   items: order.items?.map((i) => ({
     orderItemId: i.orderItemId.toString(),
-    productName: i.product?.name || "Sản phẩm không còn tồn tại",
-    productUnit: i.product?.unit || "Hộp",
+    productName: i.product?.name || "Product no longer exists",
+    productUnit: i.product?.unit || "Box",
     quantity: i.quantity,
     unitPrice: Number(i.unitPrice),
     totalPrice: Number(i.totalPrice),
@@ -34,12 +31,12 @@ const formatOrder = (order) => ({
 // ── Create Order ──────────────────────────────────────────────────
 export const createOrder = async (userId, { shippingAddress, note }) => {
   if (!shippingAddress)
-    throw { status: 400, message: "Vui lòng nhập địa chỉ giao hàng" };
+    throw { status: 400, message: "Please enter a shipping address" };
 
-  // Lấy cart từ DB — không tin client gửi items
+  // Load cart from DB instead of trusting client-submitted items.
   const cart = await cartRepo.findCartByUserId(BigInt(userId));
-  if (!cart) throw { status: 404, message: "Không tìm thấy giỏ hàng" };
-  if (!cart.items.length) throw { status: 400, message: "Giỏ hàng trống" };
+  if (!cart) throw { status: 404, message: "Cart not found" };
+  if (!cart.items.length) throw { status: 400, message: "Cart is empty" };
 
   const totalPrice = cart.items.reduce(
     (sum, item) => sum + Number(item.productPrice) * item.itemQuantity,
@@ -78,7 +75,7 @@ export const getOrderDetail = async (orderId, userId) => {
     BigInt(orderId),
     BigInt(userId),
   );
-  if (!order) throw { status: 404, message: "Không tìm thấy đơn hàng" };
+  if (!order) throw { status: 404, message: "Order not found" };
   return formatOrder(order);
 };
 
@@ -87,21 +84,22 @@ export const cancelOrder = async (orderId, userId, reason = "") => {
     BigInt(orderId),
     BigInt(userId),
   );
-  if (!order) throw { status: 404, message: "Không tìm thấy đơn hàng" };
+  if (!order) throw { status: 404, message: "Order not found" };
 
   const { orderStatus } = order;
 
   if (orderStatus === "PENDING" || orderStatus === "CONFIRMED") {
     await orderRepo.handleCancelOrderPending(BigInt(order.orderId), reason);
 
-    return { message: "Đơn hàng đã được huỷ thành công", status: "CANCELLED" };
+    return { message: "Order cancelled successfully", status: "CANCELLED" };
   }
 
   if (orderStatus === "SHIPPING") {
     await orderRepo.cancelOrderShipping(BigInt(order.orderId), reason);
 
     return {
-      message: "Yêu cầu huỷ đã được gửi. Vui lòng chờ xác nhận từ nhà thuốc.",
+      message:
+        "Cancellation request sent. Please wait for pharmacy confirmation.",
       status: "CANCEL_REQUESTED",
     };
   }
@@ -110,15 +108,14 @@ export const cancelOrder = async (orderId, userId, reason = "") => {
     await orderRepo.cancelOrderDelivered(BigInt(order.orderId), reason);
 
     return {
-      message:
-        "Yêu cầu hoàn hàng đã được gửi. Vui lòng chờ xác nhận từ nhà thuốc.",
+      message: "Return request sent. Please wait for pharmacy confirmation.",
       status: "RETURN_REQUESTED",
     };
   }
 
   throw {
     status: 400,
-    message: `Không thể huỷ đơn hàng ở trạng thái "${orderStatus}"`,
+    message: `Cannot cancel order in "${orderStatus}" status`,
   };
 };
 
@@ -129,7 +126,7 @@ export const handleCancelRequest = async (
 ) => {
   const order = await orderRepo.findOrderById(BigInt(orderId));
 
-  if (!order) throw { status: 404, message: "Không tìm thấy đơn hàng" };
+  if (!order) throw { status: 404, message: "Order not found" };
 
   const { orderStatus } = order;
 
@@ -137,33 +134,39 @@ export const handleCancelRequest = async (
     orderStatus !== "CANCEL_REQUESTED" &&
     orderStatus !== "RETURN_REQUESTED"
   ) {
-    throw { status: 400, message: "Đơn hàng không có yêu cầu huỷ/hoàn" };
+    throw {
+      status: 400,
+      message: "Order has no cancellation or return request",
+    };
   }
 
   if (action === "approve") {
-    // Admin đồng ý → CANCELLED hoặc RETURNED + hoàn tồn kho
+    // Admin approves: move to CANCELLED or RETURNED and restore inventory.
     const newStatus =
       orderStatus === "CANCEL_REQUESTED" ? "CANCELLED" : "RETURNED";
 
     if (orderStatus === "RETURN_REQUESTED") {
-      // Hoàn hàng: đổi status + hoàn tồn kho + ghi nhận hoàn tiền vào bảng payments
+      // Return: update status, restore inventory, and record refund payment.
       await orderRepo.approveReturnOrder(
         BigInt(orderId),
         Number(order.totalPrice),
       );
     } else {
-      // Huỷ khi đang ship: đổi status + hoàn tồn kho (không hoàn tiền vì chưa thu)
+      // Cancel while shipping: update status and restore inventory, no refund because payment was not collected.
       await orderRepo.handleCancelOrderDelivedAndShipping(
         BigInt(orderId),
         newStatus,
       );
     }
 
-    return { message: "Đã xác nhận huỷ/hoàn đơn hàng", status: newStatus };
+    return {
+      message: "Cancellation or return request approved",
+      status: newStatus,
+    };
   }
 
   if (action === "reject") {
-    // Admin từ chối → trả về SHIPPING hoặc DELIVERED
+    // Admin rejects: return to SHIPPING or DELIVERED.
     const previousStatus =
       orderStatus === "CANCEL_REQUESTED" ? "SHIPPING" : "DELIVERED";
 
@@ -174,13 +177,13 @@ export const handleCancelRequest = async (
     );
 
     return {
-      message: "Đã từ chối yêu cầu huỷ, đơn hàng tiếp tục xử lý",
+      message: "Cancellation request rejected, order continues processing",
       status: previousStatus,
     };
   }
 
   throw {
     status: 400,
-    message: "Action không hợp lệ. Chỉ chấp nhận approve hoặc reject",
+    message: "Invalid action. Only approve or reject is accepted",
   };
 };

@@ -1,6 +1,3 @@
-// ================================================================
-// product.controller.js
-// ================================================================
 import * as productService from "../services/product.service.js";
 import { sendSuccess, sendError } from "../utils/response.js";
 import { parsePagination } from "../utils/pagination.js";
@@ -20,7 +17,7 @@ export const getProducts = async (req, res) => {
       minPrice: minPrice ? Number(minPrice) : undefined,
       maxPrice: maxPrice ? Number(maxPrice) : undefined,
     });
-    return sendSuccess(res, data, "Lấy danh sách thuốc thành công");
+    return sendSuccess(res, data, "Products retrieved successfully");
   } catch (err) {
     console.error("getProducts error:", err);
     return sendError(res, err.message, err.status || 500);
@@ -30,11 +27,11 @@ export const getProducts = async (req, res) => {
 // GET /api/products/:slug
 export const getProductBySlug = async (req, res) => {
   try {
-    console.log("Params:", req.params); // xem slug có đến không
+    console.log("Params:", req.params); // Check whether slug reaches the controller
     console.log("URL:", req.url);
 
     const data = await productService.getProductBySlug(req.params.slug);
-    return sendSuccess(res, data, "Lấy thông tin thuốc thành công");
+    return sendSuccess(res, data, "Product information retrieved successfully");
   } catch (err) {
     return sendError(res, err.message, err.status || 500);
   }

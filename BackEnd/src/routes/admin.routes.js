@@ -4,6 +4,7 @@ import { authenticate, authorize } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
+// Require authentication for every admin route.
 router.use(authenticate);
 
 const staffAccess = authorize("ROLE_ADMIN", "ROLE_STAFF");

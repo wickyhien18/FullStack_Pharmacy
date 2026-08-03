@@ -1,6 +1,3 @@
-// ================================================================
-// cart.controller.js
-// ================================================================
 import * as cartService from "../services/cart.service.js";
 import { sendSuccess, sendError } from "../utils/response.js";
 
@@ -8,7 +5,7 @@ import { sendSuccess, sendError } from "../utils/response.js";
 export const getCart = async (req, res) => {
   try {
     const data = await cartService.getCart(req.user.userId);
-    return sendSuccess(res, data, "Lấy giỏ hàng thành công");
+    return sendSuccess(res, data, "Cart retrieved successfully");
   } catch (err) {
     return sendError(res, err.message, err.status || 500);
   }
@@ -18,13 +15,13 @@ export const getCart = async (req, res) => {
 export const addToCart = async (req, res) => {
   try {
     const { productId, quantity = 1 } = req.body;
-    if (!productId) return sendError(res, "productId là bắt buộc", 400);
+    if (!productId) return sendError(res, "productId is required", 400);
     const data = await cartService.addToCart(
       req.user.userId,
       productId,
       quantity,
     );
-    return sendSuccess(res, data, "Đã thêm vào giỏ hàng", 201);
+    return sendSuccess(res, data, "Item added to cart successfully", 201);
   } catch (err) {
     return sendError(res, err.message, err.status || 500);
   }
@@ -35,13 +32,13 @@ export const updateCartItem = async (req, res) => {
   try {
     const { quantity } = req.body;
     if (quantity === undefined)
-      return sendError(res, "quantity là bắt buộc", 400);
+      return sendError(res, "quantity is required", 400);
     const data = await cartService.updateCartItem(
       req.user.userId,
       req.params.cartItemId,
       quantity,
     );
-    return sendSuccess(res, data, "Cập nhật giỏ hàng thành công");
+    return sendSuccess(res, data, "Cart updated successfully");
   } catch (err) {
     return sendError(res, err.message, err.status || 500);
   }
@@ -54,7 +51,7 @@ export const removeFromCart = async (req, res) => {
       req.user.userId,
       req.params.cartItemId,
     );
-    return sendSuccess(res, data, "Đã xoá khỏi giỏ hàng");
+    return sendSuccess(res, data, "Item removed from cart successfully");
   } catch (err) {
     return sendError(res, err.message, err.status || 500);
   }

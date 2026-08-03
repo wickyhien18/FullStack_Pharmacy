@@ -1,6 +1,3 @@
-// ================================================================
-// product.route.jsx
-// ================================================================
 import { Router } from "express";
 import * as productController from "../controllers/product.controller.js";
 import { cacheResponse } from "../middlewares/cache.middleware.js";

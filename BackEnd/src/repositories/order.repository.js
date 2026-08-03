@@ -1,17 +1,12 @@
-// ================================================================
-// order.repository.js — v2, khớp 100% với schema hiện tại
-// Bỏ: originalPrice, paymentMethod (Order không có)
-// Bỏ: productName, productUnit (OrderItem không có)
-// ================================================================
 import { prisma } from "../config/prisma.config.js";
 
-// Helper ghi inventory log trong transaction
+// Helper for writing inventory logs inside a transaction.
 const writeInventoryLog = async (
   tx,
   {
     productId,
     changeType, // "IMPORT" | "EXPORT" | "ADJUST"
-    quantity, // số lượng thay đổi (luôn dương)
+    quantity, // Changed quantity, always positive.
     previousQuantity,
     newQuantity,
     referenceId, // orderId
@@ -31,12 +26,15 @@ const writeInventoryLog = async (
   });
 };
 
+//── ORDERS ──────────────────────────────────────────────────────
+//== FIND ORDER BY ID =============================================
 export const findOrderById = async (orderId) => {
   return prisma.order.findUnique({
     where: { orderId },
   });
 };
 
+//== CREATE ORDER =================================================
 export const createOrder = async ({
   userId,
   orderCode,
@@ -59,7 +57,7 @@ export const createOrder = async ({
         },
       });
 
-      // Lấy hết product + inventory 1 lần, không query lặp trong loop
+      // Load all products and inventory once instead of querying inside the loop.
       const productIds = items.map((i) => i.productId);
       const products = await tx.product.findMany({
         where: { productId: { in: productIds } },
@@ -75,11 +73,13 @@ export const createOrder = async ({
 
       for (const item of items) {
         const product = productMap.get(item.productId.toString());
-        if (!product) throw new Error("Sản phẩm không tồn tại");
+        if (!product) throw new Error("Product does not exist");
 
         const currentQty = product.inventory?.quantity ?? 0;
         if (currentQty < item.quantity) {
-          throw new Error(`Sản phẩm "${product.name}" không đủ hàng`);
+          throw new Error(
+            `Product "${product.name}" does not have enough stock`,
+          );
         }
 
         orderItemsData.push({
@@ -105,14 +105,14 @@ export const createOrder = async ({
           previousQuantity: currentQty,
           newQuantity: newQty,
           referenceId: order.orderId,
-          note: `Xuất kho cho đơn hàng ${order.orderCode}`,
+          note: `Stock exported for order ${order.orderCode}`,
         });
       }
 
-      // Batch insert orderItems — 1 query thay vì N query create riêng
+      // Batch insert orderItems with one query instead of N create queries.
       await tx.orderItem.createMany({ data: orderItemsData });
 
-      // Inventory update vẫn phải chạy riêng từng cái (mỗi product khác where), nhưng dùng Promise.all để chạy song song thay vì tuần tự
+      // Inventory updates are still per product, but Promise.all runs them in parallel.
       await Promise.all(inventoryUpdates);
 
       // Batch insert log
@@ -124,6 +124,7 @@ export const createOrder = async ({
   );
 };
 
+//== FIND ORDERS BY USER ==========================================
 export const findOrdersByUser = async (userId, { skip, limit }) => {
   return prisma.order.findMany({
     where: { userId },
@@ -133,7 +134,7 @@ export const findOrdersByUser = async (userId, { skip, limit }) => {
     include: {
       items: {
         include: {
-          // Lấy tên + đơn vị qua relation product vì không có snapshot column
+          // Get name and unit through product relation because there are no snapshot columns.
           product: { select: { name: true, unit: true } },
         },
       },
@@ -141,10 +142,12 @@ export const findOrdersByUser = async (userId, { skip, limit }) => {
   });
 };
 
+//== COUNT ORDERS BY USER =========================================
 export const countOrdersByUser = async (userId) => {
   return prisma.order.count({ where: { userId } });
 };
 
+//== FIND ORDER BY USER ID AND ORDER ID ===========================
 export const findOrderByUserIdAndOrderId = async (orderId, userId) => {
   return prisma.order.findFirst({
     where: { orderId, userId },
@@ -156,6 +159,7 @@ export const findOrderByUserIdAndOrderId = async (orderId, userId) => {
   });
 };
 
+//== HANDLE CANCEL ORDER PENDING ==================================
 export const handleCancelOrderPending = async (orderId, reason) => {
   return prisma.$transaction(
     async (tx) => {
@@ -164,7 +168,7 @@ export const handleCancelOrderPending = async (orderId, reason) => {
         data: {
           orderStatus: "CANCELLED",
           cancelledBy: "USER",
-          cancelledReason: reason || "Người dùng huỷ đơn",
+          cancelledReason: reason || "User cancelled the order",
           cancelledAt: new Date(),
         },
       });
@@ -200,7 +204,7 @@ export const handleCancelOrderPending = async (orderId, reason) => {
           previousQuantity: currentQty,
           newQuantity: newQty,
           referenceId: orderId,
-          note: `Hoàn kho do huỷ đơn hàng`,
+          note: `Stock restored due to order cancellation`,
         });
       }
 
@@ -211,28 +215,31 @@ export const handleCancelOrderPending = async (orderId, reason) => {
   );
 };
 
+//== CANCEL ORDER WHILE SHIPPING ==================================
 export const cancelOrderShipping = async (orderId, reason) => {
   return prisma.order.update({
     where: { orderId },
     data: {
       orderStatus: "CANCEL_REQUESTED",
       cancelledBy: "USER",
-      cancelledReason: reason || "Người dùng yêu cầu huỷ khi đang giao",
+      cancelledReason: reason || "User requested cancellation during shipping",
     },
   });
 };
 
+//== CANCEL DELIVERED ORDER =======================================
 export const cancelOrderDelivered = async (orderId, reason) => {
   return prisma.order.update({
     where: { orderId },
     data: {
       orderStatus: "RETURN_REQUESTED",
       cancelledBy: "USER",
-      cancelledReason: reason || "Người dùng yêu cầu hoàn hàng",
+      cancelledReason: reason || "User requested a return",
     },
   });
 };
 
+//== HANDLE CANCELLED OR DELIVERED/SHIPPING RESTORE ===============
 export const handleCancelOrderDelivedAndShipping = async (orderId, status) => {
   return prisma.$transaction(
     async (tx) => {
@@ -272,7 +279,7 @@ export const handleCancelOrderDelivedAndShipping = async (orderId, status) => {
           previousQuantity: currentQty,
           newQuantity: newQty,
           referenceId: orderId,
-          note: `Hoàn kho do huỷ đơn hàng (${status})`,
+          note: `Stock restored due to order cancellation (${status})`,
         });
       }
 
@@ -286,6 +293,7 @@ export const handleCancelOrderDelivedAndShipping = async (orderId, status) => {
   );
 };
 
+//== REJECT ORDER CANCEL REQUEST ==================================
 export const rejectOrder = async (orderId, status, reason) => {
   return prisma.order.update({
     where: { orderId },
@@ -293,13 +301,14 @@ export const rejectOrder = async (orderId, status, reason) => {
       orderStatus: status,
       cancelledBy: null,
       cancelledReason: reason
-        ? `Từ chối huỷ: ${reason}`
-        : "Yêu cầu huỷ bị từ chối bởi nhà thuốc",
+        ? `Cancellation rejected: ${reason}`
+        : "Cancellation request was rejected by the pharmacy",
     },
   });
 };
 
-// Xử lý hoàn hàng: đổi status RETURNED + hoàn tồn kho + ghi nhận hoàn tiền
+//== APPROVE RETURN ORDER =========================================
+// Handle returns: set status to RETURNED, restore inventory, and record refund.
 export const approveReturnOrder = async (orderId, totalPrice) => {
   return prisma.$transaction(
     async (tx) => {
@@ -342,14 +351,14 @@ export const approveReturnOrder = async (orderId, totalPrice) => {
           previousQuantity: currentQty,
           newQuantity: newQty,
           referenceId: orderId,
-          note: `Hoàn kho do hoàn hàng`,
+          note: `Stock restored due to return`,
         });
       }
 
       await Promise.all(updates);
       await tx.inventoryLog.createMany({ data: logsData });
 
-      // Ghi nhận hoàn tiền — giữ nguyên, chỉ 1 query nên không cần tối ưu
+      // Record refund. This is a single query, so no extra optimization is needed.
       const existingPayment = await tx.payment.findFirst({
         where: { orderId },
         orderBy: { createdAt: "desc" },
