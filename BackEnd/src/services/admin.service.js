@@ -63,12 +63,7 @@ export const updateOrderStatus = async (orderId, orderStatus) => {
   const order = await adminRepo.updateOrderStatus(BigInt(orderId), orderStatus);
 
   // Get user infomation to have email/fullName for notification
-  const fullOrder = await prisma.order.findUnique({
-    where: { orderId: order.orderId },
-    include: {
-      user: { select: { userId: true, email: true, fullName: true } },
-    },
-  });
+  const fullOrder = await adminRepo.findOrderByOrderId(order.orderId);
 
   await notifyOrderStatusChange(fullOrder);
 
@@ -110,10 +105,10 @@ export const updateUserStatus = async (userId, isActive) => {
 
 //── UPDATE USER ROLE ────────────────────────────────────────────────
 export const updateUserRole = async (userId, roleName) => {
-  if (!roleName) throw { status: 400, message: "roleName là bắt buộc" };
+  if (!roleName) throw { status: 400, message: "RoleName is required" };
 
   const role = await adminRepo.existRole(roleName);
-  if (!role) throw { status: 404, message: "Role không tồn tại" };
+  if (!role) throw { status: 404, message: "Role isn't existed" };
 
   const user = await adminRepo.updateUserRole(BigInt(userId), role.roleId);
   return { userId: user.userId.toString(), role: role.roleName };
@@ -132,7 +127,7 @@ export const getAllProducts = async ({ page, limit, skip }) => {
     slug: m.slug,
     price: Number(m.price),
     status: m.status,
-    primaryImage: m.image, // ← THÊM: để frontend ProductsPage hiển thị ảnh trong bảng
+    primaryImage: m.image,
     categoryName: m.category?.name || null,
     stock: m.inventory?.quantity ?? 0,
   }));
@@ -143,7 +138,7 @@ export const getAllProducts = async ({ page, limit, skip }) => {
 //── GET PRODUCT DETAIL ────────────────────────────────────────────────
 export const getProductDetail = async (productId) => {
   const product = await productRepo.findProductWithImages(BigInt(productId));
-  if (!product) throw { status: 404, message: "Không tìm thấy sản phẩm" };
+  if (!product) throw { status: 404, message: "Not found product" };
 
   return {
     productId: product.productId.toString(),
@@ -165,14 +160,13 @@ export const getProductDetail = async (productId) => {
 //── CREATE PRODUCT ────────────────────────────────────────────────
 export const createProduct = async (data, files = []) => {
   if (files.length > MAX_IMAGES) {
-    throw { status: 400, message: `Tối đa ${MAX_IMAGES} ảnh / sản phẩm` };
+    throw { status: 400, message: `Maximum ${MAX_IMAGES} images / product` };
   }
 
   const imageUrls = await Promise.all(
     files.map((file) => uploadImage(file.buffer, data.name, file.mimetype)),
   );
 
-  // SỬA: gọi đúng signature createProduct(data) — không bọc { data }
   const product = await productRepo.createProduct({
     name: data.name,
     slug: generateSlug(data.name),
@@ -182,7 +176,7 @@ export const createProduct = async (data, files = []) => {
     categoryId: data.categoryId ? BigInt(data.categoryId) : null,
     manufacturerId: data.manufacturerId ? BigInt(data.manufacturerId) : null,
     status: data.status || "ACTIVE",
-    image: imageUrls[0] || null, // ảnh đầu tiên = ảnh đại diện
+    image: imageUrls[0] || null,
   });
 
   await adminRepo.createInventory({
@@ -190,7 +184,6 @@ export const createProduct = async (data, files = []) => {
     quantity: parseInt(data.stock) || 0,
   });
 
-  // THÊM: lưu tất cả ảnh vào bảng product_images
   if (imageUrls.length > 0) {
     await productRepo.createProductImages(product.productId, imageUrls);
   }
@@ -208,14 +201,14 @@ export const updateProduct = async (
   keepImageIds = [],
 ) => {
   const existing = await adminRepo.existProduct(productId);
-  if (!existing) throw { status: 404, message: "Không tìm thấy sản phẩm" };
+  if (!existing) throw { status: 404, message: "Not found product" };
 
   const currentImages = await productRepo.findImagesByProductId(
     BigInt(productId),
   );
 
   if (keepImageIds.length + files.length > MAX_IMAGES) {
-    throw { status: 400, message: `Tối đa ${MAX_IMAGES} ảnh / sản phẩm` };
+    throw { status: 400, message: `Maximum ${MAX_IMAGES} images / product` };
   }
 
   const keptImages = currentImages.filter((img) =>
@@ -272,15 +265,14 @@ export const updateProduct = async (
     await invalidateProductCache(updateData.slug);
   }
 
-  return { productId, message: "Cập nhật thành công" };
+  return { productId, message: "Update product information successfully" };
 };
 
 //── DELETE PRODUCT  ────────────────────────────────────────────────
 export const deleteProduct = async (productId) => {
   const existing = await adminRepo.existProduct(productId);
-  if (!existing) throw { status: 404, message: "Không tìm thấy sản phẩm" };
+  if (!existing) throw { status: 404, message: "Not found product" };
 
-  // THÊM: xoá tất cả ảnh trong bảng product_images, không chỉ ảnh đại diện
   const images = await productRepo.findImagesByProductId(BigInt(productId));
   for (const img of images) {
     await deleteImage(img.imageUrl);

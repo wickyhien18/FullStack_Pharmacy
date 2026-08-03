@@ -43,6 +43,16 @@ export const findAllOrders = ({ skip, limit, status }) => {
   });
 };
 
+//== FIND ORDER BY ORERID =======================================
+export const findOrderByOrderId = (orderId) => {
+  return prisma.order.findUnique({
+    where: { orderId },
+    include: {
+      user: { select: { userId: true, email: true, fullName: true } },
+    },
+  });
+};
+
 //== COUNT ALL ORDERS =======================================
 export const countAllOrders = (status) => {
   const where = status
