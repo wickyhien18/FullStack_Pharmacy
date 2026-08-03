@@ -58,10 +58,14 @@ app.use(
 app.use(
   rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 200, // 200 requests
+    max: 300, // 300 requests
     message: { success: false, message: "Too many requests" },
     standardHeaders: true,
     legacyHeaders: false,
+    skip: (req) =>
+      req.path.startsWith("/socket.io") ||
+      req.path === "/api/payment/vnpay/callback" ||
+      req.path === "/health",
   }),
 );
 

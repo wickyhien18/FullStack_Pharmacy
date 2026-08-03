@@ -58,7 +58,7 @@ export const updateOrderStatus = async (orderId, orderStatus) => {
     "CANCELLED",
   ];
   if (!validStatuses.includes(orderStatus)) {
-    throw { status: 400, message: "Trạng thái đơn hàng không hợp lệ" };
+    throw { status: 400, message: "Invalid order status" };
   }
   const order = await adminRepo.updateOrderStatus(BigInt(orderId), orderStatus);
 
