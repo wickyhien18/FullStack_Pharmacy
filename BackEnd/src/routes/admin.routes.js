@@ -1,17 +1,13 @@
-// ================================================================
-// admin.route.jsx — Tất cả route cần ROLE_ADMIN
-// ================================================================
 import { Router } from "express";
 import * as adminController from "../controllers/admin.controller.js";
 import { authenticate, authorize } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
-// Áp dụng authenticate + authorize cho toàn bộ admin routes
 router.use(authenticate);
 
-const staffAccess = authorize("ROLE_ADMIN", "ROLE_STAFF"); // đơn hàng, tồn kho — cả 2 role
-const adminOnly = authorize("ROLE_ADMIN"); // người dùng, phân quyền, tạo/xoá sản phẩm
+const staffAccess = authorize("ROLE_ADMIN", "ROLE_STAFF");
+const adminOnly = authorize("ROLE_ADMIN");
 
 // Dashboard
 router.get("/stats", staffAccess, adminController.getDashboardStats);
@@ -39,13 +35,13 @@ router.patch(
 router.patch("/users/:userId/role", adminOnly, adminController.updateUserRole);
 router.get("/roles", adminOnly, adminController.getRoles);
 
-// products
+// Products
 router.get("/products", staffAccess, adminController.getAllproducts);
 router.get(
   "/products/:productId",
   staffAccess,
   adminController.getproductDetail,
-); // ← THÊM
+);
 router.post("/products", adminOnly, adminController.createproduct);
 router.put("/products/:productId", staffAccess, adminController.updateproduct);
 router.delete("/products/:productId", adminOnly, adminController.deleteproduct);

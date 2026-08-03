@@ -1,6 +1,3 @@
-// ================================================================
-// admin.controller.js
-// ================================================================
 import { handleUpload } from "../middlewares/upload.middleware.js";
 import * as adminService from "../services/admin.service.js";
 import * as orderService from "../services/order.service.js";
@@ -11,31 +8,30 @@ import { parsePagination } from "../utils/pagination.js";
 export const getDashboardStats = async (req, res) => {
   try {
     const data = await adminService.getDashboardStats();
-    return sendSuccess(res, data, "Lấy thống kê thành công");
+    return sendSuccess(res, data, "Get dashboard successfully");
   } catch (err) {
     return sendError(res, err.message, err.status || 500);
   }
 };
 
-// GET /api/admin/orders
+// GET /api/admin/orders?pages=?&limit=?(&status=?)
 export const getAllOrders = async (req, res) => {
   try {
     const { page, limit, skip } = parsePagination(req);
     const { status } = req.query;
     const data = await adminService.getAllOrders({ page, limit, skip, status });
-    return sendSuccess(res, data, "Lấy danh sách đơn hàng thành công");
+    return sendSuccess(res, data, "Get order list successfully");
   } catch (err) {
     return sendError(res, err.message, err.status || 500);
   }
 };
 
-// PATCH /api/admin/orders/:orderId/cancel-request — Admin xử lý
+// PATCH /api/admin/orders/:orderId/cancel-request
 export const handleCancelRequest = async (req, res) => {
   try {
     const { action, rejectReason } = req.body;
-    // action = 'approve' hoặc 'reject'
     if (!["approve", "reject"].includes(action)) {
-      return sendError(res, "action phải là approve hoặc reject", 400);
+      return sendError(res, "action must be either approve or reject", 400);
     }
     const result = await orderService.handleCancelRequest(
       req.params.orderId,
@@ -55,7 +51,7 @@ export const updateOrderStatus = async (req, res) => {
       req.params.orderId,
       req.body.orderStatus,
     );
-    return sendSuccess(res, data, "Cập nhật trạng thái thành công");
+    return sendSuccess(res, data, "Update order status successfully");
   } catch (err) {
     return sendError(res, err.message, err.status || 500);
   }
@@ -129,7 +125,7 @@ export const getAllproducts = async (req, res) => {
   }
 };
 
-// THÊM: GET /api/admin/products/:productId — chi tiết cho form edit
+// GET /api/admin/products/:productId
 export const getproductDetail = async (req, res) => {
   try {
     const data = await adminService.getproductDetail(req.params.productId);
@@ -142,7 +138,7 @@ export const getproductDetail = async (req, res) => {
 // POST /api/admin/products
 export const createproduct = async (req, res) => {
   try {
-    await handleUpload(req, res); // sẽ đổi thành handleMultiUpload bên dưới sau khi sửa middleware
+    await handleUpload(req, res);
     const data = await adminService.createproduct(req.body, req.files || []);
     return sendSuccess(res, data, "Tạo sản phẩm thành công", 201);
   } catch (err) {
@@ -153,7 +149,7 @@ export const createproduct = async (req, res) => {
 // PUT /api/admin/products/:productId
 export const updateproduct = async (req, res) => {
   try {
-    await handleUpload(req, res); // sẽ đổi thành handleMultiUpload bên dưới sau khi sửa middleware
+    await handleUpload(req, res);
     const keepImageIds = req.body.keepImageIds
       ? JSON.parse(req.body.keepImageIds)
       : [];
