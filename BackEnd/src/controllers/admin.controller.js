@@ -20,7 +20,7 @@ export const getAllOrders = async (req, res) => {
     const { page, limit, skip } = parsePagination(req);
     const { status } = req.query;
     const data = await adminService.getAllOrders({ page, limit, skip, status });
-    return sendSuccess(res, data, "Get order list successfully");
+    return sendSuccess(res, data, "Get orders list successfully");
   } catch (err) {
     return sendError(res, err.message, err.status || 500);
   }
@@ -62,7 +62,7 @@ export const getAllUsers = async (req, res) => {
   try {
     const { page, limit, skip } = parsePagination(req);
     const data = await adminService.getAllUsers({ page, limit, skip });
-    return sendSuccess(res, data, "Lấy danh sách người dùng thành công");
+    return sendSuccess(res, data, "Get users list successfully");
   } catch (err) {
     return sendError(res, err.message, err.status || 500);
   }
@@ -72,7 +72,7 @@ export const getAllUsers = async (req, res) => {
 export const getRoles = async (req, res) => {
   try {
     const data = await adminService.getRoles();
-    return sendSuccess(res, data, "Lấy danh sách roles thành công");
+    return sendSuccess(res, data, "Get roles list successfully");
   } catch (err) {
     return sendError(res, err.message, err.status || 500);
   }
@@ -82,13 +82,13 @@ export const getRoles = async (req, res) => {
 export const updateUserStatus = async (req, res) => {
   try {
     if (req.user.userId === parseInt(req.params.userId))
-      return sendError(res, "Không thể khoá chính mình", 400);
+      return sendError(res, "Cannot inactive yourself", 400);
 
     const data = await adminService.updateUserStatus(
       req.params.userId,
       req.body.isActive,
     );
-    return sendSuccess(res, data, "Cập nhật trạng thái người dùng thành công");
+    return sendSuccess(res, data, "Update user status successfully");
   } catch (err) {
     return sendError(res, err.message, err.status || 500);
   }
@@ -107,19 +107,19 @@ export const updateUserRole = async (req, res) => {
         userId: user.userId.toString(),
         role: user.role?.roleName,
       },
-      "Đổi role thành công",
+      "Change role successfully",
     );
   } catch (err) {
     return sendError(res, err.message, err.status || 500);
   }
 };
 
-// GET /api/admin/products
+// GET /api/admin/products?page=?&limit=?
 export const getAllproducts = async (req, res) => {
   try {
     const { page, limit, skip } = parsePagination(req);
     const data = await adminService.getAllproducts({ page, limit, skip });
-    return sendSuccess(res, data, "Lấy danh sách sản phẩm thành công");
+    return sendSuccess(res, data, "Get products list successfully");
   } catch (err) {
     return sendError(res, err.message, err.status || 500);
   }
@@ -129,7 +129,7 @@ export const getAllproducts = async (req, res) => {
 export const getproductDetail = async (req, res) => {
   try {
     const data = await adminService.getproductDetail(req.params.productId);
-    return sendSuccess(res, data, "Lấy chi tiết sản phẩm thành công");
+    return sendSuccess(res, data, "Get product detail successfully");
   } catch (err) {
     return sendError(res, err.message, err.status || 500);
   }
@@ -140,7 +140,7 @@ export const createproduct = async (req, res) => {
   try {
     await handleUpload(req, res);
     const data = await adminService.createproduct(req.body, req.files || []);
-    return sendSuccess(res, data, "Tạo sản phẩm thành công", 201);
+    return sendSuccess(res, data, "Add new product successfully", 201);
   } catch (err) {
     return sendError(res, err.message, err.status || 500);
   }
@@ -159,7 +159,7 @@ export const updateproduct = async (req, res) => {
       req.files || [],
       keepImageIds,
     );
-    return sendSuccess(res, data, "Cập nhật thành công");
+    return sendSuccess(res, data, "Update product information successfully");
   } catch (err) {
     return sendError(res, err.message, err.status || 500);
   }
@@ -169,7 +169,7 @@ export const updateproduct = async (req, res) => {
 export const deleteproduct = async (req, res) => {
   try {
     await adminService.deleteproduct(req.params.productId);
-    return sendSuccess(res, null, "Xoá sản phẩm thành công");
+    return sendSuccess(res, null, "Delete product information successfully");
   } catch (err) {
     return sendError(res, err.message, err.status || 500);
   }
