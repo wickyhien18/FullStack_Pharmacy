@@ -218,7 +218,7 @@ export const updateProduct = async (
     (img) => !keepImageIds.includes(img.imageId.toString()),
   );
 
-  // Upload ảnh mới trước. Nếu DB update fail, ảnh mới sẽ được dọn ở catch bên dưới.
+  // Upload new images first. If DB update fail, new images will be cleaned at catch under.
   const newImageUrls = await Promise.all(
     files.map((file) =>
       uploadImage(file.buffer, data.name || existing.name, file.mimetype),
@@ -238,7 +238,7 @@ export const updateProduct = async (
     updateData.manufacturerId = BigInt(data.manufacturerId);
   if (data.status) updateData.status = data.status;
 
-  // Đồng bộ lại ảnh đại diện = ảnh đầu tiên còn lại sau khi sửa
+  // Sync avatar product = first image after update
   updateData.image = keptImages[0]?.imageUrl || newImageUrls[0] || null;
 
   try {
@@ -260,9 +260,10 @@ export const updateProduct = async (
     await adminRepo.createOrUpdateInventory(productId, data.stock);
   }
 
-  await invalidateProductCache(existing.slug);
   if (updateData.slug) {
     await invalidateProductCache(updateData.slug);
+  } else {
+    await invalidateProductCache(existing.slug);
   }
 
   return { productId, message: "Update product information successfully" };
