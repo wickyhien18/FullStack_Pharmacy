@@ -1,6 +1,6 @@
 import { prisma } from "../config/prisma.config.js";
 
-// Thống kê tổng quan dashboard
+//── DASHBOARD STATS ────────────────────────────────────────────────
 export const getDashboardStats = async () => {
   // Promise.all: run 4 queries in parallel instead of sequentially -> approximately 4x faster
   const [totalOrders, totalUsers, totalProducts, revenueResult] =
@@ -8,7 +8,7 @@ export const getDashboardStats = async () => {
       prisma.order.count(),
       prisma.user.count({ where: { deletedAt: null } }),
       prisma.product.count({ where: { deletedAt: null } }),
-      // Total amount from successful delivered orders
+      // Get revenue from successful delivered orders
       prisma.order.aggregate({
         _sum: { totalPrice: true },
         where: { orderStatus: "DELIVERED" },
@@ -23,7 +23,8 @@ export const getDashboardStats = async () => {
   };
 };
 
-// Lấy tất cả đơn hàng (admin thấy hết)
+//── ORDERS ────────────────────────────────────────────────
+//== FIND ALL ORDERS =======================================
 export const findAllOrders = ({ skip, limit, status }) => {
   const where = status
     ? { orderStatus: { in: status.split(",").map((s) => s.trim()) } }
@@ -42,6 +43,7 @@ export const findAllOrders = ({ skip, limit, status }) => {
   });
 };
 
+//== COUNT ALL ORDERS =======================================
 export const countAllOrders = (status) => {
   const where = status
     ? { orderStatus: { in: status.split(",").map((s) => s.trim()) } }
@@ -49,7 +51,7 @@ export const countAllOrders = (status) => {
   return prisma.order.count({ where });
 };
 
-// Cập nhật status đơn hàng
+//== UPDATE ORDER STATUS =======================================
 export const updateOrderStatus = (orderId, orderStatus) => {
   return prisma.order.update({
     where: { orderId },
@@ -57,7 +59,8 @@ export const updateOrderStatus = (orderId, orderStatus) => {
   });
 };
 
-// Lấy tất cả users
+//── USERS ────────────────────────────────────────────────
+//== FIND ALL USERS =======================================
 export const findAllUsers = ({ skip, limit }) => {
   return prisma.user.findMany({
     skip,
@@ -68,22 +71,26 @@ export const findAllUsers = ({ skip, limit }) => {
   });
 };
 
+//== COUNT ALL USERS =======================================
 export const countAllUsers = () =>
   prisma.user.count({ where: { deletedAt: null } });
 
-// Khoá/mở khoá user
+//== UPDATE USER STATUS =======================================
 export const updateUserStatus = (userId, isActive) => {
   return prisma.user.update({ where: { userId }, data: { isActive } });
 };
 
+//== FIND ALL ROLES =======================================
 export const findAllRoles = () => {
   return prisma.role.findMany({ orderBy: { roleName: "asc" } });
 };
 
+//== EXIST ROLE =======================================
 export const existRole = (name) => {
   return prisma.role.findUnique({ where: { roleName: name } });
 };
 
+//== UPDATE USER ROLE =======================================
 export const updateUserRole = (userId, roleId) => {
   return prisma.user.update({
     where: { userId: BigInt(userId) },
@@ -92,8 +99,9 @@ export const updateUserRole = (userId, roleId) => {
   });
 };
 
-// Lấy tất cả products (admin thấy cả inactive)
-export const findAllproducts = ({ skip, limit }) => {
+//── PRODUCTS ────────────────────────────────────────────────
+//== FIND ALL PRODUCTS =======================================
+export const findAllProducts = ({ skip, limit }) => {
   return prisma.product.findMany({
     skip,
     take: limit,
@@ -106,17 +114,19 @@ export const findAllproducts = ({ skip, limit }) => {
   });
 };
 
-export const existproduct = (id) => {
+//== EXIST PRODUCT =======================================
+export const existProduct = (id) => {
   return prisma.product.findUnique({
     where: { productId: BigInt(id) },
   });
 };
 
-// Tạo inventory record cho product mới
+//== CREATE INVENTORY =======================================
 export const createInventory = (data) => {
   return prisma.inventory.create({ data });
 };
 
+//== CREATE OR UPDATE INVENTORY =======================================
 export const createOrUpdateInventory = (productId, stock) => {
   return prisma.inventory.upsert({
     where: { productId: BigInt(productId) },
@@ -125,6 +135,7 @@ export const createOrUpdateInventory = (productId, stock) => {
   });
 };
 
-export const countAllproducts = () => {
+//== COUNT ALL PRODUCTS =======================================
+export const countAllProducts = () => {
   return prisma.product.count({ where: { deletedAt: null } });
 };

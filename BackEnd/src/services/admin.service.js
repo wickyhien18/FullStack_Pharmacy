@@ -10,18 +10,12 @@ import slugify from "slugify";
 
 const MAX_IMAGES = 3;
 
-//── DASHBOARD STATS ────────────────────────────────────────────────
-export const getDashboardStats = () => adminRepo.getDashboardStats();
-
 //── GENERATE SLUG ────────────────────────────────────────────────
 const generateSlug = (name) =>
   slugify(name, { lower: true, strict: true, locale: "vi" }) + "-" + Date.now();
 
-//── FORMAT ROLES ────────────────────────────────────────────────
-const format = (r) => ({
-  roleId: r.roleId.toString(),
-  roleName: r.roleName,
-});
+//── DASHBOARD STATS ────────────────────────────────────────────────
+export const getDashboardStats = () => adminRepo.getDashboardStats();
 
 //── GET ALL ORDERS ────────────────────────────────────────────────
 export const getAllOrders = async ({ page, limit, skip, status }) => {
@@ -68,7 +62,7 @@ export const updateOrderStatus = async (orderId, orderStatus) => {
   }
   const order = await adminRepo.updateOrderStatus(BigInt(orderId), orderStatus);
 
-  // Lấy kèm thông tin user để có email/fullName cho bước thông báo
+  // Get user infomation to have email/fullName for notification
   const fullOrder = await prisma.order.findUnique({
     where: { orderId: order.orderId },
     include: {
@@ -84,7 +78,7 @@ export const updateOrderStatus = async (orderId, orderStatus) => {
 //── GET ROLES ────────────────────────────────────────────────
 export const getRoles = async () => {
   const roles = await adminRepo.findAllRoles();
-  return roles.map(format);
+  return { roleId: roles.roleId.toString(), roleName: roles.roleName };
 };
 
 //── GET ALL USERS ────────────────────────────────────────────────
@@ -128,8 +122,8 @@ export const updateUserRole = async (userId, roleName) => {
 //── GET ALL PRODUCTS ────────────────────────────────────────────────
 export const getAllProducts = async ({ page, limit, skip }) => {
   const [products, total] = await Promise.all([
-    adminRepo.findAllproducts({ skip, limit }),
-    adminRepo.countAllproducts(),
+    adminRepo.findAllProducts({ skip, limit }),
+    adminRepo.countAllProducts(),
   ]);
 
   const items = products.map((m) => ({
@@ -213,7 +207,7 @@ export const updateProduct = async (
   files = [],
   keepImageIds = [],
 ) => {
-  const existing = await adminRepo.existproduct(productId);
+  const existing = await adminRepo.existProduct(productId);
   if (!existing) throw { status: 404, message: "Không tìm thấy sản phẩm" };
 
   const currentImages = await productRepo.findImagesByProductId(
@@ -283,7 +277,7 @@ export const updateProduct = async (
 
 //── DELETE PRODUCT  ────────────────────────────────────────────────
 export const deleteProduct = async (productId) => {
-  const existing = await adminRepo.existproduct(productId);
+  const existing = await adminRepo.existProduct(productId);
   if (!existing) throw { status: 404, message: "Không tìm thấy sản phẩm" };
 
   // THÊM: xoá tất cả ảnh trong bảng product_images, không chỉ ảnh đại diện
