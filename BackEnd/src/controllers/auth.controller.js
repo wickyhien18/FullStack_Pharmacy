@@ -5,15 +5,15 @@ import { env } from "../config/env.config.js";
 const REFRESH_TOKEN_COOKIE = "refreshToken"; //cookie name
 
 const cookieOptions = {
-  httpOnly: true, // JS phía client KHÔNG đọc được → chống XSS lấy token
-  secure: env.isProd, // chỉ gửi qua HTTPS ở production
-  sameSite: env.isProd ? "none" : "strict", // chống CSRF — chỉ gửi cookie cùng origin
-  maxAge: 7 * 24 * 60 * 60 * 1000, // thời gian sống cookie = 7 ngày (tính bằng ms)
+  httpOnly: true, // Not readable by client-side JS → prevents XSS from stealing the token.
+  secure: env.NODE_ENV === "production", // Only send by HTTPS at production
+  sameSite: env.NODE_ENV === "production" ? "none" : "strict", // prevents CSRF — only send token in same origin
+  maxAge: 7 * 24 * 60 * 60 * 1000, // cookie life age = 7 days
 };
 
+// POST /api/auth/register
 export const register = async (req, res) => {
   try {
-    //201 - Created
     const user = await authService.register(req.body);
     return sendSuccess(res, user, "User registered successfully", 201);
   } catch (error) {
@@ -21,6 +21,7 @@ export const register = async (req, res) => {
   }
 };
 
+// POST /api/auth/login
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -36,6 +37,7 @@ export const login = async (req, res) => {
   }
 };
 
+// POST /api/auth/refresh-token
 export const refreshToken = async (req, res) => {
   try {
     const token = req.cookies[REFRESH_TOKEN_COOKIE] || req.body.refreshToken;
@@ -55,6 +57,7 @@ export const refreshToken = async (req, res) => {
   }
 };
 
+// POST /api/auth/logout
 export const logout = async (req, res) => {
   try {
     const token = req.cookies[REFRESH_TOKEN_COOKIE] || req.body.refreshToken;
@@ -66,6 +69,7 @@ export const logout = async (req, res) => {
   }
 };
 
+// POST /api/auth/logout-all
 export const logoutAll = async (req, res) => {
   try {
     await authService.logoutAll(req.user.userId);
@@ -76,6 +80,7 @@ export const logoutAll = async (req, res) => {
   }
 };
 
+// GET /api/auth/profile
 export const getProfile = async (req, res) => {
   try {
     const user = await authService.getProfile(req.user.userId);
@@ -90,12 +95,12 @@ export const updateProfile = async (req, res) => {
   try {
     const { fullName, phone } = req.body;
     if (!fullName && !phone)
-      return sendError(res, "Vui lòng nhập thông tin cần cập nhật", 400);
+      return sendError(res, "Please enter the information to be updated", 400);
     const data = await authService.updateProfile(req.user.userId, {
       fullName,
       phone,
     });
-    return sendSuccess(res, data, "Cập nhật thông tin thành công");
+    return sendSuccess(res, data, "Update profile successfully");
   } catch (err) {
     return sendError(res, err.message, err.status || 500);
   }
@@ -137,7 +142,7 @@ export const verifyEmailChange = async (req, res) => {
   }
 };
 
-// POST /api/auth/forgot-password (không cần authenticate)
+// POST /api/auth/forgot-password
 export const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
@@ -148,7 +153,7 @@ export const forgotPassword = async (req, res) => {
   }
 };
 
-// POST /api/auth/reset-password (không cần authenticate)
+// POST /api/auth/reset-password
 export const resetPassword = async (req, res) => {
   try {
     const { email, otp, newPassword } = req.body;
@@ -159,11 +164,12 @@ export const resetPassword = async (req, res) => {
   }
 };
 
+// GET /api/auth/google/callback
 export const googleCallback = async (req, res) => {
   try {
-    const user = req.user; // passport set sẵn
+    const user = req.user;
 
-    // Trường hợp mới: chưa từng có tài khoản — chuyển hướng về form hoàn tất
+    // Haven't had account yet — redirect to register form
     if (user?.pending) {
       const pendingToken = authService.createGoogleSignupToken({
         email: user.email,
@@ -200,12 +206,12 @@ export const googleCallback = async (req, res) => {
   }
 };
 
-// ── THÊM MỚI: hoàn tất đăng ký sau Google ───────────────────────────
+// POST /api/auth/google/complete-signup
 export const completeGoogleSignup = async (req, res) => {
   try {
     const { token, userName, fullName, phone, password } = req.body;
     if (!token || !userName || !phone || !password) {
-      return sendError(res, "Thiếu thông tin bắt buộc", 400);
+      return sendError(res, "Missing required information", 400);
     }
 
     const { accessToken, refreshToken, user } =
@@ -215,7 +221,11 @@ export const completeGoogleSignup = async (req, res) => {
       );
 
     res.cookie(REFRESH_TOKEN_COOKIE, refreshToken, cookieOptions);
-    return sendSuccess(res, { accessToken, user }, "Tạo tài khoản thành công");
+    return sendSuccess(
+      res,
+      { accessToken, user },
+      "Create account successfully",
+    );
   } catch (err) {
     return sendError(res, err.message, err.status || 500);
   }

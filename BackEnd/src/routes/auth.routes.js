@@ -11,26 +11,37 @@ import { registerSchema, loginSchema } from "../validator/auth.validator.js";
 
 const router = Router();
 
+// REGISTER
 router.post(
   "/register",
   authRateLimit,
   validate(registerSchema),
   authController.register,
 );
+
+// LOGIN
 router.post(
   "/login",
   authRateLimit,
   validate(loginSchema),
   authController.login,
 );
+
+// REFRESH TOKEN
 router.post("/refresh-token", refreshRateLimit, authController.refreshToken);
+
+// LOG OUT
 router.post("/logout", authController.logout);
-
 router.post("/logout-all", authenticate, authController.logoutAll);
-router.get("/profile", authenticate, authController.getProfile);
 
+// PROFILE
+router.get("/profile", authenticate, authController.getProfile);
 router.put("/profile", authenticate, authController.updateProfile);
+
+// PASSWORD CHANGE
 router.put("/change-password", authenticate, authController.changePassword);
+
+// EMAIL CHANGE
 router.post(
   "/request-email-change",
   authenticate,
@@ -42,9 +53,11 @@ router.post(
   authController.verifyEmailChange,
 );
 
+// FORGOT PASSWORD
 router.post("/forgot-password", authController.forgotPassword);
 router.post("/reset-password", authController.resetPassword);
 
+// GOOGLE SIGN UP
 router.get(
   "/google",
   passport.authenticate("google", {
@@ -52,7 +65,6 @@ router.get(
     session: false,
   }),
 );
-
 router.get(
   "/google/callback",
   passport.authenticate("google", {
@@ -61,7 +73,6 @@ router.get(
   }),
   authController.googleCallback,
 );
-
 router.post("/google/complete-signup", authController.completeGoogleSignup);
 
 export default router;
