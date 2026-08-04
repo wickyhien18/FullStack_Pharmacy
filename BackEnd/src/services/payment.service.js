@@ -1,6 +1,7 @@
 import { prisma } from "../config/prisma.config.js";
 import * as orderRepo from "../repositories/order.repository.js";
 import * as cartRepo from "../repositories/cart.repository.js";
+import * as payRepo from "../repositories/payment.repository.js";
 import { createVNPayUrl, verifyVNPayReturn } from "../utils/vnpay.util.js";
 import { env } from "../config/env.config.js";
 
@@ -18,17 +19,11 @@ export const createVNPayPayment = async (orderId, userId, ipAddr) => {
     throw { status: 400, message: "Order has been cancelled" };
 
   // Create or update the payment record.
-  const existingPayment = await prisma.payment.findFirst({
-    where: {
-      orderId: BigInt(orderId),
-      paymentMethod: "VNPAY",
-      status: "PENDING",
-    },
-  });
+  const existPayment = await payRepo.existingPayment(BigInt(orderId));
 
   const expiredAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
 
-  if (!existingPayment) {
+  if (!existPayment) {
     await prisma.payment.create({
       data: {
         orderId: BigInt(orderId),

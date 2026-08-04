@@ -4,10 +4,10 @@ import { sendOrderStatusEmail } from "./email.service.js";
 
 // Only these statuses notify customers; PENDING is created by the customer, so no reminder is needed.
 const STATUS_MESSAGES = {
-  CONFIRMED: "Your order has been confirmed and is being packed",
-  SHIPPING: "Your order is on the way",
-  DELIVERED: "Your order has been delivered successfully",
-  CANCELLED: "Your order has been cancelled",
+  CONFIRMED: "Đơn hàng của bạn đã được xác nhận và đang được đóng gói",
+  SHIPPING: "Đơn hàng của bạn đang được giao đến bạn",
+  DELIVERED: "Đơn hàng của bạn đã giao thành công",
+  CANCELLED: "Đơn hàng của bạn đã bị huỷ",
 };
 
 //── NOTIFY ORDER STATUS CHANGE ──────────────────────────────────

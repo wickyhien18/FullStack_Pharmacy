@@ -6,7 +6,7 @@ import { env } from "./config/env.config.js";
 import { prisma } from "./config/prisma.config.js";
 import { startTokenCleanupJob } from "./utils/cleanup-tokens.js";
 import { verifyAccessToken } from "./utils/jwt.js";
-import { setIO } from "./config/socket.config.js"; // file mới, xem bên dưới
+import { setIO } from "./config/socket.config.js";
 
 BigInt.prototype.toJSON = function () {
   return this.toString();
