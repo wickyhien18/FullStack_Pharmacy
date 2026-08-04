@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { translateApiMessage } from "../utils/errorMessages.js";
-import api from "../utils/axios.js";
+import { cancelOrder } from "../services/order.service.js";
 
 const CANCEL_MESSAGE = {
   PENDING: "Đơn hàng sẽ được huỷ ngay lập tức.",
@@ -23,7 +23,7 @@ export default function CancelOrderModal({ order, onClose }) {
   const queryClient = useQueryClient();
 
   const cancelMutation = useMutation({
-    mutationFn: () => api.post(`/orders/${order.orderId}/cancel`, { reason }),
+    mutationFn: () => cancelOrder(order.orderId, reason),
     onSuccess: ({ data }) => {
       toast.success(data.data?.message || "Thành công");
       queryClient.invalidateQueries({ queryKey: ["my-orders"] });
