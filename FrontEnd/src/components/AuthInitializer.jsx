@@ -12,16 +12,20 @@
 import { useEffect, useState, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "@/stores/auth.store.js";
-import api, { refreshTokenOnce } from "@/utils/axios.js";
+import { refreshTokenOnce } from "@/services/axiosInstance.js";
+import {
+  getProductByPageAndLimit,
+  getCategories,
+} from "@/services/product.service.js";
 
 const PREFETCH_TASKS = [
   {
     key: ["categories"],
-    fn: () => api.get("/categories").then((r) => r.data.data),
+    fn: () => getCategories(),
   },
   {
     key: ["products", { page: 1, limit: 12 }],
-    fn: () => api.get("/products?page=1&limit=12").then((r) => r.data.data),
+    fn: () => getProductByPageAndLimit(),
   },
 ];
 
