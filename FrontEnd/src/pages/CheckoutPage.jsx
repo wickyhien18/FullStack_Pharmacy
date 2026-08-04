@@ -15,11 +15,12 @@ import {
 } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { useCart } from "@/hooks/useCart.js";
-import api from "../utils/axios.js";
 import { useAuth } from "../hooks/useAuth.js";
 import toast from "react-hot-toast";
 import { translateApiMessage } from "../utils/errorMessages.js";
 import { productThumb } from "../utils/imageUrl.js";
+import { createVnpay, createCOD } from "../services/payment.service.js";
+import { createOrder, cancelOrder } from "../services/order.service.js";
 
 const steps = ["Địa chỉ giao hàng", "Thanh toán", "Xác nhận"];
 const paymentMethods = [
@@ -151,20 +152,17 @@ function CheckoutPage() {
 
   // ── Tạo đơn hàng ─────────────────────────────────────────────
   const createOrderMutation = useMutation({
-    mutationFn: (payload) =>
-      api.post("/orders", payload).then((r) => r.data.data),
+    mutationFn: (payload) => createOrder(payload),
   });
 
   // ── Lấy URL thanh toán VNPAY ─────────────────────────────────
   const vnpayMutation = useMutation({
-    mutationFn: (orderId) =>
-      api.post("/payment/vnpay/create", { orderId }).then((r) => r.data.data),
+    mutationFn: (orderId) => createVnpay(orderId),
   });
 
   // ── Xác nhận đơn COD ─────────────────────────────────────────
   const codMutation = useMutation({
-    mutationFn: (orderId) =>
-      api.post("/payment/cod", { orderId }).then((r) => r.data.data),
+    mutationFn: (orderId) => createCOD(orderId),
   });
 
   const isSubmitting =
@@ -260,9 +258,10 @@ function CheckoutPage() {
       // → huỷ đơn mồ côi thay vì để nó nằm PENDING không ai biết
       if (createdOrder?.orderId) {
         try {
-          await api.post(`/orders/${createdOrder.orderId}/cancel`, {
-            reason: "Tạo thanh toán thất bại, tự động huỷ",
-          });
+          await cancelOrder(
+            createdOrder.orderId,
+            "Tạo thanh toán thất bại, tự động huỷ",
+          );
         } catch (cancelErr) {
           console.error("Không thể tự động huỷ đơn mồ côi:", cancelErr);
         }
