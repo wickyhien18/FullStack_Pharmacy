@@ -8,7 +8,12 @@ import toast from "react-hot-toast";
 import { useAuthStore } from "@/stores/auth.store.js";
 import { useCart } from "@/hooks/useCart.js";
 import { translateApiMessage } from "@/utils/errorMessages.js";
-import api from "@/utils/axios.js";
+import {
+  login,
+  register,
+  logOut,
+  completeGoogleSignup,
+} from "../services/auth.service.js";
 
 export const useAuth = () => {
   const navigate = useNavigate();
@@ -19,7 +24,7 @@ export const useAuth = () => {
   // useMutation: dùng cho các action thay đổi data (POST/PUT/DELETE)
   // Khác useQuery ở chỗ: không tự chạy, phải gọi mutate() thủ công
   const loginMutation = useMutation({
-    mutationFn: (credentials) => api.post("/auth/login", credentials),
+    mutationFn: (credentials) => login(credentials),
     onSuccess: ({ data }) => {
       setAuth(data.data.user, data.data.accessToken);
       toast.success("Đăng nhập thành công!");
@@ -35,7 +40,7 @@ export const useAuth = () => {
 
   // ── Register mutation ─────────────────────────────────────────
   const registerMutation = useMutation({
-    mutationFn: (data) => api.post("/auth/register", data),
+    mutationFn: (data) => register(data),
   });
 
   // Wrap mutate để nhận callback từ bên ngoài
@@ -57,7 +62,7 @@ export const useAuth = () => {
   // ── Logout ────────────────────────────────────────────────────
   const logout = async () => {
     try {
-      await api.post("/auth/logout");
+      await logOut();
     } catch {
       // Dù API lỗi vẫn clear state — user phải thoát được
     } finally {
@@ -71,7 +76,7 @@ export const useAuth = () => {
   };
 
   const completeGoogleSignupMutation = useMutation({
-    mutationFn: (data) => api.post("/auth/google/complete-signup", data),
+    mutationFn: (data) => completeGoogleSignup(data),
     onSuccess: ({ data }) => {
       setAuth(data.data.user, data.data.accessToken);
       toast.success("Tạo tài khoản thành công!");
