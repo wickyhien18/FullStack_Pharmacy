@@ -8,10 +8,7 @@ import {
   MapPin,
 } from "lucide-react";
 import { ProductCard } from "../components/ProductCard";
-import {
-  useProducts,
-  useCategoriesWithCount,
-} from "../../hooks/useProducts.js";
+import { useProducts, useCategoriesWithCount } from "../hooks/useProducts.js";
 function HomePage() {
   const [slide, setSlide] = useState(0);
 

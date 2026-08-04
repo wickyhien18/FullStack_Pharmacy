@@ -6,8 +6,8 @@ import { useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Upload, X } from "lucide-react";
 import toast from "react-hot-toast";
-import { translateApiMessage } from "../../../utils/errorMessages.js";
-import api from "../../../utils/axios.js";
+import { translateApiMessage } from "../../utils/errorMessages.js";
+import api from "../../utils/axios.js";
 
 const MAX_IMAGES = 3;
 const UNIT_SUGGESTIONS = ["Hộp", "Chai", "Tuýp", "Gói", "Viên", "Ống"];

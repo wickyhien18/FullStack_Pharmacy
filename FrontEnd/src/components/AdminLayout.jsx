@@ -6,7 +6,7 @@ import {
   useLocation,
   ScrollRestoration,
 } from "react-router-dom";
-import { useAuthStore } from "../../stores/auth.store.js";
+import { useAuthStore } from "../stores/auth.store.js";
 import {
   LayoutDashboard,
   Package,
@@ -83,7 +83,8 @@ export default function AdminLayout() {
             {isAdmin ? "Quản trị Nhà thuốc" : "Khu vực Nhân viên"}
           </h1>
           <p className="text-xs text-gray-500 mt-0.5">
-            {user?.fullName || user?.userName} ({isStaff ? "Shipper / Dược sĩ" : "Admin"})
+            {user?.fullName || user?.userName} (
+            {isStaff ? "Shipper / Dược sĩ" : "Admin"})
           </p>
         </div>
         <button

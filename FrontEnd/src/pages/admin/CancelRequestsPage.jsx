@@ -4,8 +4,8 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import { translateApiMessage } from "../../../utils/errorMessages.js";
-import api from "../../../utils/axios.js";
+import { translateApiMessage } from "../../utils/errorMessages.js";
+import api from "../../utils/axios.js";
 
 const STATUS_CONFIG = {
   CANCEL_REQUESTED: {

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { ShoppingCart, Users, Package, TrendingUp } from "lucide-react";
-import api from "../../../utils/axios.js";
+import api from "../../utils/axios.js";
 
 export default function DashboardPage() {
   const { data: stats, isLoading } = useQuery({

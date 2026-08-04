@@ -6,8 +6,8 @@ import ReactDOM from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "react-hot-toast";
 import App from "./app/App.jsx";
-import AuthInitializer from "./app/components/AuthInitializer.jsx";
-import ErrorBoundary from "./app/components/ErrorBoundary.jsx";
+import AuthInitializer from "./components/AuthInitializer.jsx";
+import ErrorBoundary from "./components/ErrorBoundary.jsx";
 import "./styles/index.css";
 
 const queryClient = new QueryClient({

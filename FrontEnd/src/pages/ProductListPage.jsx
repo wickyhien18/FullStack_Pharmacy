@@ -8,10 +8,7 @@ import {
   X,
 } from "lucide-react";
 import { ProductCard } from "../components/ProductCard";
-import {
-  useProducts,
-  useCategoriesWithCount,
-} from "../../hooks/useProducts.js"; // ← đổi import
+import { useProducts, useCategoriesWithCount } from "../hooks/useProducts.js";
 
 const sortOptions = [
   { value: "newest", label: "Mới nhất" },

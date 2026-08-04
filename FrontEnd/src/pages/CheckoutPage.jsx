@@ -15,11 +15,11 @@ import {
 } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { useCart } from "@/hooks/useCart.js";
-import api from "../../utils/axios.js";
-import { useAuth } from "../../hooks/useAuth.js";
+import api from "../utils/axios.js";
+import { useAuth } from "../hooks/useAuth.js";
 import toast from "react-hot-toast";
-import { translateApiMessage } from "../../utils/errorMessages.js";
-import { productThumb } from "../../utils/imageUrl.js";
+import { translateApiMessage } from "../utils/errorMessages.js";
+import { productThumb } from "../utils/imageUrl.js";
 
 const steps = ["Địa chỉ giao hàng", "Thanh toán", "Xác nhận"];
 const paymentMethods = [

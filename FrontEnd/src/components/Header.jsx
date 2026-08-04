@@ -17,9 +17,9 @@ import {
   Stethoscope,
 } from "lucide-react";
 import { useCart } from "@/hooks/useCart.js";
-import { useCategories } from "../../hooks/useProducts.js";
-import { useAuth } from "../../hooks/useAuth.js";
-import { useNotifications } from "../../hooks/useNotifications.js";
+import { useCategories } from "../hooks/useProducts.js";
+import { useAuth } from "../hooks/useAuth.js";
+import { useNotifications } from "../hooks/useNotifications.js";
 
 function Header() {
   const { totalItems } = useCart();
@@ -113,7 +113,10 @@ function Header() {
           </Link>
 
           {/* Search — Desktop */}
-          <form onSubmit={handleSearch} className="hidden md:block flex-1 max-w-5xl">
+          <form
+            onSubmit={handleSearch}
+            className="hidden md:block flex-1 max-w-5xl"
+          >
             <div className="relative flex items-center">
               <input
                 type="text"

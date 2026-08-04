@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { useCart } from "@/hooks/useCart.js";
 import { useState } from "react";
-import { productThumb } from "../../utils/imageUrl.js";
+import { productThumb } from "../utils/imageUrl.js";
 
 // Skeleton cho 1 cart item
 function CartItemSkeleton() {

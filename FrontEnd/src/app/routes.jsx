@@ -2,27 +2,27 @@ import { createBrowserRouter } from "react-router-dom";
 import { lazy, Suspense } from "react";
 
 // ── Eager load — layout và trang quan trọng nhất ─────────────────
-import Layout from "./components/Layout";
-import HomePage from "./pages/HomePage";
-import NotFoundPage from "./pages/NotFoundPage";
+import Layout from "../components/Layout";
+import HomePage from "../pages/HomePage";
+import NotFoundPage from "../pages/NotFoundPage";
 
 // ── Lazy load — chỉ load khi user điều hướng đến ─────────────────
-const ProductListPage = lazy(() => import("./pages/ProductListPage"));
-const ProductDetailPage = lazy(() => import("./pages/ProductDetailPage"));
-const CartPage = lazy(() => import("./pages/CartPage"));
-const CheckoutPage = lazy(() => import("./pages/CheckoutPage"));
-const AccountPage = lazy(() => import("./pages/AccountPage"));
-const SearchPage = lazy(() => import("./pages/SearchPage"));
-const GoogleCallback = lazy(() => import("./pages/GoogleCallback"));
+const ProductListPage = lazy(() => import("../pages/ProductListPage"));
+const ProductDetailPage = lazy(() => import("../pages/ProductDetailPage"));
+const CartPage = lazy(() => import("../pages/CartPage"));
+const CheckoutPage = lazy(() => import("../pages/CheckoutPage"));
+const AccountPage = lazy(() => import("../pages/AccountPage"));
+const SearchPage = lazy(() => import("../pages/SearchPage"));
+const GoogleCallback = lazy(() => import("../pages/GoogleCallback"));
 
 // Admin — lazy load toàn bộ vì user thường không vào
-const AdminLayout = lazy(() => import("./components/AdminLayout"));
-const AdminDashboard = lazy(() => import("./pages/admin/DashboardPage"));
-const AdminProducts = lazy(() => import("./pages/admin/ProductsPage"));
-const AdminOrders = lazy(() => import("./pages/admin/OrdersPage"));
-const AdminUsers = lazy(() => import("./pages/admin/UsersPage"));
+const AdminLayout = lazy(() => import("../components/AdminLayout"));
+const AdminDashboard = lazy(() => import("../pages/admin/DashboardPage"));
+const AdminProducts = lazy(() => import("../pages/admin/ProductsPage"));
+const AdminOrders = lazy(() => import("../pages/admin/OrdersPage"));
+const AdminUsers = lazy(() => import("../pages/admin/UsersPage"));
 const CancelRequestsPage = lazy(
-  () => import("./pages/admin/CancelRequestsPage"),
+  () => import("../pages/admin/CancelRequestsPage"),
 );
 
 // Fallback hiện trong lúc lazy component đang load

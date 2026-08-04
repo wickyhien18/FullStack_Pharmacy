@@ -3,9 +3,9 @@ import { useParams, Link } from "react-router-dom";
 import { ShoppingCart, Minus, Plus, ChevronRight, Check } from "lucide-react";
 import { ProductCard } from "../components/ProductCard";
 import { useCart } from "@/hooks/useCart.js";
-import { useProduct, useProducts } from "../../hooks/useProducts.js";
-import NotFoundPage from "./NotFoundPage";
-import { productDetailMain, productDetailThumb } from "../../utils/imageUrl.js";
+import { useProduct, useProducts } from "../hooks/useProducts.js";
+import NotFoundPage from "./NotFoundPage.jsx";
+import { productDetailMain, productDetailThumb } from "../utils/imageUrl.js";
 
 const tabs = [
   "Mô tả",

@@ -2,8 +2,8 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { UserCheck, UserX, Shield } from "lucide-react";
 import toast from "react-hot-toast";
-import { translateApiMessage } from "../../../utils/errorMessages.js";
-import api from "../../../utils/axios.js";
+import { translateApiMessage } from "../../utils/errorMessages.js";
+import api from "../../utils/axios.js";
 
 function RoleModal({ user, onClose }) {
   const queryClient = useQueryClient();

@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import { translateApiMessage } from "../../utils/errorMessages.js";
-import api from "../../utils/axios.js";
+import { translateApiMessage } from "../utils/errorMessages.js";
+import api from "../utils/axios.js";
 
 const CANCEL_MESSAGE = {
   PENDING: "Đơn hàng sẽ được huỷ ngay lập tức.",

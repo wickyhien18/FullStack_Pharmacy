@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { Search, ChevronRight } from "lucide-react";
 import { ProductCard } from "../components/ProductCard";
-import { useProducts } from "../../hooks/useProducts.js";
+import { useProducts } from "../hooks/useProducts.js";
 
 // Debounce hook — chờ user gõ xong mới fetch, tránh gọi API liên tục
 function useDebounce(value, delay = 400) {
