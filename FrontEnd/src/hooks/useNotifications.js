@@ -2,8 +2,11 @@ import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "@/stores/auth.store.js";
 import { connectSocket, disconnectSocket } from "@/utils/socket.js";
-import api from "@/utils/axios.js";
 import toast from "react-hot-toast";
+import {
+  getNotification,
+  markAllRead,
+} from "../services/notification.service.js";
 
 export const useNotifications = () => {
   const { accessToken, isAuthenticated } = useAuthStore();
@@ -12,7 +15,7 @@ export const useNotifications = () => {
 
   const { data: history = [] } = useQuery({
     queryKey: ["notifications"],
-    queryFn: () => api.get("/notifications").then((r) => r.data.data),
+    queryFn: () => getNotification(),
     enabled: isAuthenticated,
   });
 
@@ -41,7 +44,7 @@ export const useNotifications = () => {
   }, [isAuthenticated, accessToken]);
 
   const markAllReadMutation = useMutation({
-    mutationFn: () => api.patch("/notifications/mark-all-read"),
+    mutationFn: () => markAllRead(),
     onSuccess: () => {
       setLiveItems((prev) => prev.map((n) => ({ ...n, isRead: true })));
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
