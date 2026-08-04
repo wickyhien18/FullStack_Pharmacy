@@ -17,6 +17,7 @@ import {
   getProductByPageAndLimit,
   getCategories,
 } from "@/services/product.service.js";
+import { getProfile } from "@/services/auth.service.js";
 
 const PREFETCH_TASKS = [
   {
@@ -25,7 +26,7 @@ const PREFETCH_TASKS = [
   },
   {
     key: ["products", { page: 1, limit: 12 }],
-    fn: () => getProductByPageAndLimit(),
+    fn: () => getProductByPageAndLimit(1, 12),
   },
 ];
 
@@ -71,9 +72,7 @@ export default function AuthInitializer({ children }) {
           // có nhiều nơi cần token cùng lúc khi app vừa mount
           const newToken = await refreshTokenOnce();
 
-          const profileRes = await api.get("/auth/profile", {
-            headers: { Authorization: `Bearer ${newToken}` },
-          });
+          const profileRes = await getProfile(newToken);
           setAuth(profileRes.data.data, newToken);
         } catch (err) {
           if (err.response?.status === 401) {
