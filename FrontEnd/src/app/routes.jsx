@@ -1,8 +1,5 @@
 import { createBrowserRouter } from "react-router-dom";
 import { lazy, Suspense } from "react";
-// import PromotionsPage from "./pages/PromotionsPage";
-// import BlogPage from "./pages/BlogPage";
-// import BlogDetailPage from "./pages/BlogDetailPage";
 
 // ── Eager load — layout và trang quan trọng nhất ─────────────────
 import Layout from "./components/Layout";

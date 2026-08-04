@@ -754,12 +754,6 @@ function CheckoutPage() {
               <span>Tạm tính</span>
               <span>{formatPrice(totalPrice)}</span>
             </div>
-            {/* <div className="flex justify-between text-gray-600">
-              <span>Vận chuyển</span>
-              <span className={shipping === 0 ? "text-green-600" : ""}>
-                {shipping === 0 ? "Mi\u1EC5n ph\xED" : formatPrice(shipping)}
-              </span>
-            </div> */}
             <div
               className="flex justify-between font-bold border-t border-gray-100 pt-2"
               style={{ color: "#e53935" }}

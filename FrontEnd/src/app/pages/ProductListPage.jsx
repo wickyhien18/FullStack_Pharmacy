@@ -104,9 +104,6 @@ function ProductListPage() {
     stock: m.stock || 50,
     image: m.primaryImage || FALLBACK_IMAGE,
     unit: m.unit || "Hộp",
-    // isFlashSale: index % 5 === 0,
-    // isBestSeller: index % 5 === 1,
-    // isFeatured: index % 5 === 2,
   }));
 
   // Tổng số trang — lấy từ backend, không tính frontend nữa
@@ -298,14 +295,19 @@ function ProductListPage() {
                 <h3 className="font-semibold text-gray-800 flex items-center gap-2">
                   <SlidersHorizontal size={16} /> Bộ lọc sản phẩm
                 </h3>
-                <button onClick={() => setShowFilter(false)} className="text-gray-400 hover:text-gray-600">
+                <button
+                  onClick={() => setShowFilter(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
                   <X size={18} />
                 </button>
               </div>
 
               {/* Danh mục */}
               <div>
-                <h4 className="font-medium text-xs text-gray-500 uppercase mb-2">Danh mục</h4>
+                <h4 className="font-medium text-xs text-gray-500 uppercase mb-2">
+                  Danh mục
+                </h4>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     onClick={() => {
@@ -339,7 +341,9 @@ function ProductListPage() {
 
               {/* Khoảng giá */}
               <div className="border-t border-gray-100 pt-3">
-                <h4 className="font-medium text-xs text-gray-500 uppercase mb-2">Khoảng giá</h4>
+                <h4 className="font-medium text-xs text-gray-500 uppercase mb-2">
+                  Khoảng giá
+                </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                   {priceRanges.map((range) => {
                     const active =
