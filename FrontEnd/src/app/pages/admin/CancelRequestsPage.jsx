@@ -4,16 +4,24 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import { translateApiMessage } from "../../../lib/errorMessages.js";
-import api from "../../../lib/axios.js";
+import { translateApiMessage } from "../../../utils/errorMessages.js";
+import api from "../../../utils/axios.js";
 
 const STATUS_CONFIG = {
-  CANCEL_REQUESTED: { label: "Yêu cầu huỷ",  color: "bg-orange-100 text-orange-700" },
-  RETURN_REQUESTED: { label: "Yêu cầu hoàn", color: "bg-purple-100 text-purple-700" },
+  CANCEL_REQUESTED: {
+    label: "Yêu cầu huỷ",
+    color: "bg-orange-100 text-orange-700",
+  },
+  RETURN_REQUESTED: {
+    label: "Yêu cầu hoàn",
+    color: "bg-purple-100 text-purple-700",
+  },
 };
 
 const formatPrice = (p) =>
-  new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(p);
+  new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(
+    p,
+  );
 
 function RejectModal({ order, onClose, onConfirm, isPending }) {
   const [reason, setReason] = useState("");
@@ -23,8 +31,11 @@ function RejectModal({ order, onClose, onConfirm, isPending }) {
       <div className="bg-white rounded-2xl w-full max-w-md p-6">
         <h3 className="font-bold text-gray-800 mb-3">Lý do từ chối</h3>
         <p className="text-sm text-gray-500 mb-4">
-          Đơn hàng <span className="font-semibold">#{order.orderCode}</span> sẽ tiếp tục
-          {order.orderStatus === "CANCEL_REQUESTED" ? " được giao." : " ở trạng thái đã giao."}
+          Đơn hàng <span className="font-semibold">#{order.orderCode}</span> sẽ
+          tiếp tục
+          {order.orderStatus === "CANCEL_REQUESTED"
+            ? " được giao."
+            : " ở trạng thái đã giao."}
         </p>
         <textarea
           value={reason}
@@ -60,14 +71,18 @@ export default function CancelRequestsPage() {
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-cancel-requests"],
-    queryFn:  () =>
-      api.get("/admin/orders?status=CANCEL_REQUESTED,RETURN_REQUESTED")
-         .then((r) => r.data.data),
+    queryFn: () =>
+      api
+        .get("/admin/orders?status=CANCEL_REQUESTED,RETURN_REQUESTED")
+        .then((r) => r.data.data),
   });
 
   const handleMutation = useMutation({
     mutationFn: ({ orderId, action, rejectReason }) =>
-      api.patch(`/admin/orders/${orderId}/cancel-request`, { action, rejectReason }),
+      api.patch(`/admin/orders/${orderId}/cancel-request`, {
+        action,
+        rejectReason,
+      }),
     onSuccess: ({ data }) => {
       toast.success(data.data?.message || "Xử lý thành công");
       queryClient.invalidateQueries({ queryKey: ["admin-cancel-requests"] });
@@ -81,16 +96,18 @@ export default function CancelRequestsPage() {
   });
 
   const handleApprove = (order) => {
-    const label = order.orderStatus === "RETURN_REQUESTED" ? "hoàn hàng" : "huỷ đơn";
-    if (!confirm(`Xác nhận đồng ý ${label} cho đơn #${order.orderCode}?`)) return;
+    const label =
+      order.orderStatus === "RETURN_REQUESTED" ? "hoàn hàng" : "huỷ đơn";
+    if (!confirm(`Xác nhận đồng ý ${label} cho đơn #${order.orderCode}?`))
+      return;
     handleMutation.mutate({ orderId: order.orderId, action: "approve" });
   };
 
   const handleReject = (reason) => {
     if (!rejectTarget) return;
     handleMutation.mutate({
-      orderId:      rejectTarget.orderId,
-      action:       "reject",
+      orderId: rejectTarget.orderId,
+      action: "reject",
       rejectReason: reason,
     });
   };
@@ -108,23 +125,32 @@ export default function CancelRequestsPage() {
       ) : orders.length === 0 ? (
         <div className="bg-white rounded-2xl p-16 text-center">
           <div className="text-4xl mb-3">✅</div>
-          <p className="text-gray-500 font-medium">Không có yêu cầu nào cần xử lý</p>
+          <p className="text-gray-500 font-medium">
+            Không có yêu cầu nào cần xử lý
+          </p>
         </div>
       ) : (
         <div className="space-y-4">
           {orders.map((order) => {
             const cfg = STATUS_CONFIG[order.orderStatus];
             return (
-              <div key={order.orderId} className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+              <div
+                key={order.orderId}
+                className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm"
+              >
                 {/* Header */}
                 <div className="flex items-start justify-between mb-3">
                   <div>
-                    <p className="font-bold text-gray-800">#{order.orderCode}</p>
+                    <p className="font-bold text-gray-800">
+                      #{order.orderCode}
+                    </p>
                     <p className="text-sm text-gray-500 mt-0.5">
                       {order.user?.fullName} · {order.user?.email}
                     </p>
                   </div>
-                  <span className={`text-xs font-semibold px-3 py-1 rounded-full ${cfg?.color}`}>
+                  <span
+                    className={`text-xs font-semibold px-3 py-1 rounded-full ${cfg?.color}`}
+                  >
                     {cfg?.label}
                   </span>
                 </div>
@@ -141,7 +167,10 @@ export default function CancelRequestsPage() {
                 <div className="text-sm text-gray-600 space-y-1 mb-3">
                   {order.items?.map((item, i) => (
                     <div key={i} className="flex justify-between">
-                      <span>{item.medicineName} <span className="text-gray-400">x{item.quantity}</span></span>
+                      <span>
+                        {item.medicineName}{" "}
+                        <span className="text-gray-400">x{item.quantity}</span>
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -149,7 +178,9 @@ export default function CancelRequestsPage() {
                 {/* Tổng tiền */}
                 <div className="flex justify-between items-center text-sm font-semibold border-t border-gray-100 pt-3 mb-4">
                   <span className="text-gray-500">Tổng cộng</span>
-                  <span style={{ color: "#1250dc" }}>{formatPrice(order.totalPrice)}</span>
+                  <span style={{ color: "#1250dc" }}>
+                    {formatPrice(order.totalPrice)}
+                  </span>
                 </div>
 
                 {/* Actions */}
@@ -159,7 +190,10 @@ export default function CancelRequestsPage() {
                     disabled={handleMutation.isPending}
                     className="flex-1 py-2.5 rounded-xl bg-green-500 text-white text-sm font-semibold hover:bg-green-600 disabled:opacity-60 transition"
                   >
-                    ✅ Đồng ý {order.orderStatus === "RETURN_REQUESTED" ? "hoàn hàng" : "huỷ đơn"}
+                    ✅ Đồng ý{" "}
+                    {order.orderStatus === "RETURN_REQUESTED"
+                      ? "hoàn hàng"
+                      : "huỷ đơn"}
                   </button>
                   <button
                     onClick={() => setRejectTarget(order)}

@@ -4,16 +4,20 @@
 // ================================================================
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "@/stores/auth.store.js";
-import api from "@/lib/axios.js";
+import api from "@/utils/axios.js";
 import toast from "react-hot-toast";
-import { translateApiMessage } from "@/lib/errorMessages.js";
+import { translateApiMessage } from "@/utils/errorMessages.js";
 
 export const useCart = () => {
   const { isAuthenticated } = useAuthStore();
   const queryClient = useQueryClient();
 
   // Fetch cart từ API — chỉ khi đã đăng nhập
-  const { data: cart, isLoading, isFetching } = useQuery({
+  const {
+    data: cart,
+    isLoading,
+    isFetching,
+  } = useQuery({
     queryKey: ["cart"],
     queryFn: () => api.get("/cart").then((r) => r.data.data),
     enabled: isAuthenticated, // không fetch khi chưa login

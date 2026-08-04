@@ -6,8 +6,8 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Eye, X } from "lucide-react";
 import toast from "react-hot-toast";
-import { translateApiMessage } from "../../../lib/errorMessages.js";
-import api from "../../../lib/axios.js";
+import { translateApiMessage } from "../../../utils/errorMessages.js";
+import api from "../../../utils/axios.js";
 
 const formatPrice = (p) =>
   new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "@/stores/auth.store.js";
-import { connectSocket, disconnectSocket } from "@/lib/socket.js";
-import api from "@/lib/axios.js";
+import { connectSocket, disconnectSocket } from "@/utils/socket.js";
+import api from "@/utils/axios.js";
 import toast from "react-hot-toast";
 
 export const useNotifications = () => {

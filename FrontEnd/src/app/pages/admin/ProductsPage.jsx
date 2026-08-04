@@ -5,10 +5,10 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
-import { translateApiMessage } from "../../../lib/errorMessages.js";
-import api from "../../../lib/axios.js";
+import { translateApiMessage } from "../../../utils/errorMessages.js";
+import api from "../../../utils/axios.js";
 import ProductFormModal from "./ProductFormModal.jsx";
-import { adminTableImage } from "../../../lib/imageUrl.js";
+import { adminTableImage } from "../../../utils/imageUrl.js";
 
 const formatPrice = (p) =>
   new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(
@@ -132,15 +132,15 @@ export default function ProductsPage() {
                           m.status === "ACTIVE"
                             ? "bg-green-100 text-green-700"
                             : m.status === "OUT_OF_STOCK"
-                            ? "bg-amber-100 text-amber-700"
-                            : "bg-gray-100 text-gray-500"
+                              ? "bg-amber-100 text-amber-700"
+                              : "bg-gray-100 text-gray-500"
                         }`}
                       >
                         {m.status === "ACTIVE"
                           ? "Đang bán"
                           : m.status === "OUT_OF_STOCK"
-                          ? "Hết hàng"
-                          : "Ngừng bán"}
+                            ? "Hết hàng"
+                            : "Ngừng bán"}
                       </span>
                     </td>
                     <td className="px-4 py-3">

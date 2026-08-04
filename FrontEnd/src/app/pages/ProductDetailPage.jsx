@@ -5,7 +5,7 @@ import { ProductCard } from "../components/ProductCard";
 import { useCart } from "@/hooks/useCart.js";
 import { useProduct, useProducts } from "../../hooks/useProducts.js";
 import NotFoundPage from "./NotFoundPage";
-import { productDetailMain, productDetailThumb } from "../../lib/imageUrl.js";
+import { productDetailMain, productDetailThumb } from "../../utils/imageUrl.js";
 
 const tabs = [
   "Mô tả",
@@ -222,7 +222,9 @@ function ProductDetailPage() {
               </button>
             </div>
             <span className="text-xs text-gray-400">
-              {product.status === "OUT_OF_STOCK" ? "Sản phẩm tạm thời hết hàng" : `Còn ${product.stock} sản phẩm`}
+              {product.status === "OUT_OF_STOCK"
+                ? "Sản phẩm tạm thời hết hàng"
+                : `Còn ${product.stock} sản phẩm`}
             </span>
           </div>
 
@@ -232,10 +234,14 @@ function ProductDetailPage() {
               onClick={handleAddToCart}
               disabled={product.status === "OUT_OF_STOCK"}
               className="flex-1 py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all disabled:bg-gray-100 disabled:text-gray-400 disabled:border-gray-200 disabled:cursor-not-allowed"
-              style={product.status === "OUT_OF_STOCK" ? {} : {
-                backgroundColor: added ? "#16a34a" : "#1250dc",
-                color: "white",
-              }}
+              style={
+                product.status === "OUT_OF_STOCK"
+                  ? {}
+                  : {
+                      backgroundColor: added ? "#16a34a" : "#1250dc",
+                      color: "white",
+                    }
+              }
             >
               {product.status === "OUT_OF_STOCK" ? (
                 "Hết hàng"

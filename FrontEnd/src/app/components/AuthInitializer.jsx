@@ -12,7 +12,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "@/stores/auth.store.js";
-import api, { refreshTokenOnce } from "@/lib/axios.js";
+import api, { refreshTokenOnce } from "@/utils/axios.js";
 
 const PREFETCH_TASKS = [
   {

@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { ShoppingCart, Heart, Star } from "lucide-react";
 import { useCart } from "@/hooks/useCart.js";
 import { useAuthStore } from "@/stores/auth.store.js";
-import { productCardImage } from "../../lib/imageUrl.js";
+import { productCardImage } from "../../utils/imageUrl.js";
 
 function ProductCard({ product, showDiscount = true }) {
   const { addToCart, formatPrice } = useCart();

@@ -3,7 +3,7 @@
 // useQuery: dùng cho GET data, tự động cache, refetch, loading state
 // ================================================================
 import { useQuery } from "@tanstack/react-query";
-import api from "@/lib/axios.js";
+import api from "@/utils/axios.js";
 
 // Lấy danh sách thuốc có lọc + phân trang
 // params = { page, limit, search, categoryId, sort }

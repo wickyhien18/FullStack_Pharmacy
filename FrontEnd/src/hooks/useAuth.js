@@ -7,8 +7,8 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useAuthStore } from "@/stores/auth.store.js";
 import { useCart } from "@/hooks/useCart.js";
-import { translateApiMessage } from "@/lib/errorMessages.js";
-import api from "@/lib/axios.js";
+import { translateApiMessage } from "@/utils/errorMessages.js";
+import api from "@/utils/axios.js";
 
 export const useAuth = () => {
   const navigate = useNavigate();

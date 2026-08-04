@@ -15,8 +15,8 @@ import {
 } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth.js";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import api from "../../lib/axios.js";
-import { translateApiMessage } from "../../lib/errorMessages.js";
+import api from "../../utils/axios.js";
+import { translateApiMessage } from "../../utils/errorMessages.js";
 
 const PASSWORD_REGEX =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[_@$!%*?&])[A-Za-z\d_@$!%*?&]{8,}$/;

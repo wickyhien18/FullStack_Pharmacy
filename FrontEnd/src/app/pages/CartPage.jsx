@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { useCart } from "@/hooks/useCart.js";
 import { useState } from "react";
-import { productThumb } from "../../lib/imageUrl.js";
+import { productThumb } from "../../utils/imageUrl.js";
 
 // Skeleton cho 1 cart item
 function CartItemSkeleton() {
@@ -46,7 +46,12 @@ function CartPage() {
   const [deleteItemId, setDeleteItemId] = useState(null);
 
   // loading state includes query loading, background fetching (when empty), or any ongoing mutation
-  const isPageLoading = isLoading || isAdding || isUpdating || isRemoving || (isFetching && items.length === 0);
+  const isPageLoading =
+    isLoading ||
+    isAdding ||
+    isUpdating ||
+    isRemoving ||
+    (isFetching && items.length === 0);
   const isEmpty = !isPageLoading && items.length === 0;
 
   if (isEmpty) {
@@ -109,10 +114,12 @@ function CartPage() {
             <div className="divide-y divide-gray-100">
               {isPageLoading
                 ? // Skeleton 3 items trong lúc loading
-                  Array(3)
-                    .fill(0)
-                                 : items.map((item) => (
-                    <div key={item.cartItemId} className="p-3 sm:p-5 flex gap-3 sm:gap-4 items-start">
+                  Array(3).fill(0)
+                : items.map((item) => (
+                    <div
+                      key={item.cartItemId}
+                      className="p-3 sm:p-5 flex gap-3 sm:gap-4 items-start"
+                    >
                       <Link to={`/products/${item.slug}`} className="shrink-0">
                         <img
                           src={productThumb(item.image)}
@@ -136,7 +143,9 @@ function CartPage() {
                               onClick={() =>
                                 updateItem(item.cartItemId, item.quantity - 1)
                               }
-                              disabled={item.quantity <= 1 || isUpdating || isRemoving}
+                              disabled={
+                                item.quantity <= 1 || isUpdating || isRemoving
+                              }
                               className="px-2 py-1 sm:px-2.5 sm:py-1.5 hover:bg-gray-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                             >
                               <Minus size={14} />
@@ -243,7 +252,9 @@ function CartPage() {
       {deleteItemId && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-xs">
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full mx-4 shadow-xl border border-gray-100 animate-in fade-in zoom-in duration-200">
-            <h3 className="text-lg font-bold text-gray-900 mb-2">Xác nhận xóa sản phẩm</h3>
+            <h3 className="text-lg font-bold text-gray-900 mb-2">
+              Xác nhận xóa sản phẩm
+            </h3>
             <p className="text-sm text-gray-500 mb-6">
               Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng không?
             </p>
