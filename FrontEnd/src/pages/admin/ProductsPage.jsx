@@ -6,7 +6,10 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
 import { translateApiMessage } from "../../utils/errorMessages.js";
-import api from "../../utils/axios.js";
+import {
+  getProductByPageAndLimitInAdmin,
+  deletePoduct,
+} from "../../services/product.service.js";
 import ProductFormModal from "./ProductFormModal.jsx";
 import { adminTableImage } from "../../utils/imageUrl.js";
 
@@ -24,12 +27,11 @@ export default function ProductsPage() {
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-products", page],
-    queryFn: () =>
-      api.get(`/admin/products?page=${page}&limit=20`).then((r) => r.data.data),
+    queryFn: () => getProductByPageAndLimitInAdmin(page),
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => api.delete(`/admin/products/${id}`),
+    mutationFn: (id) => deletePoduct(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-products"] });
       toast.success("Đã xoá sản phẩm");

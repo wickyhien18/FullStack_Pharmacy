@@ -7,7 +7,13 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Upload, X } from "lucide-react";
 import toast from "react-hot-toast";
 import { translateApiMessage } from "../../utils/errorMessages.js";
-import api from "../../utils/axios.js";
+import {
+  getProductById,
+  addProduct,
+  updateProduct,
+  getCategories,
+  getManufacturer,
+} from "../../services/product.service.js";
 
 const MAX_IMAGES = 3;
 const UNIT_SUGGESTIONS = ["Hộp", "Chai", "Tuýp", "Gói", "Viên", "Ống"];
@@ -37,8 +43,7 @@ export default function ProductFormModal({ productId, onClose }) {
   // ── Lấy chi tiết product khi edit ──────────────────────────────
   const { data: detail, isLoading: isLoadingDetail } = useQuery({
     queryKey: ["admin-product-detail", productId],
-    queryFn: () =>
-      api.get(`/admin/products/${productId}`).then((r) => r.data.data),
+    queryFn: () => getProductById(productId),
     enabled: isEdit,
   });
 
@@ -60,14 +65,14 @@ export default function ProductFormModal({ productId, onClose }) {
 
   const { data: categories } = useQuery({
     queryKey: ["categories"],
-    queryFn: () => api.get("/categories").then((r) => r.data.data),
+    queryFn: () => getCategories(),
     // SỬA: AuthInitializer đã prefetch key "categories" với data dạng {items, total}
     // select giúp luôn lấy đúng mảng items dù cache trả về object hay đã là mảng
     select: (data) => (Array.isArray(data) ? data : data?.items || []),
   });
   const { data: manufacturers } = useQuery({
     queryKey: ["manufacturers"],
-    queryFn: () => api.get("/manufacturers").then((r) => r.data.data),
+    queryFn: () => getManufacturer(),
     select: (data) => (Array.isArray(data) ? data : data?.items || []),
   });
 
@@ -102,13 +107,9 @@ export default function ProductFormModal({ productId, onClose }) {
   const mutation = useMutation({
     mutationFn: (formData) => {
       if (isEdit) {
-        return api.put(`/admin/products/${productId}`, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+        return updateProduct(productId, formData);
       }
-      return api.post("/admin/products", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      return addProduct(formData);
     },
     onSuccess: () => {
       toast.success(
