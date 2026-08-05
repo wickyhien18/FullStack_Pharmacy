@@ -1,7 +1,17 @@
 import api from "../services/axiosInstance.js";
 
+export const getOrder = (page, filterStatus) =>
+  api
+    .get(
+      `/admin/orders?page=${page}&limit=20${filterStatus ? `&status=${filterStatus}` : ""}`,
+    )
+    .then((r) => r.data.data);
+
 export const createOrder = (payload) =>
   api.post("/orders", payload).then((r) => r.data.data);
+
+export const updateOrderStatus = (orderId, orderStatus) =>
+  api.patch(`/admin/orders/${orderId}/status`, { orderStatus });
 
 export const getCancelOrder = () =>
   api

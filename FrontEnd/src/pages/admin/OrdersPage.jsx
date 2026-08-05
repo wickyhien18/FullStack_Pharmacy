@@ -7,7 +7,11 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Eye, X } from "lucide-react";
 import toast from "react-hot-toast";
 import { translateApiMessage } from "../../utils/errorMessages.js";
-import api from "../../utils/axios.js";
+import {
+  getOrder,
+  updateOrderStatus,
+  handleCancelOrder,
+} from "../../services/order.service.js";
 
 const formatPrice = (p) =>
   new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(
@@ -47,8 +51,7 @@ function OrderDetailModal({ order, onClose }) {
   const nextStatuses = NEXT_STATUS[order.orderStatus] || [];
 
   const statusMutation = useMutation({
-    mutationFn: (orderStatus) =>
-      api.patch(`/admin/orders/${order.orderId}/status`, { orderStatus }),
+    mutationFn: (orderStatus) => updateOrderStatus(order.orderId, orderStatus),
     onSuccess: ({ data }) => {
       toast.success("Cập nhật trạng thái thành công");
       queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
@@ -63,10 +66,7 @@ function OrderDetailModal({ order, onClose }) {
   // Admin xử lý yêu cầu huỷ/hoàn
   const cancelRequestMutation = useMutation({
     mutationFn: ({ action, rejectReason }) =>
-      api.patch(`/admin/orders/${order.orderId}/cancel-request`, {
-        action,
-        rejectReason,
-      }),
+      handleCancelOrder(order.orderId, action, rejectReason),
     onSuccess: ({ data }) => {
       toast.success(data.data?.message || "Xử lý thành công");
       queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
@@ -233,12 +233,7 @@ export default function OrdersPage() {
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-orders", page, filterStatus],
-    queryFn: () =>
-      api
-        .get(
-          `/admin/orders?page=${page}&limit=20${filterStatus ? `&status=${filterStatus}` : ""}`,
-        )
-        .then((r) => r.data.data),
+    queryFn: () => getOrder(page, filterStatus),
   });
 
   return (
