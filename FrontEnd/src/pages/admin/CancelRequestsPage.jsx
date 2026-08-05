@@ -5,7 +5,10 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { translateApiMessage } from "../../utils/errorMessages.js";
-import api from "../../utils/axios.js";
+import {
+  getCancelOrder,
+  handleCancelOrder,
+} from "../../services/order.service.js";
 
 const STATUS_CONFIG = {
   CANCEL_REQUESTED: {
@@ -71,18 +74,12 @@ export default function CancelRequestsPage() {
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-cancel-requests"],
-    queryFn: () =>
-      api
-        .get("/admin/orders?status=CANCEL_REQUESTED,RETURN_REQUESTED")
-        .then((r) => r.data.data),
+    queryFn: () => getCancelOrder(),
   });
 
   const handleMutation = useMutation({
     mutationFn: ({ orderId, action, rejectReason }) =>
-      api.patch(`/admin/orders/${orderId}/cancel-request`, {
-        action,
-        rejectReason,
-      }),
+      handleCancelOrder(orderId, action, rejectReason),
     onSuccess: ({ data }) => {
       toast.success(data.data?.message || "Xử lý thành công");
       queryClient.invalidateQueries({ queryKey: ["admin-cancel-requests"] });
