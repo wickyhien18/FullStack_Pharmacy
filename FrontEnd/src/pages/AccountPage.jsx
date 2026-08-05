@@ -15,7 +15,15 @@ import {
 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth.js";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import api from "../utils/axios.js";
+import {
+  requestEmailChange,
+  verifyEmailChange,
+  changePassword,
+  requestForgotPassword,
+  resetPassword,
+  updateProfile,
+} from "../services/auth.service.js";
+import { getMyOrder } from "../services/order.service.js";
 import { translateApiMessage } from "../utils/errorMessages.js";
 
 const PASSWORD_REGEX =
@@ -59,7 +67,7 @@ function ChangeEmailModal({ onClose }) {
   const [otp, setOtp] = useState("");
 
   const requestMutation = useMutation({
-    mutationFn: () => api.post("/auth/request-email-change", { newEmail }),
+    mutationFn: () => requestEmailChange(newEmail),
     onSuccess: () => {
       toast.success("Mã OTP đã gửi!");
       setStep(2);
@@ -71,7 +79,7 @@ function ChangeEmailModal({ onClose }) {
   });
 
   const verifyMutation = useMutation({
-    mutationFn: () => api.post("/auth/verify-email-change", { otp }),
+    mutationFn: () => verifyEmailChange(otp),
     onSuccess: () => {
       toast.success("Đổi email thành công!");
       queryClient.invalidateQueries({ queryKey: ["profile"] });
@@ -190,11 +198,7 @@ function ChangePasswordModal({ onClose, logout }) {
   });
 
   const mutation = useMutation({
-    mutationFn: () =>
-      api.put("/auth/change-password", {
-        currentPassword: form.currentPassword,
-        newPassword: form.newPassword,
-      }),
+    mutationFn: () => changePassword(form.currentPassword, form.newPassword),
     onSuccess: () => {
       toast.success("Đổi mật khẩu thành công! Vui lòng đăng nhập lại.");
       onClose();
@@ -314,7 +318,7 @@ function ForgotPasswordModal({ onClose }) {
   const [confirmPwd, setConfirmPwd] = useState("");
 
   const requestMutation = useMutation({
-    mutationFn: () => api.post("/auth/forgot-password", { email }),
+    mutationFn: () => requestForgotPassword(email),
     onSuccess: () => {
       toast.success("Mã OTP đã gửi!");
       setStep(2);
@@ -327,8 +331,7 @@ function ForgotPasswordModal({ onClose }) {
   });
 
   const resetMutation = useMutation({
-    mutationFn: () =>
-      api.post("/auth/reset-password", { email, otp, newPassword: newPwd }),
+    mutationFn: () => resetPassword(email, otp, newPwd),
     onSuccess: () => {
       toast.success("Đặt lại mật khẩu thành công!");
       onClose();
@@ -512,13 +515,13 @@ function AccountPage() {
   // Query order history
   const { data: ordersData, isLoading: isLoadingOrders } = useQuery({
     queryKey: ["my-orders"],
-    queryFn: () => api.get("/orders/my").then((r) => r.data.data),
+    queryFn: () => getMyOrder(),
     enabled: isAuthenticated && activeSubTab === "orders",
     staleTime: 0,
   });
 
   const updateProfileMutation = useMutation({
-    mutationFn: (data) => api.put("/auth/profile", data),
+    mutationFn: (data) => updateProfile(data),
     onSuccess: ({ data }) => {
       toast.success("Cập nhật thành công!");
       queryClient.invalidateQueries({ queryKey: ["profile"] });

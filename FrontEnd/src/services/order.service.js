@@ -5,3 +5,5 @@ export const createOrder = (payload) =>
 
 export const cancelOrder = (orderId, reason) =>
   api.post(`/orders/${orderId}/cancel`, { reason });
+
+export const getMyOrder = () => api.get("/orders/my").then((r) => r.data.data);
