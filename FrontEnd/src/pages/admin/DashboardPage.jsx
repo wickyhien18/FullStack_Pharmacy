@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { ShoppingCart, Users, Package, TrendingUp } from "lucide-react";
-import api from "../../utils/axios.js";
+import { getGeneralStats } from "../../services/stats.service.js";
 
 export default function DashboardPage() {
   const { data: stats, isLoading } = useQuery({
     queryKey: ["admin-stats"],
-    queryFn: () => api.get("/admin/stats").then((r) => r.data.data),
+    queryFn: () => getGeneralStats(),
   });
 
   const formatPrice = (price) => {
