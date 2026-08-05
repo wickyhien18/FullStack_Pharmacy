@@ -3,7 +3,12 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { UserCheck, UserX, Shield } from "lucide-react";
 import toast from "react-hot-toast";
 import { translateApiMessage } from "../../utils/errorMessages.js";
-import api from "../../utils/axios.js";
+import {
+  getRoles,
+  getUser,
+  updateUserRole,
+  changeUserStatus,
+} from "../../services/user.service.js";
 
 function RoleModal({ user, onClose }) {
   const queryClient = useQueryClient();
@@ -11,13 +16,12 @@ function RoleModal({ user, onClose }) {
 
   const { data: roles } = useQuery({
     queryKey: ["roles"],
-    queryFn: () => api.get("/admin/roles").then((r) => r.data.data),
+    queryFn: () => getRoles(),
     select: (data) => (Array.isArray(data) ? data : data?.roles || []),
   });
 
   const mutation = useMutation({
-    mutationFn: (roleName) =>
-      api.patch(`/admin/users/${user.userId}/role`, { roleName }),
+    mutationFn: (roleName) => updateUserRole(user.userId, roleName),
     onSuccess: () => {
       toast.success("Đổi role thành công");
       queryClient.invalidateQueries({ queryKey: ["admin-users"] });
@@ -88,12 +92,11 @@ export default function UsersPage() {
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-users"],
-    queryFn: () => api.get("/admin/users").then((r) => r.data.data),
+    queryFn: () => getUser(),
   });
 
   const toggleMutation = useMutation({
-    mutationFn: ({ userId, isActive }) =>
-      api.patch(`/admin/users/${userId}/status`, { isActive }),
+    mutationFn: ({ userId, isActive }) => changeUserStatus(userId, isActive),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-users"] });
       toast.success("Cập nhật trạng thái thành công");
