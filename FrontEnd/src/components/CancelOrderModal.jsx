@@ -25,7 +25,7 @@ export default function CancelOrderModal({ order, onClose }) {
   const cancelMutation = useMutation({
     mutationFn: () => cancelOrder(order.orderId, reason),
     onSuccess: ({ data }) => {
-      toast.success(data.data?.message || "Thành công");
+      toast.success(translateApiMessage(data.data?.message) || "Thành công");
       queryClient.invalidateQueries({ queryKey: ["my-orders"] });
       onClose();
     },

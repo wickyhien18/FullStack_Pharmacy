@@ -81,7 +81,7 @@ export default function CancelRequestsPage() {
     mutationFn: ({ orderId, action, rejectReason }) =>
       handleCancelOrder(orderId, action, rejectReason),
     onSuccess: ({ data }) => {
-      toast.success(data.data?.message || "Xử lý thành công");
+      toast.success(translateApiMessage(data.data?.message) || "Xử lý thành công");
       queryClient.invalidateQueries({ queryKey: ["admin-cancel-requests"] });
       queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
       setRejectTarget(null);
