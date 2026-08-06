@@ -13,7 +13,7 @@ const uploadMultiple = multer({
     if (ALLOWED_TYPES.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error("Chỉ chấp nhận file JPG, PNG, WEBP"), false);
+      cb(new Error("Only JPG, PNG, WEBP files are allowed"), false);
     }
   },
 }).array("images", MAX_FILES);

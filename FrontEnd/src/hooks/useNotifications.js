@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "@/stores/auth.store.js";
 import { connectSocket, disconnectSocket } from "@/utils/socket.js";
 import toast from "react-hot-toast";
+import { translateApiMessage } from "@/utils/errorMessages.js";
 import {
   getNotification,
   markAllRead,
@@ -24,7 +25,7 @@ export const useNotifications = () => {
     const socket = connectSocket(accessToken);
 
     socket.on("order:status_changed", (data) => {
-      toast.success(data.message);
+      toast.success(translateApiMessage(data.message) || data.message);
       setLiveItems((prev) => [
         { ...data, isRead: false, createdAt: new Date() },
         ...prev,

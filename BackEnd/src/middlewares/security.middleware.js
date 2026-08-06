@@ -12,7 +12,7 @@ export const authRateLimit = rateLimit({
   handler: (req, res) => {
     return sendError(
       res,
-      "Quá nhiều yêu cầu, vui lòng thử lại sau 15 phút",
+      "Too many requests, please try again after 15 minutes",
       429,
     );
   },
@@ -26,7 +26,7 @@ export const refreshRateLimit = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   handler: (req, res) => {
-    return sendError(res, "Quá nhiều yêu cầu làm mới token", 429);
+    return sendError(res, "Too many token refresh requests", 429);
   },
 });
 
@@ -36,7 +36,7 @@ export const refreshRateLimit = rateLimit({
 export const requireJson = (req, res, next) => {
   if (["POST", "PUT", "PATCH"].includes(req.method)) {
     if (!req.is("application/json")) {
-      return sendError(res, "Content-Type phải là application/json", 415);
+      return sendError(res, "Content-Type must be application/json", 415);
     }
   }
   return next();

@@ -23,7 +23,7 @@ export const configurePassport = () => {
           const fullName = profile.displayName;
           const googleId = profile.id;
 
-          if (!email) return done(new Error("Không lấy được email từ Google"));
+          if (!email) return done(new Error("Failed to retrieve email from Google"));
 
           // Find user by googleId first
           let user = await prisma.user.findFirst({
@@ -51,7 +51,7 @@ export const configurePassport = () => {
           }
 
           if (!user.isActive) {
-            return done(null, false, { message: "Tài khoản đang bị khóa" });
+            return done(null, false, { message: "Account is locked" });
           }
 
           return done(null, user);

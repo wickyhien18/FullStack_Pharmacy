@@ -8,6 +8,6 @@ export const setIO = (io) => {
 
 // A function that retrieves the Socket.IO instance for use in other services or controllers
 export const getIO = () => {
-  if (!ioInstance) throw new Error("Socket.io chưa được khởi tạo");
+  if (!ioInstance) throw new Error("Socket.io is not initialized");
   return ioInstance;
 };
