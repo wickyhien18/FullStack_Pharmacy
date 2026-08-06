@@ -1,5 +1,6 @@
 import { prisma } from "../config/prisma.config.js";
 
+//== GET NOTIFICATION =======================================
 export const getNotification = (userId, take) => {
   return prisma.notification.findMany({
     where: { userId },
@@ -8,12 +9,14 @@ export const getNotification = (userId, take) => {
   });
 };
 
+//== CREATE NOTIFICATION =======================================
 export const createNotification = (userId, orderId, message) => {
   return prisma.notification.create({
     data: { userId, orderId, message },
   });
 };
 
+//== UPDATE MARK ALL READ =======================================
 export const updateMarkAllRead = (userId) => {
   return prisma.notification.updateMany({
     where: { userId, isRead: false },

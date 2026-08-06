@@ -1,5 +1,6 @@
 import { prisma } from "../config/prisma.config.js";
 
+//== FIND PAYMENT BY ORDER ID =======================================
 export const findPaymentByOrderId = (orderId) => {
   return prisma.payment.findFirst({
     where: { orderId },
@@ -7,7 +8,7 @@ export const findPaymentByOrderId = (orderId) => {
   });
 };
 
-//== EXISTING PAYMENT =======================================
+//== EXISTING VN PAYMENT =======================================
 export const existingVNPayment = (orderId) => {
   return prisma.payment.findFirst({
     where: {
@@ -18,12 +19,14 @@ export const existingVNPayment = (orderId) => {
   });
 };
 
+//== EXISTING PAYMENT =======================================
 export const existingPayment = (orderId) => {
   return prisma.payment.findUnique({
     where: { orderId },
   });
 };
 
+//== CREATE VN PAYMENT =======================================
 export const createVNPayPayment = (orderId, totalPrice, expiredAt) => {
   return prisma.payment.create({
     data: {
@@ -37,6 +40,7 @@ export const createVNPayPayment = (orderId, totalPrice, expiredAt) => {
   });
 };
 
+//== CREATE COD PAYMENT =======================================
 export const createCODPayment = (orderId, totalPrice) => {
   return prisma.payment.create({
     data: {
@@ -48,6 +52,7 @@ export const createCODPayment = (orderId, totalPrice) => {
   });
 };
 
+//== RETRY VN PAYMENT =======================================
 export const retryVNPayment = (paymentId, expiredAt) => {
   return prisma.payment.update({
     where: { paymentId },
@@ -55,6 +60,7 @@ export const retryVNPayment = (paymentId, expiredAt) => {
   });
 };
 
+//== UPDATE VN PAYMENT RECORD =======================================
 export const updateVNPaymentRecord = (
   orderId,
   isSuccess,

@@ -34,6 +34,7 @@ export const findOrderById = (orderId) => {
   });
 };
 
+//== FIND ORDER BY ORDER CODE =======================================
 export const findOrderByOrderCode = (orderCode) => {
   return prisma.order.findFirst({
     where: { orderCode },
