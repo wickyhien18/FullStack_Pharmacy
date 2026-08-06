@@ -1,4 +1,4 @@
-import { prisma } from "../config/prisma.config.js";
+import * as notificationRepo from "../repositories/notification.repository.js";
 import { getIO } from "../config/socket.config.js";
 import { sendOrderStatusEmail } from "./email.service.js";
 
@@ -18,9 +18,11 @@ export const notifyOrderStatusChange = async (order) => {
   const message = `${baseMessage} (Order code: ${order.orderCode})`;
 
   // 1. Save to DB so customers can review notifications later, even if they were offline.
-  await prisma.notification.create({
-    data: { userId: order.userId, orderId: order.orderId, message },
-  });
+  await notificationRepo.createNotification(
+    order.userId,
+    order.orderId,
+    message,
+  );
 
   // 2. Push real-time updates without blocking the main status update flow.
   try {
@@ -51,11 +53,10 @@ export const notifyOrderStatusChange = async (order) => {
 
 //── GET MY NOTIFICATIONS ────────────────────────────────────────
 export const getMyNotifications = async (userId) => {
-  const items = await prisma.notification.findMany({
-    where: { userId: BigInt(userId) },
-    orderBy: { createdAt: "desc" },
-    take: 20,
-  });
+  const items = await await notificationRepo.getNotification(
+    BigInt(userId),
+    20,
+  );
   return items.map((n) => ({
     notificationId: n.notificationId.toString(),
     orderId: n.orderId?.toString() || null,
@@ -67,8 +68,5 @@ export const getMyNotifications = async (userId) => {
 
 //── MARK ALL NOTIFICATIONS AS READ ──────────────────────────────
 export const markAllRead = async (userId) => {
-  await prisma.notification.updateMany({
-    where: { userId: BigInt(userId), isRead: false },
-    data: { isRead: true },
-  });
+  await notificationRepo.updateMarkAllRead(BigInt(userId));
 };
