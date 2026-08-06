@@ -1,7 +1,6 @@
-import { prisma } from "../config/prisma.config.js";
 import * as orderRepo from "../repositories/order.repository.js";
 import * as cartRepo from "../repositories/cart.repository.js";
-import * as payRepo from "../repositories/payment.repository.js";
+import * as paymentRepo from "../repositories/payment.repository.js";
 import { createVNPayUrl, verifyVNPayReturn } from "../utils/vnpay.util.js";
 import { env } from "../config/env.config.js";
 
@@ -19,27 +18,19 @@ export const createVNPayPayment = async (orderId, userId, ipAddr) => {
     throw { status: 400, message: "Order has been cancelled" };
 
   // Create or update the payment record.
-  const existPayment = await payRepo.existingPayment(BigInt(orderId));
+  const existingPayment = await paymentRepo.existingVNPayment(BigInt(orderId));
 
   const expiredAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
 
-  if (!existPayment) {
-    await prisma.payment.create({
-      data: {
-        orderId: BigInt(orderId),
-        paymentMethod: "VNPAY",
-        amount: order.totalPrice,
-        status: "PENDING",
-        expiredAt,
-        attemptCount: 1,
-      },
-    });
+  if (!existingPayment) {
+    await paymentRepo.createVNPayPayment(
+      BigInt(orderId),
+      order.totalPrice,
+      expiredAt,
+    );
   } else {
     // Increase attempt count when the user retries payment.
-    await prisma.payment.update({
-      where: { paymentId: existingPayment.paymentId },
-      data: { expiredAt, attemptCount: { increment: 1 } },
-    });
+    await paymentRepo.retryVNPayment(existingPayment.paymentId, expiredAt);
   }
 
   // Create VNPAY URL.
@@ -71,35 +62,22 @@ export const handleVNPayCallback = async (vnpParams) => {
     rawCallback,
   } = verifyVNPayReturn(vnpParams);
 
-  // Find order by orderCode.
-  const order = await prisma.order.findFirst({
-    where: { orderCode },
-  });
+  const order = await orderRepo.findOrderByOrderCode(orderCode);
   if (!order) throw { status: 404, message: "Order not found" };
 
   const isSuccess = isValid && responseCode === "00";
 
   // Update payment record.
-  await prisma.payment.updateMany({
-    where: {
-      orderId: order.orderId,
-      paymentMethod: "VNPAY",
-      status: "PENDING",
-    },
-    data: {
-      status: isSuccess ? "SUCCESS" : "FAILED",
-      transactionCode: transactionCode || null,
-      paidAt: isSuccess ? new Date() : null,
-      rawCallback: rawCallback,
-    },
-  });
+  await paymentRepo.updateVNPaymentRecord(
+    order.orderId,
+    isSuccess,
+    transactionCode,
+    rawCallback,
+  );
 
   if (isSuccess) {
     // Update order payment status.
-    await prisma.order.update({
-      where: { orderId: order.orderId },
-      data: { paymentStatus: "PAID" },
-    });
+    await orderRepo.updateOrderPaymentStatus(order.orderId);
 
     if (order.userId) {
       const cart = await cartRepo.findCartByUserId(order.userId);
@@ -128,20 +106,11 @@ export const createCODPayment = async (orderId, userId) => {
   if (!order) throw { status: 404, message: "Order not found" };
 
   // Check whether the order already has a payment method.
-  const existing = await prisma.payment.findFirst({
-    where: { orderId: BigInt(orderId) },
-  });
+  const existing = await paymentRepo.existingPayment(BigInt(orderId));
   if (existing)
     throw { status: 400, message: "Order already has a payment method" };
 
-  await prisma.payment.create({
-    data: {
-      orderId: BigInt(orderId),
-      paymentMethod: "COD",
-      amount: order.totalPrice,
-      status: "PENDING", // COD remains pending until delivery.
-    },
-  });
+  await paymentRepo.createCODPayment(BigInt(orderId), order.totalPrice);
 
   // COD is confirmed once selected, so clear the cart here.
   const cart = await cartRepo.findCartByUserId(BigInt(userId));
@@ -158,10 +127,7 @@ export const getPaymentByOrder = async (orderId, userId) => {
   );
   if (!order) throw { status: 404, message: "Order not found" };
 
-  const payment = await prisma.payment.findFirst({
-    where: { orderId: BigInt(orderId) },
-    orderBy: { createdAt: "desc" },
-  });
+  const payment = await paymentRepo.findPaymentByOrderId(BigInt(orderId));
 
   return payment
     ? {

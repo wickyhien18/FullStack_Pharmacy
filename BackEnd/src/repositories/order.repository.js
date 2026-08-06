@@ -28,9 +28,15 @@ const writeInventoryLog = async (
 
 //── ORDERS ──────────────────────────────────────────────────────
 //== FIND ORDER BY ID =============================================
-export const findOrderById = async (orderId) => {
+export const findOrderById = (orderId) => {
   return prisma.order.findUnique({
     where: { orderId },
+  });
+};
+
+export const findOrderByOrderCode = (orderCode) => {
+  return prisma.order.findFirst({
+    where: { orderCode },
   });
 };
 
@@ -125,7 +131,7 @@ export const createOrder = async ({
 };
 
 //== FIND ORDERS BY USER ==========================================
-export const findOrdersByUser = async (userId, { skip, limit }) => {
+export const findOrdersByUser = (userId, { skip, limit }) => {
   return prisma.order.findMany({
     where: { userId },
     skip,
@@ -143,12 +149,12 @@ export const findOrdersByUser = async (userId, { skip, limit }) => {
 };
 
 //== COUNT ORDERS BY USER =========================================
-export const countOrdersByUser = async (userId) => {
+export const countOrdersByUser = (userId) => {
   return prisma.order.count({ where: { userId } });
 };
 
 //== FIND ORDER BY USER ID AND ORDER ID ===========================
-export const findOrderByUserIdAndOrderId = async (orderId, userId) => {
+export const findOrderByUserIdAndOrderId = (orderId, userId) => {
   return prisma.order.findFirst({
     where: { orderId, userId },
     include: {
@@ -156,6 +162,13 @@ export const findOrderByUserIdAndOrderId = async (orderId, userId) => {
       payments: true,
       shipment: true,
     },
+  });
+};
+
+export const updateOrderPaymentStatus = (orderId) => {
+  return prisma.order.update({
+    where: { orderId },
+    data: { paymentStatus: "PAID" },
   });
 };
 
@@ -216,7 +229,7 @@ export const handleCancelOrderPending = async (orderId, reason) => {
 };
 
 //== CANCEL ORDER WHILE SHIPPING ==================================
-export const cancelOrderShipping = async (orderId, reason) => {
+export const cancelOrderShipping = (orderId, reason) => {
   return prisma.order.update({
     where: { orderId },
     data: {
@@ -228,7 +241,7 @@ export const cancelOrderShipping = async (orderId, reason) => {
 };
 
 //== CANCEL DELIVERED ORDER =======================================
-export const cancelOrderDelivered = async (orderId, reason) => {
+export const cancelOrderDelivered = (orderId, reason) => {
   return prisma.order.update({
     where: { orderId },
     data: {
@@ -294,7 +307,7 @@ export const handleCancelOrderDelivedAndShipping = async (orderId, status) => {
 };
 
 //== REJECT ORDER CANCEL REQUEST ==================================
-export const rejectOrder = async (orderId, status, reason) => {
+export const rejectOrder = (orderId, status, reason) => {
   return prisma.order.update({
     where: { orderId },
     data: {

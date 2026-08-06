@@ -1,4 +1,3 @@
-import { prisma } from "../config/prisma.config.js";
 import * as orderRepo from "../repositories/order.repository.js";
 import * as cartRepo from "../repositories/cart.repository.js";
 import { buildPaginatedResponse } from "../utils/pagination.js";
