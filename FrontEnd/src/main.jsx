@@ -1,5 +1,5 @@
 // ================================================================
-// main.jsx — Khởi chạy bản mockup giao diện Long Châu kết nối API
+// main.jsx — Staring Point - Run first when the page loads
 // ================================================================
 import React from "react";
 import ReactDOM from "react-dom/client";
@@ -21,11 +21,16 @@ const queryClient = new QueryClient({
   },
 });
 
+// Mount React into <div id="root"></div> that is inside index.html
 ReactDOM.createRoot(document.getElementById("root")).render(
+  //Plugging in global service
   <React.StrictMode>
+    {/*Development Tool - Intentionally making certain things run TWICE in the dev enviroment*/}
+    {/*Help detect potential bugs in the code*/}
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <AuthInitializer>
+          {/* Bootstrapping App */}
           <App />
         </AuthInitializer>
         <Toaster
