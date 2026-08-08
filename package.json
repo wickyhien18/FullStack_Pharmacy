@@ -6,7 +6,10 @@
     "install:all": "npm install --prefix BackEnd && npm install --prefix FrontEnd",
     "dev:backend": "npm run dev --prefix BackEnd",
     "dev:frontend": "npm run dev --prefix FrontEnd",
-    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\""
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "test:backend": "npm run test --prefix BackEnd",
+    "test:frontend": "npm run test --prefix FrontEnd",
+    "test": "npm run test:backend && npm run test:frontend"
   },
   "dependencies": {
     "bootstrap": "^5.3.8",
