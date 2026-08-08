@@ -33,6 +33,11 @@ var stdin_default = defineConfig(({ mode }) => {
         },
       },
     },
+    test: {
+      globals: true,
+      environment: "jsdom",
+      setupFiles: "./src/tests/setup.js",
+    },
   };
 });
 export { stdin_default as default };

@@ -1,4 +1,8 @@
+// Function create route using HTML5 History API (URL like /products, not have # like HashRouter)
 import { createBrowserRouter } from "react-router-dom";
+
+//Lazy - React's function for "code splitting" instead of bundling ENTIRE code from every page
+// Suspense - display fallback UI (loading spinner) to wait file JS in page finish install
 import { lazy, Suspense } from "react";
 
 // ── Eager load — layout và trang quan trọng nhất ─────────────────
@@ -25,7 +29,6 @@ const CancelRequestsPage = lazy(
   () => import("../pages/admin/CancelRequestsPage"),
 );
 
-// Fallback hiện trong lúc lazy component đang load
 const PageLoader = () => (
   <div className="min-h-[50vh] flex items-center justify-center">
     <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />

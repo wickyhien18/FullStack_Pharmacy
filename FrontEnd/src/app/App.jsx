@@ -1,3 +1,4 @@
+//Special component read current URL -> find matching route -> render corresponding component
 import { RouterProvider } from "react-router-dom";
 import { router } from "./routes";
 

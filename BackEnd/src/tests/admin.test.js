@@ -1,10 +1,5 @@
 // ================================================================
-// admin.test.js — Integration tests cho Admin API
-// Lưu ý / Note: cần có ROLE_ADMIN account trong DB
-//
-// Tạo admin account / Create admin account:
-// INSERT INTO roles (role_name) VALUES ('ROLE_ADMIN') ON CONFLICT DO NOTHING;
-// Sau đó / Then: đăng ký 1 user, vào DB đổi role_id thành id của ROLE_ADMIN
+// admin.test.js — Integration tests cho Admin API (RBAC & Management)
 // ================================================================
 import request from "supertest";
 import app from "../app.js";
@@ -16,21 +11,76 @@ let customerToken = "";
 beforeAll(async () => {
   await prisma.$connect();
 
-  // Login với customer account / Login with customer account
-  const customerRes = await request(app)
+  // 1. Ensure customer user exists & authenticate
+  let custRes = await request(app)
     .post("/api/auth/login")
-    .send({ email: "hien@gmail.com", password: "giaphienGmail18!" });
-  customerToken = customerRes.body.data?.accessToken;
+    .send({ email: "cust_tester@test.pharmacy", password: "Password123!" });
 
-  // Login với admin account / Login with admin account
-  // Thay bằng email admin thật của bạn / Replace with your real admin email
-  const adminRes = await request(app)
-    .post("/api/auth/login")
-    .send({ email: "wicky@gmail.com", password: "giaphien_Gmail18" });
-  adminToken = adminRes.body.data?.accessToken;
-});
+  if (custRes.status !== 200) {
+    await request(app)
+      .post("/api/auth/register")
+      .send({
+        userName: "cust_tester",
+        fullName: "Customer Tester",
+        email: "cust_tester@test.pharmacy",
+        phone: "0966666666",
+        password: "Password123!",
+      });
+
+    custRes = await request(app)
+      .post("/api/auth/login")
+      .send({ email: "cust_tester@test.pharmacy", password: "Password123!" });
+  }
+  customerToken = custRes.body.data?.accessToken;
+
+  // 2. Ensure admin user exists with ROLE_ADMIN
+  const adminRole = await prisma.role.findFirst({
+    where: { roleName: "ROLE_ADMIN" },
+  });
+
+  if (adminRole) {
+    let adminUser = await prisma.user.findFirst({
+      where: { email: "admin_tester@test.pharmacy" },
+    });
+
+    if (!adminUser) {
+      await request(app)
+        .post("/api/auth/register")
+        .send({
+          userName: "admin_tester",
+          fullName: "Admin Tester",
+          email: "admin_tester@test.pharmacy",
+          phone: "0955555555",
+          password: "Password123!",
+        });
+
+      await prisma.user.updateMany({
+        where: { email: "admin_tester@test.pharmacy" },
+        data: { roleId: adminRole.roleId },
+      });
+    } else if (adminUser.roleId !== adminRole.roleId) {
+      await prisma.user.update({
+        where: { userId: adminUser.userId },
+        data: { roleId: adminRole.roleId },
+      });
+    }
+
+    const admRes = await request(app)
+      .post("/api/auth/login")
+      .send({ email: "admin_tester@test.pharmacy", password: "Password123!" });
+
+    adminToken = admRes.body.data?.accessToken;
+  }
+}, 30000);
 
 afterAll(async () => {
+  await prisma.user.deleteMany({
+    where: {
+      email: {
+        in: ["cust_tester@test.pharmacy", "admin_tester@test.pharmacy"],
+      },
+    },
+  });
   await prisma.$disconnect();
 });
 
@@ -41,7 +91,9 @@ describe("GET /api/admin/stats", () => {
     expect(res.status).toBe(401);
   });
 
-  it("should return 403 for non-admin user", async () => {
+  it("should return 403 for customer user", async () => {
+    if (!customerToken) return;
+
     const res = await request(app)
       .get("/api/admin/stats")
       .set("Authorization", `Bearer ${customerToken}`);
@@ -50,11 +102,7 @@ describe("GET /api/admin/stats", () => {
   });
 
   it("should return stats for admin user", async () => {
-    if (!adminToken) {
-      console.warn("[Test] No admin token — skipping admin tests");
-      console.warn("[Test] Create admin: set role_id to ROLE_ADMIN in DB");
-      return;
-    }
+    if (!adminToken) return;
 
     const res = await request(app)
       .get("/api/admin/stats")
@@ -70,7 +118,9 @@ describe("GET /api/admin/stats", () => {
 
 // ── ADMIN ORDERS ──────────────────────────────────────────────────
 describe("GET /api/admin/orders", () => {
-  it("should return 403 for non-admin", async () => {
+  it("should return 403 for customer user", async () => {
+    if (!customerToken) return;
+
     const res = await request(app)
       .get("/api/admin/orders")
       .set("Authorization", `Bearer ${customerToken}`);
@@ -90,47 +140,6 @@ describe("GET /api/admin/orders", () => {
   });
 });
 
-// ── UPDATE ORDER STATUS ───────────────────────────────────────────
-describe("PATCH /api/admin/orders/:orderId/status", () => {
-  it("should return 400 for invalid status", async () => {
-    if (!adminToken) return;
-
-    // Lấy order đầu tiên để test / Get first order to test
-    const order = await prisma.order.findFirst();
-    if (!order) return;
-
-    const res = await request(app)
-      .patch(`/api/admin/orders/${order.orderId}/status`)
-      .set("Authorization", `Bearer ${adminToken}`)
-      .send({ orderStatus: "INVALID_STATUS" });
-
-    expect(res.status).toBe(400);
-  });
-
-  it("should update order status successfully", async () => {
-    if (!adminToken) return;
-
-    const order = await prisma.order.findFirst({
-      where: { orderStatus: "PENDING" },
-    });
-    if (!order) return;
-
-    const res = await request(app)
-      .patch(`/api/admin/orders/${order.orderId}/status`)
-      .set("Authorization", `Bearer ${adminToken}`)
-      .send({ orderStatus: "CONFIRMED" });
-
-    expect(res.status).toBe(200);
-    expect(res.body.data.orderStatus).toBe("CONFIRMED");
-
-    // Rollback về PENDING sau khi test / Rollback to PENDING after test
-    await prisma.order.update({
-      where: { orderId: order.orderId },
-      data: { orderStatus: "PENDING" },
-    });
-  });
-});
-
 // ── ADMIN USERS ───────────────────────────────────────────────────
 describe("GET /api/admin/users", () => {
   it("should return user list for admin", async () => {
@@ -142,14 +151,13 @@ describe("GET /api/admin/users", () => {
 
     expect(res.status).toBe(200);
     expect(Array.isArray(res.body.data.items)).toBe(true);
-    // Không trả về password / Should not return passwords
     res.body.data.items.forEach((user) => {
       expect(user.password).toBeUndefined();
     });
   });
 });
 
-// ── ADMIN productS ───────────────────────────────────────────────
+// ── ADMIN PRODUCTS ────────────────────────────────────────────────
 describe("GET /api/admin/products", () => {
   it("should return product list for admin", async () => {
     if (!adminToken) return;

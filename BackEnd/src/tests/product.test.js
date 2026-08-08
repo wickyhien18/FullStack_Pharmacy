@@ -72,6 +72,6 @@ describe("GET /api/categories", () => {
 
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
-    expect(Array.isArray(res.body.data.items)).toBe(true);
+    expect(Array.isArray(res.body.data)).toBe(true);
   });
 });

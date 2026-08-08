@@ -461,7 +461,6 @@ function ForgotPasswordModal({ onClose }) {
 
 //Trang chính
 function AccountPage() {
-  console.log("[DEBUG] AccountPage đang render lúc:", new Date().toISOString());
   const [searchParams] = useSearchParams();
   const {
     user,
