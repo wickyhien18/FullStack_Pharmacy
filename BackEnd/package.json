@@ -1,5 +1,8 @@
 {
   "name": "pharmacy-backend",
+  "engines": {
+    "node": ">=22"
+  },
   "version": "1.0.0",
   "type": "module",
   "description": "Pharmacy E-Commerce API - inspired by NhathuocLongChau",
