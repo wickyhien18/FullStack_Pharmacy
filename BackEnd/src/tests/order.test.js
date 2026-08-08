@@ -47,7 +47,7 @@ afterAll(async () => {
     }
   }
   await prisma.user.deleteMany({
-    where: { email: { contains: "@test.pharmacy" } },
+    where: { email: orderUser.emai },
   });
   await prisma.$disconnect();
 });
