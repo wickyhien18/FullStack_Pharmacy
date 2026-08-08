@@ -32,18 +32,34 @@ jobs:
         working-directory: BackEnd
         env:
           NODE_ENV: test
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+
           JWT_ACCESS_SECRET: ${{ secrets.JWT_ACCESS_SECRET }}
           JWT_ACCESS_EXPIRES: 15m
           JWT_REFRESH_EXPIRES: 7d
-          BCRYPT_ROUNDS: 4
-          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+
+          CLIENT_URL: ${{ secrets.CLIENT_URL }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           SUPABASE_STORAGE_BUCKET: medicine-images
+
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          RESEND_FROM_EMAIL: ${{ secrets.RESEND_FROM_EMAIL }}
+
+          BCRYPT_ROUNDS: ${{ secrets.BCRYPT_ROUNDS }}
+
+          REDIS_URL: ${{ secrets.REDIS_URL }}
+
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GOOGLE_CALLBACK_URL: ${{ secrets.GOOGLE_CALLBACK_URL }}
+
+          VNP_TMN_CODE: ${{ secrets.VNP_TMN_CODE }}
+          VNP_HASH_SECRET: ${{ secrets.VNP_HASH_SECRET }}
+          VNP_URL: ${{ secrets.VNP_URL }}
+          BACKEND_URL: ${{ secrets.BACKEND_URL }}
+
           TEST_ADMIN_EMAIL: ${{ secrets.TEST_ADMIN_EMAIL }}
           TEST_ADMIN_PASSWORD: ${{ secrets.TEST_ADMIN_PASSWORD }}
           TEST_CUSTOMER_EMAIL: ${{ secrets.TEST_CUSTOMER_EMAIL }}
