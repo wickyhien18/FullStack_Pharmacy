@@ -13,6 +13,7 @@ lerna-debug.log*
 .DS_Store
 .vscode/
 .idea/
+.codex/
 *.suo
 *.ntvsca*
 *.njsproj
