@@ -2,7 +2,7 @@
 
 > A full-stack pharmacy management and e-commerce system for managing products, inventory, customer orders, authentication, and role-based administration.
 
-Modernizing and digitizing community pharmacy operations by automating prescription and OTC medicine catalog management, real-time inventory tracking, multi-channel payment processing (COD, VNPay), and multi-role workflows for pharmacists, administrators, and online customers.
+Modernizing and digitizing community pharmacy operations by automating prescription and OTC medicine catalog management, real-time inventory tracking, multi-channel payment processing (COD, VNPay), and multi-role workflows for staffs, administrators, and online customers.
 
 ![Node.js](https://img.shields.io/badge/Node.js-Express-339933?logo=node.js)
 ![JavaScript](https://img.shields.io/badge/JavaScript-ES%20Modules-F7DF1E?logo=javascript&logoColor=black)
@@ -34,7 +34,7 @@ Modernizing and digitizing community pharmacy operations by automating prescript
 
 ## Overview
 
-The Fullstack Pharmacy Management System is an end-to-end e-commerce and inventory management platform designed for pharmaceutical retail. It caters to three primary user groups: **Administrators** managing platform statistics, user roles, catalog data, and cancellation requests; **Pharmacists/Staff** fulfilling orders, updating batch inventory, and monitoring stock levels; and **Customers** browsing pharmaceutical products, managing shopping carts, placing orders, and tracking shipments. Unlike simple CRUD applications, it features transactional checkout with atomic stock deductions, double-token authentication with refresh token rotation, Redis query caching, real-time notifications, VNPay payment gateway integration, and comprehensive automated CI/CD testing.
+The Fullstack Pharmacy Management System is an end-to-end e-commerce and inventory management platform designed for pharmaceutical retail. It caters to three primary user groups: **Administrators** managing platform statistics, user roles, catalog data, and cancellation requests; **Staff** fulfilling orders, updating batch inventory, and monitoring stock levels; and **Customers** browsing pharmaceutical products, managing shopping carts, placing orders, and tracking shipments. Unlike simple CRUD applications, it features transactional checkout with atomic stock deductions, double-token authentication with refresh token rotation, Redis query caching, real-time notifications, VNPay payment gateway integration, and comprehensive automated CI/CD testing.
 
 **Role:** Full Stack Developer  
 **Timeline:** 2026  
@@ -489,18 +489,6 @@ Frontend Test Suites (FrontEnd/src/tests/):
 3. **Multi-Image Storage Pipeline**: Handled multipart form uploads with Supabase Storage, thumbnail creation, and configurable gallery display ordering.
 4. **Smart Cache Invalidation**: Optimized Redis caching for high-load catalog queries with instant cache flushing on product, category, or stock mutations.
 5. **Unified Localization Architecture**: Maintained standard English backend response codes while providing automated client-side Vietnamese translation for user notifications.
-
----
-
-## Future Roadmap
-
-- [x] Implement comprehensive CI/CD automated test suites for Backend and Frontend.
-- [x] Integrate VNPay and Cash on Delivery (COD) payment processing workflows.
-- [x] In-app real-time customer notifications and order cancellation management.
-- [ ] Exportable sales, revenue, and inventory reports in Excel / PDF format.
-- [ ] Barcode / QR-code scanning for rapid pharmacist point-of-sale counter checkout.
-- [ ] Prescription image upload and pharmacist review verification workflow.
-- [ ] Automated email receipts and shipping tracking notifications via SendGrid/Resend.
 
 ---
 
