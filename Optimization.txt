@@ -81,6 +81,8 @@ BEFORE
 /api/categories - 2047.08ms
 /api/categories/count - 2775.65ms
 
+1529,83777778
+
 AFTER
 /api/products?page=1&limit=12 - 218.91ms
 /api/products?limit=12 - 219.33ms
@@ -92,6 +94,8 @@ AFTER
 /api/products/friso-gold-3-1782486276520 - 218.39ms
 /api/categories - 222.59ms
 /api/categories/count - 222.45ms
+
+243,52
 
 --Index
 Order : 8s -> 5s 
