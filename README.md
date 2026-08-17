@@ -48,7 +48,7 @@ The Fullstack Pharmacy Management System is an end-to-end e-commerce and invento
 
 - User registration and login with JWT authentication.
 - Refresh token stored in an HttpOnly, Secure cookie with automatic rotation and device fingerprinting.
-- Role-Based Access Control (RBAC) with **3 roles**: `ROLE_ADMIN`, `ROLE_PHARMACIST` / `ROLE_STAFF`, and `ROLE_CUSTOMER`.
+- Role-Based Access Control (RBAC) with **3 roles**: `ROLE_ADMIN`,`ROLE_STAFF`, and `ROLE_CUSTOMER`.
 - Protected admin routes for dashboard, product, user, and order management.
 - Google OAuth2 authentication integration.
 - Secure email change with OTP verification via Resend.
@@ -188,7 +188,7 @@ erDiagram
 | Table               | Description                                                        | Main Relationships                                                   |
 | :------------------ | :----------------------------------------------------------------- | :------------------------------------------------------------------- |
 | `users`             | User accounts, credentials, and profiles                           | Many-to-one with `roles`; one-to-many with `orders`, `notifications` |
-| `roles`             | RBAC roles (`ROLE_ADMIN`, `ROLE_PHARMACIST`, `ROLE_CUSTOMER`)      | One-to-many with `users`                                             |
+| `roles`             | RBAC roles (`ROLE_ADMIN`, `ROLE_STAFF`, `ROLE_CUSTOMER`)           | One-to-many with `users`                                             |
 | `refresh_tokens`    | Active refresh tokens with device info & rotation                  | Many-to-one with `users`                                             |
 | `otp_verifications` | OTP verification codes for email updates                           | One-to-one with `users`                                              |
 | `categories`        | Medicine categories with slug support                              | One-to-many with `products`                                          |
