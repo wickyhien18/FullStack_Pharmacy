@@ -21,8 +21,8 @@ export const env = {
   SUPABASE_STORAGE_BUCKET:
     process.env.SUPABASE_STORAGE_BUCKET || "product-images",
   BCRYPT_ROUNDS: parseInt(process.env.BCRYPT_ROUNDS || "10"),
-  RESEND_API_KEY: requireEnv("RESEND_API_KEY"),
-  RESEND_FROM_EMAIL: process.env.RESEND_FROM_EMAIL || "noreply@example.com",
+  BREVO_API_KEY: requireEnv("BREVO_API_KEY"),
+  BREVO_SENDER_EMAIL: process.env.BREVO_SENDER_EMAIL || "noreply@example.com",
   REDIS_URL: process.env.REDIS_URL,
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || "",
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || "",

@@ -1,12 +1,27 @@
-import { Resend } from "resend";
 import { env } from "../config/env.config.js";
 
-const resend = new Resend(env.RESEND_API_KEY);
-const FROM = env.RESEND_FROM_EMAIL;
+const sendMail = async ({ to, subject, html }) => {
+  const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+    method: "POST",
+    headers: {
+      "api-key": env.BREVO_API_KEY,
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({
+      sender: { name: "Nhà Thuốc Wicky Hien", email: env.BREVO_SENDER_EMAIL },
+      to: [{ email: to }],
+      subject,
+      htmlContent: html,
+    }),
+  });
+  if (!res.ok) {
+    console.error("[Brevo] gửi thất bại:", res.status, await res.text());
+    throw { status: 502, message: "Gửi email thất bại, vui lòng thử lại sau" };
+  }
+};
 
 export const sendOTPEmail = async (toEmail, otp) => {
-  const { error } = await resend.emails.send({
-    from: `Wicky Hien Pharmacy <${FROM}>`,
+  const { error } = await sendMail({
     to: toEmail,
     subject: "Confirm email change - Your OTP code",
     html: `
@@ -47,8 +62,7 @@ export const sendOTPEmail = async (toEmail, otp) => {
 };
 
 export const sendResetPasswordEmail = async (toEmail, fullName, otp) => {
-  const { error } = await resend.emails.send({
-    from: `Wicky Hien Pharmacy <${FROM}>`,
+  const { error } = await sendMail({
     to: toEmail,
     subject: "Reset password - Your OTP code",
     html: `
@@ -97,8 +111,7 @@ export const sendOrderStatusEmail = async (
   orderCode,
   statusMessage,
 ) => {
-  const { error } = await resend.emails.send({
-    from: `Wicky Hien Pharmacy <${FROM}>`,
+  const { error } = await sendMail({
     to: toEmail,
     subject: `Order update #${orderCode}`,
     html: `
