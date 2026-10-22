@@ -25,6 +25,9 @@ afterAll(async () => {
   await prisma.$disconnect();
 });
 
+// Shared across login + refresh-token suites — set once to avoid rate-limit
+let sharedCookieHeader = "";
+
 // ── REGISTER ──────────────────────────────────────────────────────
 describe("POST /api/auth/register", () => {
   it("should register successfully with valid data", async () => {
@@ -80,6 +83,12 @@ describe("POST /api/auth/login", () => {
     expect(res.body.success).toBe(true);
     expect(res.body.data.accessToken).toBeDefined();
     expect(res.headers["set-cookie"]).toBeDefined();
+
+    // Capture cookie for reuse in refresh-token suite (avoids extra login → rate-limit)
+    const setCookie = res.headers["set-cookie"];
+    if (setCookie) {
+      sharedCookieHeader = setCookie.map((c) => c.split(";")[0]).join("; ");
+    }
   });
 
   it("should return 401 with wrong password", async () => {
@@ -121,6 +130,13 @@ describe("GET /api/auth/profile", () => {
       .post("/api/auth/login")
       .send({ email: validUser.email, password: validUser.password });
     accessToken = res.body.data?.accessToken;
+
+    // Update sharedCookieHeader with the new rotated token from this login
+    // (same device → DB overwrites previous token, so earlier cookie is stale)
+    const setCookie = res.headers["set-cookie"];
+    if (setCookie) {
+      sharedCookieHeader = setCookie.map((c) => c.split(";")[0]).join("; ");
+    }
   }, 30000);
 
   it("should return profile with valid token", async () => {
@@ -143,5 +159,39 @@ describe("GET /api/auth/profile", () => {
       .get("/api/auth/profile")
       .set("Authorization", "Bearer invalid.jwt.token");
     expect(res.status).toBe(401);
+  });
+});
+// ── REFRESH TOKEN (reload-after-login flow) ───────────────────────
+// Uses sharedCookieHeader captured during the LOGIN suite to avoid extra
+// login requests that would trip the authRateLimit middleware.
+describe("POST /api/auth/refresh-token", () => {
+  it("should return a new accessToken when a valid refreshToken cookie is sent (simulates page reload)", async () => {
+    // Guard: ensure we have a cookie from the login suite
+    expect(sharedCookieHeader).toBeTruthy();
+
+    const res = await request(app)
+      .post("/api/auth/refresh-token")
+      .set("Cookie", sharedCookieHeader);
+
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.data.accessToken).toBeDefined();
+    // Should also rotate the refreshToken cookie
+    expect(res.headers["set-cookie"]).toBeDefined();
+  });
+
+  it("should return 401 when no refreshToken cookie is sent", async () => {
+    const res = await request(app).post("/api/auth/refresh-token");
+    expect(res.status).toBe(401);
+    expect(res.body.success).toBe(false);
+  });
+
+  it("should return 401 when an invalid refreshToken is sent", async () => {
+    const res = await request(app)
+      .post("/api/auth/refresh-token")
+      .set("Cookie", "refreshToken=invalid_token_value");
+
+    expect(res.status).toBe(401);
+    expect(res.body.success).toBe(false);
   });
 });

@@ -39,15 +39,16 @@ export const configurePassport = () => {
             });
 
             if (user) {
-              // Add Google ID to this user
+              // Link Google ID to existing account, then log them in normally
               user = await prisma.user.update({
                 where: { userId: user.userId },
                 data: { googleId },
                 include: { role: true },
               });
+            } else {
+              // No account found at all — send to signup flow
+              return done(null, { pending: true, email, fullName, googleId });
             }
-
-            return done(null, { pending: true, email, fullName, googleId });
           }
 
           if (!user.isActive) {

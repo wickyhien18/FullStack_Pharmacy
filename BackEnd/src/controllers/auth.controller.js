@@ -7,7 +7,10 @@ const REFRESH_TOKEN_COOKIE = "refreshToken"; //cookie name
 const cookieOptions = {
   httpOnly: true, // Not readable by client-side JS → prevents XSS from stealing the token.
   secure: env.NODE_ENV === "production", // Only send by HTTPS at production
-  sameSite: env.NODE_ENV === "production" ? "none" : "strict", // prevents CSRF — only send token in same origin
+  // "lax" allows cookies to be set during top-level navigations/redirects (e.g. Google OAuth flow).
+  // "strict" blocks this, causing refreshToken to be lost after OAuth redirect.
+  // In production "none" is required for cross-origin (Vercel ↔ Render).
+  sameSite: env.NODE_ENV === "production" ? "none" : "lax",
   maxAge: 7 * 24 * 60 * 60 * 1000, // cookie life age = 7 days
 };
 
