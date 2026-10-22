@@ -56,9 +56,6 @@ export const sendOTPEmail = async (toEmail, otp) => {
       </div>
     `,
   });
-
-  if (error)
-    throw { status: 500, message: `Failed to send email: ${error.message}` };
 };
 
 export const sendResetPasswordEmail = async (toEmail, fullName, otp) => {
@@ -100,9 +97,6 @@ export const sendResetPasswordEmail = async (toEmail, fullName, otp) => {
       </div>
     `,
   });
-
-  if (error)
-    throw { status: 500, message: `Failed to send email: ${error.message}` };
 };
 
 export const sendOrderStatusEmail = async (
@@ -135,6 +129,4 @@ export const sendOrderStatusEmail = async (
       </div>
     `,
   });
-  if (error)
-    throw { status: 500, message: `Failed to send email: ${error.message}` };
 };
