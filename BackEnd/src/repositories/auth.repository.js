@@ -182,7 +182,7 @@ export const revokeRefreshToken = (refreshToken) => {
 //== REVOKE ALL REFRESH TOKENS BY USER ============================
 export const revokeAllRefreshTokensByUser = (userId) => {
   return prisma.refreshToken.updateMany({
-    where: { userId },
+    where: { userId, isRevoked: false },
     data: { isRevoked: true, token: "" },
   });
 };

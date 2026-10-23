@@ -21,7 +21,7 @@ const sendMail = async ({ to, subject, html }) => {
 };
 
 export const sendOTPEmail = async (toEmail, otp) => {
-  const { error } = await sendMail({
+  await sendMail({
     to: toEmail,
     subject: "Confirm email change - Your OTP code",
     html: `
@@ -59,7 +59,7 @@ export const sendOTPEmail = async (toEmail, otp) => {
 };
 
 export const sendResetPasswordEmail = async (toEmail, fullName, otp) => {
-  const { error } = await sendMail({
+  await sendMail({
     to: toEmail,
     subject: "Reset password - Your OTP code",
     html: `
@@ -105,7 +105,7 @@ export const sendOrderStatusEmail = async (
   orderCode,
   statusMessage,
 ) => {
-  const { error } = await sendMail({
+  await sendMail({
     to: toEmail,
     subject: `Order update #${orderCode}`,
     html: `
