@@ -175,7 +175,7 @@ export const updateUserPassword = (userId, hashedPasword) => {
 export const revokeRefreshToken = (refreshToken) => {
   return prisma.refreshToken.update({
     where: { token: refreshToken },
-    data: { isRevoked: true, token: "" },
+    data: { isRevoked: true },
   });
 };
 
@@ -183,7 +183,7 @@ export const revokeRefreshToken = (refreshToken) => {
 export const revokeAllRefreshTokensByUser = (userId) => {
   return prisma.refreshToken.updateMany({
     where: { userId, isRevoked: false },
-    data: { isRevoked: true, token: "" },
+    data: { isRevoked: true },
   });
 };
 

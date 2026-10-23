@@ -166,8 +166,7 @@ export const refreshToken = async (refreshToken) => {
     };
   }
 
-  if (!tokenData.isActive)
-    throw { status: 403, message: "Account is locked" };
+  if (!tokenData.isActive) throw { status: 403, message: "Account is locked" };
 
   const newToken = jwt.generateRefreshToken();
   const expireAt = getRefreshTokenExpiry();
@@ -201,7 +200,7 @@ export const logout = async (refreshToken) => {
 
 // ── LOGOUT ALL DEVICES ────────────────────────────────────────────
 export const logoutAll = async (userId) => {
-  await authRepository.deleteRefreshTokensByUserId(userId);
+  await authRepository.revokeAllRefreshTokensByUser(userId);
 };
 
 // ── GET PROFILE ───────────────────────────────────────────────────
@@ -216,7 +215,7 @@ export const getProfile = async (userId) => {
 // ── UPDATE PROFILE (FULLNAME OR PHONE) ───────────────────────────
 export const updateProfile = async (userId, { fullName, phone }) => {
   if (phone) {
-    const existing = await authRepository.findUserByPhone(phone, userId);
+    const existing = await authRepository.existUserPhone(phone, userId);
     if (existing)
       throw { status: 409, message: "Phone number is already in use" };
   }
@@ -235,9 +234,15 @@ export const changePassword = async (
   { currentPassword, newPassword },
 ) => {
   if (!currentPassword || !newPassword)
-    throw { status: 400, message: "Please enter both current and new passwords" };
+    throw {
+      status: 400,
+      message: "Please enter both current and new passwords",
+    };
   if (currentPassword === newPassword)
-    throw { status: 400, message: "New password must be different from the current password" };
+    throw {
+      status: 400,
+      message: "New password must be different from the current password",
+    };
   const PASSWORD_REGEX =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[_@$!%*?&])[A-Za-z\d_@$!%*?&]{8,}$/;
   if (!PASSWORD_REGEX.test(newPassword)) {
@@ -289,8 +294,7 @@ export const verifyEmailChange = async (userId, otp) => {
   if (!otp) throw { status: 400, message: "Please enter the OTP" };
 
   const record = await authRepository.findEmailOTP(userId);
-  if (!record)
-    throw { status: 404, message: "Email change request not found" };
+  if (!record) throw { status: 404, message: "Email change request not found" };
 
   if (record.expiresAt < new Date())
     throw { status: 400, message: "OTP has expired. Please resend it." };
